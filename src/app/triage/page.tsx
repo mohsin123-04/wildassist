@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
+import PhotoIdentify from "@/components/PhotoIdentify";
 import {
   ANIMAL_TYPES,
   SITUATIONS,
@@ -20,6 +21,8 @@ export default function TriagePage() {
   const [animal, setAnimal] = useState<AnimalType | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
   const [description, setDescription] = useState("");
+  const [photoHint, setPhotoHint] = useState("");
+  const [showPhoto, setShowPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
 
@@ -30,6 +33,8 @@ export default function TriagePage() {
     setAnimal(null);
     setSituation(null);
     setDescription("");
+    setPhotoHint("");
+    setShowPhoto(false);
     setResult(null);
     setStep("animal");
   }
@@ -37,11 +42,14 @@ export default function TriagePage() {
   async function submit() {
     if (!animal || !situation) return;
     setLoading(true);
+    const fullDescription = photoHint
+      ? `Photo analysis suggests it may be a ${photoHint}. ${description}`.trim()
+      : description;
     try {
       const res = await fetch("/api/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ animal, situation, description }),
+        body: JSON.stringify({ animal, situation, description: fullDescription }),
       });
       if (!res.ok) throw new Error("bad response");
       setResult(await res.json());
@@ -80,7 +88,11 @@ export default function TriagePage() {
                   setAnimal(a.value);
                   setStep("situation");
                 }}
-                className="flex flex-col items-start gap-2 rounded-2xl border border-black/10 bg-white p-4 text-left transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+                className={`flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left transition-colors hover:border-emerald-400 hover:bg-emerald-50 ${
+                  animal === a.value
+                    ? "border-emerald-500 ring-1 ring-emerald-500"
+                    : "border-black/10"
+                }`}
               >
                 <span aria-hidden className="text-2xl">
                   {a.icon}
@@ -88,6 +100,24 @@ export default function TriagePage() {
                 <span className="font-medium">{a.label}</span>
               </button>
             ))}
+          </div>
+
+          <div className="mt-1">
+            {!showPhoto ? (
+              <button
+                onClick={() => setShowPhoto(true)}
+                className="text-sm font-medium text-emerald-700 underline underline-offset-4"
+              >
+                📷 Not sure? Identify it with a photo
+              </button>
+            ) : (
+              <PhotoIdentify
+                onIdentify={(detected, hint) => {
+                  setPhotoHint(hint);
+                  if (detected) setAnimal(detected);
+                }}
+              />
+            )}
           </div>
         </Section>
       )}
