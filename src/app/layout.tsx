@@ -32,7 +32,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <span aria-hidden className="text-lg">🦉</span>
               <span>WildAssist</span>
             </Link>
-            <span className="text-xs text-emerald-700/80">Ontario</span>
+            <Link
+              href="/emergency"
+              className="text-sm font-medium text-emerald-700 hover:text-emerald-900"
+            >
+              Emergency info
+            </Link>
           </div>
         </header>
         <div className="flex flex-1 flex-col">{children}</div>

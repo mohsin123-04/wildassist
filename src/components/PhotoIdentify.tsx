@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Spinner from "@/components/Spinner";
 import { classifyPredictions, type Prediction } from "@/lib/vision";
 import type { AnimalType } from "@/lib/triage";
 
@@ -99,8 +100,8 @@ export default function PhotoIdentify({
         className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-600 px-6 font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
       >
         {status === "idle" && "📷 Take or choose a photo"}
-        {status === "loading-model" && "Loading model…"}
-        {status === "classifying" && "Looking…"}
+        {status === "loading-model" && <Spinner label="Loading model…" />}
+        {status === "classifying" && <Spinner label="Looking…" />}
         {(status === "done" || status === "error") && "Try another photo"}
       </button>
 

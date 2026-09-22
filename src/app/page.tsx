@@ -2,7 +2,8 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-8 px-5 py-16 text-center">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-gradient-to-b from-emerald-50 to-transparent px-5 py-16 text-center">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8">
       <div className="flex flex-col items-center gap-4">
         <span aria-hidden className="text-5xl">🐦</span>
         <h1 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
@@ -14,12 +15,20 @@ export default function Home() {
         </p>
       </div>
 
-      <Link
-        href="/triage"
-        className="inline-flex h-14 items-center justify-center rounded-full bg-emerald-700 px-8 text-lg font-medium text-white shadow-sm transition-colors hover:bg-emerald-800"
-      >
-        Get help now
-      </Link>
+      <div className="flex flex-col items-center gap-3">
+        <Link
+          href="/triage"
+          className="inline-flex h-14 items-center justify-center rounded-full bg-emerald-700 px-8 text-lg font-medium text-white shadow-sm transition-colors hover:bg-emerald-800"
+        >
+          Get help now
+        </Link>
+        <Link
+          href="/emergency"
+          className="text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+        >
+          Or see emergency basics
+        </Link>
+      </div>
 
       <div className="mt-4 grid w-full gap-3 text-left sm:grid-cols-3">
         {[
@@ -44,6 +53,7 @@ export default function Home() {
         Sometimes the best thing you can do is leave it be — we&apos;ll help you tell
         the difference.
       </p>
+      </div>
     </main>
   );
 }

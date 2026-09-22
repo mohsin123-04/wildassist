@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
+import Spinner from "@/components/Spinner";
 import {
   ANIMAL_TYPES,
   SITUATIONS,
@@ -168,7 +169,7 @@ export default function TriagePage() {
               disabled={loading}
               className="inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-8 font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-60"
             >
-              {loading ? "Thinking…" : "Get advice"}
+              {loading ? <Spinner label="Thinking…" /> : "Get advice"}
             </button>
             <button
               onClick={() => setStep("situation")}
