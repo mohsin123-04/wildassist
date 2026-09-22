@@ -9,28 +9,55 @@ import {
   recommend,
   type AnimalType,
   type Situation,
+  type Recommendation,
 } from "@/lib/triage";
 
-type Step = "animal" | "situation" | "result";
+type Step = "animal" | "situation" | "details" | "result";
+type Result = Recommendation & { source?: "ai" | "rules" };
 
 export default function TriagePage() {
   const [step, setStep] = useState<Step>("animal");
   const [animal, setAnimal] = useState<AnimalType | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<Result | null>(null);
 
-  const stepIndex = step === "animal" ? 0 : step === "situation" ? 1 : 2;
+  const stepIndex =
+    step === "animal" ? 0 : step === "situation" ? 1 : step === "details" ? 2 : 3;
 
   function reset() {
     setAnimal(null);
     setSituation(null);
+    setDescription("");
+    setResult(null);
     setStep("animal");
+  }
+
+  async function submit() {
+    if (!animal || !situation) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/triage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ animal, situation, description }),
+      });
+      if (!res.ok) throw new Error("bad response");
+      setResult(await res.json());
+    } catch {
+      // Network/API failure → deterministic client-side fallback.
+      setResult({ ...recommend(animal, situation), source: "rules" });
+    } finally {
+      setLoading(false);
+      setStep("result");
+    }
   }
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
-      {/* Progress */}
       <div className="mb-6 flex items-center gap-2">
-        {[0, 1, 2].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full ${
@@ -76,7 +103,7 @@ export default function TriagePage() {
                 key={s.value}
                 onClick={() => {
                   setSituation(s.value);
-                  setStep("result");
+                  setStep("details");
                 }}
                 className="rounded-xl border border-black/10 bg-white px-4 py-3 text-left transition-colors hover:border-emerald-400 hover:bg-emerald-50"
               >
@@ -93,8 +120,38 @@ export default function TriagePage() {
         </Section>
       )}
 
-      {step === "result" && animal && situation && (
-        <Result animal={animal} situation={situation} onRestart={reset} />
+      {step === "details" && (
+        <Section
+          title="Tell us a bit more"
+          subtitle="In your own words — the more detail, the better the guidance. (Optional)"
+        >
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g. A small bird has been sitting under a tree for an hour, hopping but not flying. There's a cat in the yard."
+            rows={5}
+            className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 outline-none focus:border-emerald-400"
+          />
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              onClick={submit}
+              disabled={loading}
+              className="inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-8 font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-60"
+            >
+              {loading ? "Thinking…" : "Get advice"}
+            </button>
+            <button
+              onClick={() => setStep("situation")}
+              className="text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-700"
+            >
+              ← Back
+            </button>
+          </div>
+        </Section>
+      )}
+
+      {step === "result" && animal && result && (
+        <ResultView animal={animal} result={result} onRestart={reset} />
       )}
     </main>
   );
@@ -120,28 +177,26 @@ function Section({
   );
 }
 
-function Result({
+function ResultView({
   animal,
-  situation,
+  result,
   onRestart,
 }: {
   animal: AnimalType;
-  situation: Situation;
+  result: Result;
   onRestart: () => void;
 }) {
-  const rec = recommend(animal, situation);
-
   const accent =
-    rec.verdict === "help"
+    result.verdict === "help"
       ? "border-red-200 bg-red-50"
-      : rec.verdict === "leave"
+      : result.verdict === "leave"
         ? "border-emerald-200 bg-emerald-50"
         : "border-amber-200 bg-amber-50";
 
   const badge =
-    rec.verdict === "help"
+    result.verdict === "help"
       ? { text: "Needs help", cls: "bg-red-600" }
-      : rec.verdict === "leave"
+      : result.verdict === "leave"
         ? { text: "Leave it alone", cls: "bg-emerald-600" }
         : { text: "Check with an expert", cls: "bg-amber-600" };
 
@@ -154,15 +209,15 @@ function Result({
           {badge.text}
         </span>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
-          {rec.title}
+          {result.title}
         </h1>
-        <p className="mt-2 leading-7 text-zinc-700">{rec.reasoning}</p>
+        <p className="mt-2 leading-7 text-zinc-700">{result.reasoning}</p>
       </div>
 
       <div>
         <h2 className="mb-2 font-semibold">What to do</h2>
         <ol className="flex flex-col gap-2">
-          {rec.steps.map((s, i) => (
+          {result.steps.map((s, i) => (
             <li
               key={i}
               className="flex gap-3 rounded-xl border border-black/5 bg-white p-3"
@@ -176,7 +231,7 @@ function Result({
         </ol>
       </div>
 
-      {rec.showContactCentre && <CentreFinder animal={animal} />}
+      {result.showContactCentre && <CentreFinder animal={animal} />}
 
       <div className="flex flex-wrap gap-3 pt-2">
         <button
@@ -196,6 +251,7 @@ function Result({
       <p className="pt-2 text-xs leading-5 text-zinc-400">
         This is general guidance from an early prototype, not veterinary advice.
         When in doubt, always contact a licensed wildlife rehabilitator.
+        {result.source === "rules" && " (Offline guidance mode.)"}
       </p>
     </div>
   );
