@@ -1,15 +1,12 @@
 /**
- * Triage decision logic (PLACEHOLDER).
+ * Triage types, options, and a deterministic rule engine used as a fallback
+ * when the LLM is unavailable.
  *
- * This is deliberately isolated from the UI so it can be swapped out later for
- * the real engine: a vision model (species ID from a photo) + an LLM grounded
- * via RAG in vetted Ontario wildlife-rehabilitation guidance.
- *
- * ⚠️ The rules below are simplified stand-ins, NOT authoritative wildlife advice.
- * They intentionally err toward "contact a licensed rehabilitator" whenever there
- * is any doubt. Real guidance must be sourced from reputable organizations
- * (e.g. Toronto Wildlife Centre, Ontario SPCA, wildlife rehab councils) before
- * this ships to real users.
+ * The advice here is paraphrased from reputable wildlife-rehabilitation sources
+ * (Toronto Wildlife Centre, Ontario SPCA, International Wildlife Rehabilitation
+ * Council, Ontario Turtle Conservation Centre, Ontario Nature). It errs toward
+ * "contact a licensed rehabilitator" whenever there is doubt. See lib/guidance.ts
+ * for the fuller knowledge base the LLM draws on.
  */
 
 export type AnimalType = "bird" | "mammal" | "reptile" | "unsure";
@@ -18,8 +15,12 @@ export type Situation =
   | "bleeding"
   | "hit-by-vehicle"
   | "caught-by-pet"
+  | "window-strike"
   | "cant-move"
-  | "seems-orphaned"
+  | "entangled"
+  | "cold-wet-still"
+  | "baby-alone"
+  | "nest-destroyed"
   | "looks-fine-worried"
   | "something-else";
 
@@ -42,66 +43,109 @@ export const ANIMAL_TYPES: { value: AnimalType; label: string; icon: string }[] 
 ];
 
 export const SITUATIONS: { value: Situation; label: string }[] = [
-  { value: "bleeding", label: "It's bleeding or has a visible injury" },
+  { value: "bleeding", label: "It's bleeding or has an open wound" },
   { value: "hit-by-vehicle", label: "It was hit by a car or bike" },
-  { value: "caught-by-pet", label: "A cat or dog caught it" },
-  { value: "cant-move", label: "It can't move, fly, or stand normally" },
-  { value: "seems-orphaned", label: "It's a baby and seems alone" },
+  { value: "caught-by-pet", label: "A cat or dog got it" },
+  { value: "window-strike", label: "It flew into a window" },
+  { value: "cant-move", label: "It can't stand, fly, or move normally" },
+  { value: "entangled", label: "It's trapped, tangled, or stuck" },
+  { value: "cold-wet-still", label: "It's cold, wet, weak, or very still" },
+  { value: "baby-alone", label: "It's a baby and seems alone" },
+  { value: "nest-destroyed", label: "Its nest fell or was destroyed" },
   { value: "looks-fine-worried", label: "It looks okay but I'm worried" },
   { value: "something-else", label: "Something else" },
 ];
 
 const CONTAIN_STEPS = [
   "Keep people and pets far away to reduce its stress.",
-  "If it's safe, gently place it in a ventilated cardboard box lined with a towel.",
-  "Keep it somewhere warm, dark, and quiet. Do not offer food or water.",
-  "Do not handle it more than necessary, and wash your hands afterward.",
+  "If it's safe, gently move it into a ventilated cardboard box lined with a soft towel. Use a box it can't see out of, not a wire cage.",
+  "Keep the box somewhere warm, dark, and quiet, and don't keep checking on it.",
+  "Do not offer any food or water, and handle it as little as possible.",
 ];
 
-/**
- * These situations indicate clear trauma, so the animal almost always needs a
- * licensed rehabilitator regardless of species.
- */
+/** Situations that almost always mean the animal needs a rehabilitator. */
 const CLEAR_TRAUMA: Situation[] = [
   "bleeding",
   "hit-by-vehicle",
-  "caught-by-pet",
   "cant-move",
+  "entangled",
+  "cold-wet-still",
 ];
 
 export function recommend(
   animal: AnimalType,
   situation: Situation
 ): Recommendation {
-  // Clear trauma → needs help.
   if (CLEAR_TRAUMA.includes(situation)) {
-    const catDogNote =
-      situation === "caught-by-pet"
-        ? " Cat and dog saliva can cause fatal infections in wildlife, so even small wounds need professional care."
-        : "";
     return {
       verdict: "help",
       title: "This animal likely needs help",
       reasoning:
-        "The situation you described points to a possible injury." + catDogNote,
+        "What you've described points to injury, illness, or distress. An animal in this state needs a licensed wildlife rehabilitator as soon as possible.",
       steps: CONTAIN_STEPS,
       showContactCentre: true,
     };
   }
 
-  // "Seems orphaned" is the classic case where intervention is often wrong.
-  if (situation === "seems-orphaned") {
+  if (situation === "caught-by-pet") {
+    return {
+      verdict: "help",
+      title: "It needs care, even if it looks fine",
+      reasoning:
+        "Cat and dog saliva carries bacteria that cause deadly infections in wildlife, often within a day or two. Even a tiny scratch needs prompt antibiotic treatment, so this should always be seen by a rehabilitator.",
+      steps: [
+        "Gently contain it in a ventilated box with a soft towel, away from the pet.",
+        "Keep it warm, dark, and quiet, and avoid handling it.",
+        "Do not offer food or water.",
+        "Contact a wildlife rehabilitator right away. Timing matters here.",
+      ],
+      showContactCentre: true,
+    };
+  }
+
+  if (situation === "window-strike") {
+    return {
+      verdict: "uncertain",
+      title: "It may just be stunned",
+      reasoning:
+        "Birds are often dazed after hitting a window and can recover on their own. But keep it safe from predators while it rests, and watch for signs of real injury.",
+      steps: [
+        "Gently place it in a ventilated box or paper bag it can't see out of.",
+        "Keep it somewhere warm, dark, and quiet, with no food or water.",
+        "Leave it undisturbed for about an hour, then check if it's alert.",
+        "If it can fly, release it outside. If not, or if it's visibly injured, contact a rehabilitator.",
+      ],
+      showContactCentre: true,
+    };
+  }
+
+  if (situation === "baby-alone") {
     return {
       verdict: "uncertain",
       title: "It may not actually need rescuing",
       reasoning:
-        "Many baby animals that look abandoned are being cared for by a parent " +
-        "who is nearby or only returns occasionally. Removing them can do harm. " +
-        "But some are genuinely orphaned, so it's worth checking with an expert before acting.",
+        "Many baby animals that look abandoned are still being cared for by a parent who forages nearby and returns only occasionally. Removing them does real harm. Some are genuinely orphaned, so it's worth checking before acting.",
       steps: [
-        "Watch from a distance for a few hours without touching the animal.",
-        "Keep pets and children away so a parent feels safe returning.",
-        "If it's clearly injured, cold, or a parent is known to be dead, treat it as needing help.",
+        "Watch from a distance for a few hours without touching it. Keep pets and children away so a parent feels safe returning.",
+        "For baby birds, a feathered bird hopping on the ground is usually a normal fledgling. Leave it be.",
+        "Signs it does need help: it's injured, cold, wet, crying non-stop, covered in insects, or you know the parent is dead.",
+        "If any of those are true, contain it gently and contact a rehabilitator.",
+      ],
+      showContactCentre: true,
+    };
+  }
+
+  if (situation === "nest-destroyed") {
+    return {
+      verdict: "uncertain",
+      title: "You may be able to reunite them",
+      reasoning:
+        "A displaced nest can often be restored, and parents will usually keep caring for their young. It's best to try to renest before assuming the babies are orphaned.",
+      steps: [
+        "If the babies look unhurt, place them and any nesting material into a small container and secure it as close as possible to the original spot.",
+        "Watch from a distance for a couple of hours to see if a parent returns.",
+        "Keep pets and people well away from the area.",
+        "If a parent doesn't return, or a baby is injured or cold, contact a rehabilitator.",
       ],
       showContactCentre: true,
     };
@@ -112,27 +156,23 @@ export function recommend(
       verdict: "leave",
       title: "It's probably best to leave it alone",
       reasoning:
-        "If the animal looks alert and uninjured, intervening usually does more " +
-        "harm than good. Wild animals are easily stressed by human contact.",
+        "If the animal looks alert and uninjured, stepping in usually does more harm than good. Wild animals are easily stressed by human contact.",
       steps: [
         "Give it space and keep pets indoors or away.",
         "Check back later from a distance to see if it has moved on.",
-        "If its condition changes or it still hasn't moved after several hours, come back and start over.",
+        "If its condition changes or it still hasn't moved after several hours, start over and tell us what's different.",
       ],
       showContactCentre: false,
     };
   }
 
-  // Default / "something else" / unknown → be cautious and route to an expert.
   return {
     verdict: "uncertain",
-    title: "Let's get a real expert involved",
+    title: "Let's get an expert's eyes on it",
     reasoning:
-      "From what you've told us, it's hard to be sure. When in doubt, a licensed " +
-      "wildlife rehabilitator can tell you the right thing to do. It's always " +
-      "safest to ask before acting.",
+      "From what you've told us it's hard to be certain. When in doubt, a licensed wildlife rehabilitator can tell you the right thing to do. It's always safest to ask before acting.",
     steps: [
-      "Don't attempt treatment yourself.",
+      "Don't attempt any treatment yourself.",
       "Keep people and pets away from the animal.",
       "Note the exact location so a rehabilitator can advise or respond.",
     ],
