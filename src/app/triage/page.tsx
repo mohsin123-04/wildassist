@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import CentreFinder from "@/components/CentreFinder";
 import {
   ANIMAL_TYPES,
   SITUATIONS,
@@ -175,21 +176,7 @@ function Result({
         </ol>
       </div>
 
-      {rec.showContactCentre && (
-        <div className="rounded-2xl border border-emerald-200 bg-white p-5">
-          <h2 className="font-semibold">Find a wildlife centre near you</h2>
-          <p className="mt-1 text-sm text-zinc-600">
-            Coming soon: we&apos;ll use your location to point you to the nearest
-            centre that can take this animal.
-          </p>
-          <button
-            disabled
-            className="mt-3 inline-flex h-11 cursor-not-allowed items-center justify-center rounded-full bg-emerald-600/40 px-6 font-medium text-white"
-          >
-            Find nearest centre (coming soon)
-          </button>
-        </div>
-      )}
+      {rec.showContactCentre && <CentreFinder animal={animal} />}
 
       <div className="flex flex-wrap gap-3 pt-2">
         <button
