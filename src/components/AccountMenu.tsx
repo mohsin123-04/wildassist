@@ -10,7 +10,9 @@ export default function AccountMenu() {
   const router = useRouter();
   // undefined = still checking, null = logged out, User = logged in
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [centreName, setCentreName] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -21,22 +23,35 @@ export default function AccountMenu() {
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (!session?.user) setCentreName(null);
+      if (!session?.user) {
+        setCentreName(null);
+        setDisplayName(null);
+      }
     });
 
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  // Load the linked centre name for the subtitle.
+  // Refresh the menu's display when the profile page saves changes.
+  useEffect(() => {
+    function bump() {
+      setReload((n) => n + 1);
+    }
+    window.addEventListener("profile-updated", bump);
+    return () => window.removeEventListener("profile-updated", bump);
+  }, []);
+
+  // Load the display name and linked centre for the menu.
   useEffect(() => {
     if (!user) return;
     const supabase = createClient();
     supabase
       .from("profiles")
-      .select("centres(name)")
+      .select("full_name, centres(name)")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
+        setDisplayName(data?.full_name ?? null);
         const centres = data?.centres as
           | { name: string }
           | { name: string }[]
@@ -44,7 +59,7 @@ export default function AccountMenu() {
         const name = Array.isArray(centres) ? centres[0]?.name : centres?.name;
         setCentreName(name ?? null);
       });
-  }, [user]);
+  }, [user, reload]);
 
   // Close the dropdown on outside click.
   useEffect(() => {
@@ -83,7 +98,8 @@ export default function AccountMenu() {
   }
 
   const email = user.email ?? "Account";
-  const initial = email.charAt(0).toUpperCase();
+  const label = displayName || email;
+  const initial = label.charAt(0).toUpperCase();
 
   return (
     <div className="relative" ref={menuRef}>
@@ -95,7 +111,7 @@ export default function AccountMenu() {
           {initial}
         </span>
         <span className="hidden max-w-[10rem] truncate text-sm font-medium text-emerald-950 sm:block">
-          {email}
+          {label}
         </span>
         <span
           aria-hidden
@@ -114,10 +130,10 @@ export default function AccountMenu() {
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-emerald-950">
-                  {email}
+                  {label}
                 </p>
                 <p className="truncate text-xs text-zinc-500">
-                  {centreName ?? "No centre linked yet"}
+                  {displayName ? email : (centreName ?? "No centre linked yet")}
                 </p>
               </div>
             </div>
@@ -128,6 +144,13 @@ export default function AccountMenu() {
             className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             Dashboard
+          </Link>
+          <Link
+            href="/profile"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+          >
+            Profile
           </Link>
           <button
             onClick={signOut}
