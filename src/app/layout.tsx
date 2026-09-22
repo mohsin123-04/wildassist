@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,17 +49,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
             <div className="flex items-center gap-2">
               <Link
-                href="/dashboard"
-                className="hidden px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:text-emerald-800 sm:block"
-              >
-                Staff
-              </Link>
-              <Link
                 href="/emergency"
-                className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                className="text-sm font-medium text-zinc-500 transition-colors hover:text-emerald-800"
               >
                 Emergency
               </Link>
+              <AccountMenu />
             </div>
           </div>
         </header>

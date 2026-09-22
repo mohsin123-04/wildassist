@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import CentreOnboarding from "./CentreOnboarding";
 import CaseList, { type CaseRow } from "./CaseList";
-import SignOutButton from "./SignOutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +29,6 @@ export default async function DashboardPage() {
 
     return (
       <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-8">
-        <Header email={user.email} />
         <CentreOnboarding centres={centres ?? []} />
       </main>
     );
@@ -50,7 +48,6 @@ export default async function DashboardPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
-      <Header email={user.email} />
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
           Centre dashboard
@@ -64,14 +61,5 @@ export default async function DashboardPage() {
       </div>
       <CaseList initialCases={(cases ?? []) as CaseRow[]} />
     </main>
-  );
-}
-
-function Header({ email }: { email?: string }) {
-  return (
-    <div className="mb-6 flex items-center justify-between border-b border-black/5 pb-4">
-      <p className="text-sm text-zinc-500">{email}</p>
-      <SignOutButton />
-    </div>
   );
 }

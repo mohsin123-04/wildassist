@@ -5,8 +5,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * Refreshes the Supabase auth session on every request so Server Components
  * always see a valid session. If Supabase env vars are absent (e.g. before
  * setup), it passes through untouched so the app still runs.
+ *
+ * (Next.js 16 renamed Middleware to Proxy; behaviour is unchanged.)
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
