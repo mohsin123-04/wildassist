@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
@@ -13,6 +13,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "WildAssist — Found an injured animal?",
   description:
@@ -23,27 +29,37 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="border-b border-black/5 bg-white/70 backdrop-blur">
+        <header className="sticky top-0 z-20 border-b border-black/5 bg-[var(--background)]/80 backdrop-blur-md">
           <div className="mx-auto flex w-full max-w-2xl items-center justify-between px-5 py-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-              <span aria-hidden className="text-lg">🦉</span>
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-emerald-900"
+            >
+              <span
+                aria-hidden
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-base"
+              >
+                🦉
+              </span>
               <span>WildAssist</span>
             </Link>
             <Link
               href="/emergency"
-              className="text-sm font-medium text-emerald-700 hover:text-emerald-900"
+              className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
             >
-              Emergency info
+              Emergency
             </Link>
           </div>
         </header>
+
         <div className="flex flex-1 flex-col">{children}</div>
-        <footer className="border-t border-black/5 px-5 py-4 text-center text-xs text-zinc-500">
-          WildAssist offers general guidance only. In an emergency, contact a licensed
-          wildlife rehabilitator directly.
+
+        <footer className="border-t border-black/5 px-5 py-5 text-center text-xs leading-5 text-zinc-500">
+          WildAssist offers general guidance only. In an emergency, contact a
+          licensed wildlife rehabilitator directly.
         </footer>
       </body>
     </html>

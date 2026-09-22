@@ -75,7 +75,7 @@ export default function PhotoIdentify({
   const busy = status === "loading-model" || status === "classifying";
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-4">
+    <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
       <input
         ref={inputRef}
         type="file"
@@ -97,7 +97,7 @@ export default function PhotoIdentify({
       <button
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-600 px-6 font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+        className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
       >
         {status === "idle" && "📷 Take or choose a photo"}
         {status === "loading-model" && <Spinner label="Loading model…" />}

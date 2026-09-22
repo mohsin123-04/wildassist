@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const DOS = [
   "Keep people and pets well away to reduce the animal's stress.",
-  "If the animal is in a dangerous spot (like a road) and it's safe for you, note the exact location.",
+  "If the animal is somewhere dangerous (like a road) and it's safe for you, note the exact location.",
   "If advised to contain it, use a ventilated cardboard box lined with a towel, kept warm, dark, and quiet.",
   "Call a licensed wildlife rehabilitator before acting whenever you can.",
 ];
@@ -23,13 +23,16 @@ const DONTS = [
 
 export default function EmergencyPage() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-5 py-8">
+    <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-5 py-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+          Quick reference
+        </p>
+        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-emerald-950">
           Wildlife emergency basics
         </h1>
-        <p className="mt-1 text-zinc-600">
-          A quick reference while you get expert help. Not sure what you&apos;re
+        <p className="mt-2 text-zinc-600">
+          A fast reference while you get expert help. Not sure what you&apos;re
           dealing with?{" "}
           <Link
             href="/triage"
@@ -41,38 +44,48 @@ export default function EmergencyPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-emerald-200 bg-white p-5">
-        <h2 className="font-semibold">Reach a wildlife hotline</h2>
-        <p className="mt-1 text-sm text-zinc-600">
+      <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
+        <h2 className="font-display text-lg font-semibold text-emerald-950">
+          Reach a wildlife hotline
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-zinc-600">
           The Toronto Wildlife Centre runs a hotline that can advise on most
           Ontario situations.
         </p>
         <a
           href="tel:4166310662"
-          className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white transition-colors hover:bg-emerald-800"
+          className="mt-4 inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-7 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98]"
         >
-          Call 416-631-0662
+          📞 Call 416-631-0662
         </a>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <h2 className="mb-2 font-semibold text-emerald-900">Do</h2>
-          <ul className="flex flex-col gap-2 text-sm text-emerald-950">
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
+          <h2 className="mb-3 font-display text-lg font-semibold text-emerald-900">
+            Do
+          </h2>
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-emerald-950">
             {DOS.map((d, i) => (
               <li key={i} className="flex gap-2">
-                <span aria-hidden>✅</span>
+                <span aria-hidden className="text-emerald-600">
+                  ✓
+                </span>
                 <span>{d}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
-          <h2 className="mb-2 font-semibold text-red-900">Don&apos;t</h2>
-          <ul className="flex flex-col gap-2 text-sm text-red-950">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6">
+          <h2 className="mb-3 font-display text-lg font-semibold text-rose-900">
+            Don&apos;t
+          </h2>
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-rose-950">
             {DONTS.map((d, i) => (
               <li key={i} className="flex gap-2">
-                <span aria-hidden>⛔</span>
+                <span aria-hidden className="text-rose-500">
+                  ✕
+                </span>
                 <span>{d}</span>
               </li>
             ))}
@@ -83,13 +96,13 @@ export default function EmergencyPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 font-medium text-white transition-colors hover:bg-zinc-700"
+          className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white transition-colors hover:bg-emerald-800"
         >
           Start guided help
         </Link>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
+          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
         >
           Home
         </Link>

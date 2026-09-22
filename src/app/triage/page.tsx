@@ -17,6 +17,8 @@ import {
 type Step = "animal" | "situation" | "details" | "result";
 type Result = Recommendation & { source?: "ai" | "rules" };
 
+const STEP_ORDER: Step[] = ["animal", "situation", "details", "result"];
+
 export default function TriagePage() {
   const [step, setStep] = useState<Step>("animal");
   const [animal, setAnimal] = useState<AnimalType | null>(null);
@@ -27,8 +29,7 @@ export default function TriagePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
 
-  const stepIndex =
-    step === "animal" ? 0 : step === "situation" ? 1 : step === "details" ? 2 : 3;
+  const stepIndex = STEP_ORDER.indexOf(step);
 
   function reset() {
     setAnimal(null);
@@ -55,7 +56,6 @@ export default function TriagePage() {
       if (!res.ok) throw new Error("bad response");
       setResult(await res.json());
     } catch {
-      // Network/API failure → deterministic client-side fallback.
       setResult({ ...recommend(animal, situation), source: "rules" });
     } finally {
       setLoading(false);
@@ -64,13 +64,14 @@ export default function TriagePage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
-      <div className="mb-6 flex items-center gap-2">
-        {[0, 1, 2, 3].map((i) => (
+    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-8">
+      {/* Progress */}
+      <div className="mb-8 flex items-center gap-1.5">
+        {STEP_ORDER.map((s, i) => (
           <div
-            key={i}
-            className={`h-1.5 flex-1 rounded-full ${
-              i <= stepIndex ? "bg-emerald-600" : "bg-black/10"
+            key={s}
+            className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
+              i <= stepIndex ? "bg-emerald-600" : "bg-emerald-600/15"
             }`}
           />
         ))}
@@ -78,7 +79,9 @@ export default function TriagePage() {
 
       {step === "animal" && (
         <Section
-          title="What kind of animal did you find?"
+          key="animal"
+          eyebrow="Step 1 of 3"
+          title="What did you find?"
           subtitle="A rough idea is fine — pick the closest match."
         >
           <div className="grid grid-cols-2 gap-3">
@@ -89,25 +92,25 @@ export default function TriagePage() {
                   setAnimal(a.value);
                   setStep("situation");
                 }}
-                className={`flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left transition-colors hover:border-emerald-400 hover:bg-emerald-50 ${
+                className={`group flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
                   animal === a.value
-                    ? "border-emerald-500 ring-1 ring-emerald-500"
-                    : "border-black/10"
+                    ? "border-emerald-500 ring-2 ring-emerald-500/30"
+                    : "border-black/5"
                 }`}
               >
-                <span aria-hidden className="text-2xl">
+                <span aria-hidden className="text-3xl">
                   {a.icon}
                 </span>
-                <span className="font-medium">{a.label}</span>
+                <span className="font-medium text-emerald-950">{a.label}</span>
               </button>
             ))}
           </div>
 
-          <div className="mt-1">
+          <div className="mt-2">
             {!showPhoto ? (
               <button
                 onClick={() => setShowPhoto(true)}
-                className="text-sm font-medium text-emerald-700 underline underline-offset-4"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-900"
               >
                 📷 Not sure? Identify it with a photo
               </button>
@@ -125,10 +128,13 @@ export default function TriagePage() {
 
       {step === "situation" && (
         <Section
+          key="situation"
+          eyebrow="Step 2 of 3"
           title="What's going on with it?"
-          subtitle="Choose the option that best describes what you're seeing."
+          subtitle="Choose the option that best fits what you're seeing."
+          onBack={() => setStep("animal")}
         >
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {SITUATIONS.map((s) => (
               <button
                 key={s.value}
@@ -136,48 +142,43 @@ export default function TriagePage() {
                   setSituation(s.value);
                   setStep("details");
                 }}
-                className="rounded-xl border border-black/10 bg-white px-4 py-3 text-left transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+                className="group flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3.5 text-left shadow-sm transition-all hover:border-emerald-400 hover:shadow-md"
               >
-                {s.label}
+                <span className="text-emerald-950">{s.label}</span>
+                <span
+                  aria-hidden
+                  className="text-emerald-400 transition-transform group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
               </button>
             ))}
           </div>
-          <button
-            onClick={() => setStep("animal")}
-            className="mt-5 text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-700"
-          >
-            ← Back
-          </button>
         </Section>
       )}
 
       {step === "details" && (
         <Section
+          key="details"
+          eyebrow="Step 3 of 3"
           title="Tell us a bit more"
-          subtitle="In your own words — the more detail, the better the guidance. (Optional)"
+          subtitle="In your own words — the more detail, the better the guidance. Optional."
+          onBack={() => setStep("situation")}
         >
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g. A small bird has been sitting under a tree for an hour, hopping but not flying. There's a cat in the yard."
+            placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
             rows={5}
-            className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 outline-none focus:border-emerald-400"
+            className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
           />
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-8 font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-60"
-            >
-              {loading ? <Spinner label="Thinking…" /> : "Get advice"}
-            </button>
-            <button
-              onClick={() => setStep("situation")}
-              className="text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-700"
-            >
-              ← Back
-            </button>
-          </div>
+          <button
+            onClick={submit}
+            disabled={loading}
+            className="mt-4 inline-flex h-13 items-center justify-center rounded-full bg-emerald-700 px-8 py-3.5 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
+          >
+            {loading ? <Spinner label="Thinking…" /> : "Get advice"}
+          </button>
         </Section>
       )}
 
@@ -189,24 +190,62 @@ export default function TriagePage() {
 }
 
 function Section({
+  eyebrow,
   title,
   subtitle,
+  onBack,
   children,
 }: {
+  eyebrow: string;
   title: string;
   subtitle: string;
+  onBack?: () => void;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="animate-in flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+          {eyebrow}
+        </p>
+        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
+          {title}
+        </h1>
         <p className="mt-1 text-zinc-600">{subtitle}</p>
       </div>
       {children}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="mt-1 self-start text-sm text-zinc-500 transition-colors hover:text-zinc-800"
+        >
+          ← Back
+        </button>
+      )}
     </div>
   );
 }
+
+const VERDICT_STYLES = {
+  help: {
+    card: "border-rose-200 bg-rose-50",
+    badge: "bg-rose-600",
+    label: "Needs help",
+    icon: "🚑",
+  },
+  leave: {
+    card: "border-emerald-200 bg-emerald-50",
+    badge: "bg-emerald-600",
+    label: "Leave it be",
+    icon: "🌿",
+  },
+  uncertain: {
+    card: "border-amber-200 bg-amber-50",
+    badge: "bg-amber-600",
+    label: "Check first",
+    icon: "👀",
+  },
+} as const;
 
 function ResultView({
   animal,
@@ -217,46 +256,39 @@ function ResultView({
   result: Result;
   onRestart: () => void;
 }) {
-  const accent =
-    result.verdict === "help"
-      ? "border-red-200 bg-red-50"
-      : result.verdict === "leave"
-        ? "border-emerald-200 bg-emerald-50"
-        : "border-amber-200 bg-amber-50";
-
-  const badge =
-    result.verdict === "help"
-      ? { text: "Needs help", cls: "bg-red-600" }
-      : result.verdict === "leave"
-        ? { text: "Leave it alone", cls: "bg-emerald-600" }
-        : { text: "Check with an expert", cls: "bg-amber-600" };
+  const style = VERDICT_STYLES[result.verdict];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className={`rounded-2xl border p-5 ${accent}`}>
-        <span
-          className={`inline-block rounded-full px-3 py-1 text-xs font-semibold text-white ${badge.cls}`}
-        >
-          {badge.text}
-        </span>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight">
+    <div className="animate-in flex flex-col gap-5">
+      <div className={`rounded-3xl border p-6 ${style.card}`}>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white ${style.badge}`}
+          >
+            <span aria-hidden>{style.icon}</span>
+            {style.label}
+          </span>
+        </div>
+        <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-zinc-900">
           {result.title}
         </h1>
         <p className="mt-2 leading-7 text-zinc-700">{result.reasoning}</p>
       </div>
 
       <div>
-        <h2 className="mb-2 font-semibold">What to do</h2>
-        <ol className="flex flex-col gap-2">
+        <h2 className="mb-2.5 font-display text-lg font-semibold text-emerald-950">
+          What to do
+        </h2>
+        <ol className="flex flex-col gap-2.5">
           {result.steps.map((s, i) => (
             <li
               key={i}
-              className="flex gap-3 rounded-xl border border-black/5 bg-white p-3"
+              className="flex gap-3 rounded-2xl border border-black/5 bg-white p-3.5 shadow-sm"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-700">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-800">
                 {i + 1}
               </span>
-              <span className="text-zinc-700">{s}</span>
+              <span className="leading-6 text-zinc-700">{s}</span>
             </li>
           ))}
         </ol>
@@ -264,24 +296,24 @@ function ResultView({
 
       {result.showContactCentre && <CentreFinder animal={animal} />}
 
-      <div className="flex flex-wrap gap-3 pt-2">
+      <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onRestart}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 font-medium text-white transition-colors hover:bg-zinc-700"
+          className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white transition-colors hover:bg-emerald-800"
         >
           Start over
         </button>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
+          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
         >
           Home
         </Link>
       </div>
 
-      <p className="pt-2 text-xs leading-5 text-zinc-400">
-        This is general guidance from an early prototype, not veterinary advice.
-        When in doubt, always contact a licensed wildlife rehabilitator.
+      <p className="text-xs leading-5 text-zinc-400">
+        General guidance from an early prototype, not veterinary advice. When in
+        doubt, always contact a licensed wildlife rehabilitator.
         {result.source === "rules" && " (Offline guidance mode.)"}
       </p>
     </div>

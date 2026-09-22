@@ -39,20 +39,22 @@ export default function CentreFinder({ animal }: { animal: AnimalType }) {
   }
 
   return (
-    <div className="rounded-2xl border border-emerald-200 bg-white p-5">
-      <h2 className="font-semibold">Find a wildlife centre</h2>
+    <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-emerald-950">
+        Find a wildlife centre
+      </h2>
 
       {status === "idle" && (
         <>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm leading-6 text-zinc-600">
             Share your location and we&apos;ll sort Ontario centres by how close
             they are to you.
           </p>
           <button
             onClick={findNearest}
-            className="mt-3 inline-flex h-11 items-center justify-center rounded-full bg-emerald-600 px-6 font-medium text-white transition-colors hover:bg-emerald-700"
+            className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
           >
-            Find nearest centre
+            📍 Find nearest centre
           </button>
         </>
       )}
@@ -73,15 +75,15 @@ export default function CentreFinder({ animal }: { animal: AnimalType }) {
           {centres.map((c) => (
             <li
               key={c.id}
-              className="rounded-xl border border-black/5 bg-zinc-50 p-3"
+              className="rounded-2xl border border-black/5 bg-[var(--background)] p-3.5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-medium">{c.name}</p>
+                  <p className="font-medium text-emerald-950">{c.name}</p>
                   <p className="text-sm text-zinc-500">{c.town}</p>
                 </div>
                 {"distanceKm" in c && (
-                  <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800">
+                  <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
                     {Math.round(c.distanceKm)} km
                   </span>
                 )}
