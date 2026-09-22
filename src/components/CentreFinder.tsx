@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ONTARIO_CENTRES,
   rankCentres,
@@ -11,9 +11,36 @@ import type { AnimalType } from "@/lib/triage";
 
 type Status = "idle" | "locating" | "ranked" | "denied";
 
-export default function CentreFinder({ animal }: { animal: AnimalType }) {
+export default function CentreFinder({
+  animal,
+  caseId,
+}: {
+  animal: AnimalType;
+  caseId?: string | null;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [centres, setCentres] = useState<(Centre | RankedCentre)[]>([]);
+  const [allCentres, setAllCentres] = useState<Centre[]>(ONTARIO_CENTRES);
+
+  // Load centres from the database (falls back to the seed list on the server).
+  useEffect(() => {
+    fetch("/api/centres")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.centres) && d.centres.length) setAllCentres(d.centres);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Attach the nearest centre + reporter coordinates to the logged case.
+  function attachCentreToCase(centreId: string, lat: number, lng: number) {
+    if (!caseId) return;
+    fetch(`/api/cases/${caseId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ centreId, lat, lng }),
+    }).catch(() => {});
+  }
 
   function findNearest() {
     if (!("geolocation" in navigator)) {
@@ -23,10 +50,21 @@ export default function CentreFinder({ animal }: { animal: AnimalType }) {
     setStatus("locating");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCentres(
-          rankCentres(pos.coords.latitude, pos.coords.longitude, animal)
+        const ranked = rankCentres(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          animal,
+          allCentres
         );
+        setCentres(ranked);
         setStatus("ranked");
+        if (ranked[0]) {
+          attachCentreToCase(
+            ranked[0].id,
+            pos.coords.latitude,
+            pos.coords.longitude
+          );
+        }
       },
       () => showAll(),
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
@@ -34,7 +72,7 @@ export default function CentreFinder({ animal }: { animal: AnimalType }) {
   }
 
   function showAll() {
-    setCentres([...ONTARIO_CENTRES].sort((a, b) => a.name.localeCompare(b.name)));
+    setCentres([...allCentres].sort((a, b) => a.name.localeCompare(b.name)));
     setStatus("denied");
   }
 

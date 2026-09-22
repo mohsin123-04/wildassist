@@ -129,11 +129,12 @@ export function haversineKm(
 export function rankCentres(
   userLat: number,
   userLng: number,
-  animal?: AnimalType
+  animal?: AnimalType,
+  centres: Centre[] = ONTARIO_CENTRES
 ): RankedCentre[] {
   const filterAnimal = animal && animal !== "unsure" ? animal : null;
 
-  return ONTARIO_CENTRES.map((c) => ({
+  return centres.map((c) => ({
     ...c,
     distanceKm: haversineKm(userLat, userLng, c.lat, c.lng),
   })).sort((a, b) => {

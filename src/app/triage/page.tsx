@@ -28,6 +28,7 @@ export default function TriagePage() {
   const [showPhoto, setShowPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [caseId, setCaseId] = useState<string | null>(null);
 
   const stepIndex = STEP_ORDER.indexOf(step);
 
@@ -38,7 +39,29 @@ export default function TriagePage() {
     setPhotoHint("");
     setShowPhoto(false);
     setResult(null);
+    setCaseId(null);
     setStep("animal");
+  }
+
+  async function logCase(rec: Result, fullDescription: string) {
+    if (!animal || !situation) return;
+    try {
+      const r = await fetch("/api/cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          animal,
+          situation,
+          description: fullDescription,
+          verdict: rec.verdict,
+          title: rec.title,
+        }),
+      });
+      const d = await r.json();
+      if (d.id) setCaseId(d.id);
+    } catch {
+      // Logging is best-effort; never block the user on it.
+    }
   }
 
   async function submit() {
@@ -54,9 +77,13 @@ export default function TriagePage() {
         body: JSON.stringify({ animal, situation, description: fullDescription }),
       });
       if (!res.ok) throw new Error("bad response");
-      setResult(await res.json());
+      const data = await res.json();
+      setResult(data);
+      logCase(data, fullDescription);
     } catch {
-      setResult({ ...recommend(animal, situation), source: "rules" });
+      const fallback = { ...recommend(animal, situation), source: "rules" as const };
+      setResult(fallback);
+      logCase(fallback, fullDescription);
     } finally {
       setLoading(false);
       setStep("result");
@@ -183,7 +210,12 @@ export default function TriagePage() {
       )}
 
       {step === "result" && animal && result && (
-        <ResultView animal={animal} result={result} onRestart={reset} />
+        <ResultView
+          animal={animal}
+          result={result}
+          caseId={caseId}
+          onRestart={reset}
+        />
       )}
     </main>
   );
@@ -250,10 +282,12 @@ const VERDICT_STYLES = {
 function ResultView({
   animal,
   result,
+  caseId,
   onRestart,
 }: {
   animal: AnimalType;
   result: Result;
+  caseId: string | null;
   onRestart: () => void;
 }) {
   const style = VERDICT_STYLES[result.verdict];
@@ -294,7 +328,9 @@ function ResultView({
         </ol>
       </div>
 
-      {result.showContactCentre && <CentreFinder animal={animal} />}
+      {result.showContactCentre && (
+        <CentreFinder animal={animal} caseId={caseId} />
+      )}
 
       <div className="flex flex-wrap gap-3 pt-1">
         <button

@@ -46,12 +46,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </span>
               <span>WildAssist</span>
             </Link>
-            <Link
-              href="/emergency"
-              className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
-            >
-              Emergency
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="hidden px-2 py-1.5 text-sm font-medium text-zinc-500 transition-colors hover:text-emerald-800 sm:block"
+              >
+                Staff
+              </Link>
+              <Link
+                href="/emergency"
+                className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+              >
+                Emergency
+              </Link>
+            </div>
           </div>
         </header>
 
