@@ -31,6 +31,27 @@ function labelFor<T extends string>(
   return list.find((x) => x.value === value)?.label ?? value;
 }
 
+/** Normalize model output to plain ASCII punctuation (no fancy dashes/quotes). */
+function toAscii(s: string): string {
+  return s
+    .replace(/[‐‑]/g, "-") // hyphen, non-breaking hyphen
+    .replace(/[‒–—―]/g, ", ") // figure/en/em/horizontal dash
+    .replace(/[‘’‛]/g, "'") // curly single quotes
+    .replace(/[“”]/g, '"') // curly double quotes
+    .replace(/…/g, "...") // ellipsis
+    .replace(/\s+,/g, ",") // tidy spaces left before a comma
+    .trim();
+}
+
+function sanitizeRecommendation(r: Recommendation): Recommendation {
+  return {
+    ...r,
+    title: toAscii(r.title),
+    reasoning: toAscii(r.reasoning),
+    steps: r.steps.map(toAscii),
+  };
+}
+
 function isValidRecommendation(x: unknown): x is Recommendation {
   if (!x || typeof x !== "object") return false;
   const r = x as Record<string, unknown>;
@@ -120,7 +141,7 @@ Return the JSON recommendation now.`;
     if (typeof content !== "string") return null;
 
     const parsed = JSON.parse(content);
-    return isValidRecommendation(parsed) ? parsed : null;
+    return isValidRecommendation(parsed) ? sanitizeRecommendation(parsed) : null;
   } catch {
     return null;
   }
