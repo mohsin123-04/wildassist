@@ -53,6 +53,7 @@ STRICT RULES:
 - Never tell someone to keep, feed a specific diet to, medically treat, or raise a wild animal themselves.
 - Put human and pet safety first. If handling could be dangerous (raptors, raccoons, foxes, skunks, bats, etc.), advise calling a rehabilitator instead of handling.
 - Keep it calm, plain, and brief.
+- Write naturally. Do not use em dashes or en dashes; use commas, periods, or parentheses instead.
 
 Respond with ONLY a JSON object, no prose, matching exactly:
 {
@@ -82,7 +83,7 @@ Situation they selected: ${labelFor(SITUATIONS, situation)}
 Their description: ${description.trim() || "(none provided)"}
 
 VETTED GUIDANCE (only use these facts):
-${guidance || "(no specific guidance matched — treat as uncertain and recommend contacting a rehabilitator)"}
+${guidance || "(no specific guidance matched, treat as uncertain and recommend contacting a rehabilitator)"}
 
 Return the JSON recommendation now.`;
 

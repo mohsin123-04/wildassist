@@ -56,7 +56,7 @@ export default function PhotoIdentify({
       setStatus("done");
       if (result.animal) {
         setMessage(
-          `Looks like a ${result.topLabel}. We'll start you off as "${result.animal}" — you can change it.`
+          `Looks like a ${result.topLabel}. We'll start you off as "${result.animal}". You can change it.`
         );
       } else {
         setMessage(
@@ -108,7 +108,7 @@ export default function PhotoIdentify({
       {status === "loading-model" && (
         <p className="mt-3 text-sm text-zinc-500">
           Downloading the vision model (first time only, ~90&nbsp;MB). It runs
-          entirely on your device — no photo is uploaded.
+          entirely on your device. No photo is uploaded.
         </p>
       )}
 

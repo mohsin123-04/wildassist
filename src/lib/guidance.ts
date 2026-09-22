@@ -41,7 +41,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "fledgling-birds",
     animals: ["bird"],
     situations: ["seems-orphaned", "cant-move", "looks-fine-worried"],
-    text: "A feathered young bird hopping on the ground that cannot yet fly well is usually a fledgling — this is a normal stage and the parents are typically still feeding it nearby. Leave it alone, keep pets and people away, and watch from a distance. Only intervene if it is featherless, obviously injured, in immediate danger, or the parents are confirmed dead.",
+    text: "A feathered young bird hopping on the ground that cannot yet fly well is usually a fledgling. This is a normal stage and the parents are typically still feeding it nearby. Leave it alone, keep pets and people away, and watch from a distance. Only intervene if it is featherless, obviously injured, in immediate danger, or the parents are confirmed dead.",
     source: "Common songbird fledgling guidance (needs verification).",
   },
   {
@@ -62,7 +62,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "safety-first",
     animals: [],
     situations: [],
-    text: "Human safety comes first. Do not handle raptors, herons, adult raccoons, foxes, skunks, bats, or any animal that could bite or scratch — call a rehabilitator for advice instead. Bats and other mammals can carry rabies; never handle a bat with bare hands.",
+    text: "Human safety comes first. Do not handle raptors, herons, adult raccoons, foxes, skunks, bats, or any animal that could bite or scratch. Call a rehabilitator for advice instead. Bats and other mammals can carry rabies; never handle a bat with bare hands.",
     source: "General wildlife-handling safety guidance (needs verification).",
   },
   {

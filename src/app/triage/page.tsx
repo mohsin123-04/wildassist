@@ -82,7 +82,7 @@ export default function TriagePage() {
           key="animal"
           eyebrow="Step 1 of 3"
           title="What did you find?"
-          subtitle="A rough idea is fine — pick the closest match."
+          subtitle="A rough idea is fine. Pick the closest match."
         >
           <div className="grid grid-cols-2 gap-3">
             {ANIMAL_TYPES.map((a) => (
@@ -162,7 +162,7 @@ export default function TriagePage() {
           key="details"
           eyebrow="Step 3 of 3"
           title="Tell us a bit more"
-          subtitle="In your own words — the more detail, the better the guidance. Optional."
+          subtitle="In your own words. The more detail, the better the guidance. Optional."
           onBack={() => setStep("situation")}
         >
           <textarea

@@ -3,7 +3,7 @@
  *
  * ⚠️ Coordinates are approximate (town-level) and contact details must be
  * verified against each centre's official site before this ships to real users.
- * Intake capacity, accepted species, and hours change seasonally — always
+ * Intake capacity, accepted species, and hours change seasonally, so always
  * confirm by phone. This list is a starting point, not authoritative.
  */
 
@@ -124,7 +124,7 @@ export function haversineKm(
 /**
  * Centres ranked by distance from the user. When `animal` is provided (and not
  * "unsure"), centres that don't list that category are still included but sorted
- * after — a nearby generalist is often the right first call regardless.
+ * after. A nearby generalist is often the right first call regardless.
  */
 export function rankCentres(
   userLat: number,

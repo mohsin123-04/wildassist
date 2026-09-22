@@ -20,7 +20,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "WildAssist — Found an injured animal?",
+  title: "WildAssist | Found an injured animal?",
   description:
     "Found an injured or orphaned wild animal in Ontario? WildAssist helps you figure out what to do and connects you to the nearest wildlife rehabilitation centre.",
 };

@@ -26,7 +26,7 @@ export default function Home() {
           </h1>
           <p className="mx-auto max-w-md text-lg leading-8 text-zinc-600">
             Take a breath. Answer a few quick questions and we&apos;ll tell you
-            exactly what to do — and where to get help.
+            exactly what to do, and where to get help.
           </p>
         </div>
 
@@ -66,7 +66,7 @@ export default function Home() {
 
         <p className="mx-auto max-w-sm text-sm leading-6 text-zinc-500">
           Not every animal that looks alone or hurt needs rescuing. Sometimes the
-          kindest thing is to leave it be — we&apos;ll help you tell the difference.
+          kindest thing is to leave it be. We&apos;ll help you tell the difference.
         </p>
       </div>
     </main>

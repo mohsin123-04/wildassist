@@ -5,7 +5,7 @@
  * This is intentionally conservative: if nothing recognizable matches, we return
  * null so the user picks manually rather than being given a wrong guess. The goal
  * is only to pre-fill the animal *type* (bird / mammal / reptile) and pass a hint
- * to the triage model — not to diagnose species.
+ * to the triage model, not to diagnose species.
  */
 
 import type { AnimalType } from "./triage";

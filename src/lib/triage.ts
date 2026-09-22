@@ -59,7 +59,7 @@ const CONTAIN_STEPS = [
 ];
 
 /**
- * These situations indicate clear trauma — the animal almost always needs a
+ * These situations indicate clear trauma, so the animal almost always needs a
  * licensed rehabilitator regardless of species.
  */
 const CLEAR_TRAUMA: Situation[] = [
@@ -97,7 +97,7 @@ export function recommend(
       reasoning:
         "Many baby animals that look abandoned are being cared for by a parent " +
         "who is nearby or only returns occasionally. Removing them can do harm. " +
-        "But some are genuinely orphaned — it's worth checking with an expert before acting.",
+        "But some are genuinely orphaned, so it's worth checking with an expert before acting.",
       steps: [
         "Watch from a distance for a few hours without touching the animal.",
         "Keep pets and children away so a parent feels safe returning.",
@@ -129,7 +129,7 @@ export function recommend(
     title: "Let's get a real expert involved",
     reasoning:
       "From what you've told us, it's hard to be sure. When in doubt, a licensed " +
-      "wildlife rehabilitator can tell you the right thing to do — it's always " +
+      "wildlife rehabilitator can tell you the right thing to do. It's always " +
       "safest to ask before acting.",
     steps: [
       "Don't attempt treatment yourself.",

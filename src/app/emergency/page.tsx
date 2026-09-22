@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Wildlife emergency basics — WildAssist",
+  title: "Wildlife emergency basics | WildAssist",
   description:
     "Quick do's and don'ts for when you find an injured or orphaned wild animal in Ontario, plus how to reach a wildlife hotline.",
 };
@@ -15,10 +15,10 @@ const DOS = [
 ];
 
 const DONTS = [
-  "Don't give food or water — the wrong food can seriously harm or kill wildlife.",
-  "Don't handle raptors, herons, raccoons, foxes, skunks, or bats. Bats and other mammals can carry rabies — never touch a bat with bare hands.",
+  "Don't give food or water. The wrong food can seriously harm or kill wildlife.",
+  "Don't handle raptors, herons, raccoons, foxes, skunks, or bats. Bats and other mammals can carry rabies, so never touch a bat with bare hands.",
   "Don't try to treat injuries yourself or keep the animal as a pet (it's also illegal in Ontario).",
-  "Don't assume a lone baby animal is orphaned — a parent is often nearby.",
+  "Don't assume a lone baby animal is orphaned. A parent is often nearby.",
 ];
 
 export default function EmergencyPage() {
