@@ -509,6 +509,19 @@ function ResultView({
         <p className="mt-2 leading-7 text-zinc-700">{result.reasoning}</p>
       </div>
 
+      {result.verdict === "help" && (
+        <div className="flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-900">
+          <span aria-hidden className="text-base">
+            ⏱️
+          </span>
+          <span>
+            Time matters for an injured animal. Follow these steps and get it to
+            a centre as soon as you safely can. If it&apos;s a life-threatening
+            emergency, call a centre right now.
+          </span>
+        </div>
+      )}
+
       <div>
         <h2 className="mb-2.5 font-display text-lg font-semibold text-emerald-950">
           What to do

@@ -39,9 +39,9 @@ export default function Home() {
           </Link>
           <Link
             href="/emergency"
-            className="text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+            className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-100"
           >
-            Or jump to emergency basics
+            🚨 Life-threatening emergency? Get help fast
           </Link>
         </div>
 
