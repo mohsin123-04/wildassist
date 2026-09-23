@@ -41,19 +41,13 @@ export async function POST(req: Request) {
     );
   }
 
-  // The first person to join a centre becomes its manager (can manage the
-  // join code and invite staff); everyone after is regular staff.
-  const { count } = await admin
-    .from("profiles")
-    .select("id", { count: "exact", head: true })
-    .eq("centre_id", centreId);
-  const role = (count ?? 0) === 0 ? "manager" : "staff";
-
+  // Everyone joins as staff. A centre's manager is designated deliberately
+  // (by the operator when onboarding, or promoted by an existing manager).
   const { error } = await admin
     .from("profiles")
-    .update({ centre_id: centreId, role })
+    .update({ centre_id: centreId, role: "staff" })
     .eq("id", user.id);
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  return Response.json({ ok: true, role });
+  return Response.json({ ok: true });
 }

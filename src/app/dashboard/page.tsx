@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import CentreOnboarding from "./CentreOnboarding";
 import CaseList, { type CaseRow } from "./CaseList";
 import CentreCodePanel from "./CentreCodePanel";
+import TeamPanel from "./TeamPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function DashboardPage() {
         </p>
       </div>
       {isManager && <CentreCodePanel />}
+      {isManager && <TeamPanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}
