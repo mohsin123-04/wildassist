@@ -36,18 +36,20 @@ export default async function DashboardPage() {
     );
   }
 
-  const { data: centre } = await supabase
+  const { data: allCentres } = await supabase
     .from("centres")
-    .select("name, town")
-    .eq("id", profile.centre_id)
-    .single();
+    .select("id, name, town");
+  const centreNames = Object.fromEntries(
+    (allCentres ?? []).map((c) => [c.id, c.name])
+  );
+  const centre = allCentres?.find((c) => c.id === profile.centre_id);
 
+  // RLS returns cases in the staff member's area plus all unassigned cases.
   const { data: cases } = await supabase
     .from("cases")
     .select(
-      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes"
+      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id"
     )
-    .eq("centre_id", profile.centre_id)
     .order("created_at", { ascending: false });
 
   return (
@@ -63,7 +65,11 @@ export default async function DashboardPage() {
           Cases routed to you from the public triage tool.
         </p>
       </div>
-      <CaseList initialCases={(cases ?? []) as CaseRow[]} />
+      <CaseList
+        initialCases={(cases ?? []) as CaseRow[]}
+        myCentreId={profile.centre_id}
+        centreNames={centreNames}
+      />
     </main>
   );
 }

@@ -17,6 +17,7 @@ export type CaseRow = {
   reporter_name: string | null;
   reporter_phone: string | null;
   staff_notes: string | null;
+  centre_id: string | null;
 };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
@@ -32,15 +33,31 @@ const VERDICT_BADGE: Record<CaseRow["verdict"], string> = {
   uncertain: "bg-amber-100 text-amber-700",
 };
 
-type Filter = "all" | CaseRow["status"];
+type Tab = "area" | "unassigned";
 
-export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) {
+export default function CaseList({
+  initialCases,
+  myCentreId,
+  centreNames,
+}: {
+  initialCases: CaseRow[];
+  myCentreId: string;
+  centreNames: Record<string, string>;
+}) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
-  const [filter, setFilter] = useState<Filter>("all");
+  const [tab, setTab] = useState<Tab>("area");
+  const [statusFilter, setStatusFilter] = useState<"all" | CaseRow["status"]>(
+    "all"
+  );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [savingNoteId, setSavingNoteId] = useState<string | null>(null);
+  const [claimingId, setClaimingId] = useState<string | null>(null);
+
+  const areaCases = cases.filter((c) => c.centre_id !== null);
+  const unassignedCases = cases.filter((c) => c.centre_id === null);
+  const tabCases = tab === "area" ? areaCases : unassignedCases;
 
   const stats = useMemo(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -50,13 +67,14 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
       needsHelp: cases.filter(
         (c) => c.verdict === "help" && c.status !== "closed"
       ).length,
-      thisWeek: cases.filter((c) => new Date(c.created_at).getTime() >= weekAgo)
-        .length,
+      unassigned: unassignedCases.length,
     };
-  }, [cases]);
+  }, [cases, unassignedCases.length]);
 
   const filtered =
-    filter === "all" ? cases : cases.filter((c) => c.status === filter);
+    statusFilter === "all"
+      ? tabCases
+      : tabCases.filter((c) => c.status === statusFilter);
 
   async function updateStatus(id: string, status: CaseRow["status"]) {
     const previous = cases;
@@ -80,8 +98,25 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
     setSavingNoteId(null);
     if (!error) {
       setCases((cs) =>
-        cs.map((c) => (c.id === id ? { ...c, staff_notes: notes.trim() || null } : c))
+        cs.map((c) =>
+          c.id === id ? { ...c, staff_notes: notes.trim() || null } : c
+        )
       );
+    }
+  }
+
+  async function claim(id: string) {
+    setClaimingId(id);
+    const { error } = await createClient()
+      .from("cases")
+      .update({ centre_id: myCentreId })
+      .eq("id", id);
+    setClaimingId(null);
+    if (!error) {
+      setCases((cs) =>
+        cs.map((c) => (c.id === id ? { ...c, centre_id: myCentreId } : c))
+      );
+      setExpandedId(null);
     }
   }
 
@@ -89,22 +124,32 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
     <div className="flex flex-col gap-5">
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="Total" value={stats.total} />
+        <Stat label="In your area" value={areaCases.length} />
         <Stat label="Open" value={stats.open} accent="text-emerald-700" />
         <Stat label="Needs help" value={stats.needsHelp} accent="text-rose-600" />
-        <Stat label="This week" value={stats.thisWeek} />
+        <Stat label="Unassigned" value={stats.unassigned} accent="text-amber-600" />
       </div>
 
-      {/* Filters */}
+      {/* Tabs */}
+      <div className="flex gap-2">
+        <Tab active={tab === "area"} onClick={() => setTab("area")}>
+          In your area ({areaCases.length})
+        </Tab>
+        <Tab active={tab === "unassigned"} onClick={() => setTab("unassigned")}>
+          Unassigned ({unassignedCases.length})
+        </Tab>
+      </div>
+
+      {/* Status filters */}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        <Chip active={filter === "all"} onClick={() => setFilter("all")}>
+        <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
           All
         </Chip>
         {STATUSES.map((s) => (
           <Chip
             key={s.value}
-            active={filter === s.value}
-            onClick={() => setFilter(s.value)}
+            active={statusFilter === s.value}
+            onClick={() => setStatusFilter(s.value)}
           >
             {s.label}
           </Chip>
@@ -115,19 +160,20 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
       {filtered.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-black/10 bg-white/50 p-10 text-center">
           <p className="text-3xl">🕊️</p>
-          <p className="mt-2 font-medium text-emerald-950">
-            {cases.length === 0 ? "No cases yet" : "Nothing here"}
-          </p>
+          <p className="mt-2 font-medium text-emerald-950">Nothing here</p>
           <p className="mt-1 text-sm text-zinc-500">
-            {cases.length === 0
-              ? "When someone near you reports an animal and picks your centre, it will appear here."
-              : "No cases match this filter."}
+            {tab === "unassigned"
+              ? "No unassigned cases right now."
+              : "No cases in your area match this filter."}
           </p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
           {filtered.map((c) => {
             const expanded = expandedId === c.id;
+            const isMine = c.centre_id === myCentreId;
+            const otherCentre =
+              c.centre_id && !isMine ? centreNames[c.centre_id] : null;
             return (
               <li
                 key={c.id}
@@ -151,6 +197,16 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
                       <span className="text-sm font-medium capitalize text-emerald-950">
                         {c.animal}
                       </span>
+                      {otherCentre && (
+                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500">
+                          {otherCentre}
+                        </span>
+                      )}
+                      {c.centre_id === null && (
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          unassigned
+                        </span>
+                      )}
                     </div>
                     <p className="mt-1.5 text-sm text-zinc-700">
                       {c.title ?? c.situation.replace(/-/g, " ")}
@@ -172,13 +228,14 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
                     {c.description && (
                       <div className="mb-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                          Reporter's description
+                          Reporter&apos;s description
                         </p>
                         <p className="mt-1 text-sm leading-6 text-zinc-700">
                           {c.description}
                         </p>
                       </div>
                     )}
+
                     <div className="flex flex-wrap items-center gap-4">
                       {c.lat != null && c.lng != null ? (
                         <a
@@ -195,23 +252,33 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
                         </span>
                       )}
 
-                      <label className="ml-auto flex items-center gap-2 text-sm text-zinc-500">
-                        Status
-                        <select
-                          value={c.status}
-                          disabled={savingId === c.id}
-                          onChange={(e) =>
-                            updateStatus(c.id, e.target.value as CaseRow["status"])
-                          }
-                          className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
+                      {c.centre_id === null ? (
+                        <button
+                          onClick={() => claim(c.id)}
+                          disabled={claimingId === c.id}
+                          className="ml-auto inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
                         >
-                          {STATUSES.map((s) => (
-                            <option key={s.value} value={s.value}>
-                              {s.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                          {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
+                        </button>
+                      ) : (
+                        <label className="ml-auto flex items-center gap-2 text-sm text-zinc-500">
+                          Status
+                          <select
+                            value={c.status}
+                            disabled={savingId === c.id}
+                            onChange={(e) =>
+                              updateStatus(c.id, e.target.value as CaseRow["status"])
+                            }
+                            className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
+                          >
+                            {STATUSES.map((s) => (
+                              <option key={s.value} value={s.value}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
                     </div>
 
                     {/* Reporter contact */}
@@ -293,6 +360,29 @@ function Stat({
   );
 }
 
+function Tab({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+        active
+          ? "bg-emerald-700 text-white"
+          : "border border-black/10 bg-white text-zinc-600 hover:bg-black/5"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function Chip({
   active,
   onClick,
@@ -307,7 +397,7 @@ function Chip({
       onClick={onClick}
       className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "bg-emerald-700 text-white"
+          ? "bg-emerald-100 text-emerald-800"
           : "border border-black/10 bg-white text-zinc-600 hover:bg-black/5"
       }`}
     >
