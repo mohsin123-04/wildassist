@@ -38,7 +38,7 @@ export default async function DashboardPage() {
 
   const { data: allCentres } = await supabase
     .from("centres")
-    .select("id, name, town");
+    .select("id, name, town, lat, lng");
   const centreNames = Object.fromEntries(
     (allCentres ?? []).map((c) => [c.id, c.name])
   );
@@ -69,6 +69,11 @@ export default async function DashboardPage() {
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id}
         centreNames={centreNames}
+        centre={
+          centre?.lat != null && centre?.lng != null
+            ? [centre.lat, centre.lng]
+            : [44.0, -79.4]
+        }
       />
     </main>
   );

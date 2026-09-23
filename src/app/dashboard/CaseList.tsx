@@ -1,7 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
+
+const CasesMap = dynamic(() => import("./CasesMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-black/5 bg-white text-sm text-zinc-400">
+      Loading map…
+    </div>
+  ),
+});
 
 export type CaseRow = {
   id: string;
@@ -40,10 +50,12 @@ export default function CaseList({
   initialCases,
   myCentreId,
   centreNames,
+  centre,
 }: {
   initialCases: CaseRow[];
   myCentreId: string;
   centreNames: Record<string, string>;
+  centre: [number, number];
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
   const [tab, setTab] = useState<Tab>("area");
@@ -55,6 +67,9 @@ export default function CaseList({
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [savingNoteId, setSavingNoteId] = useState<string | null>(null);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
+  const [view, setView] = useState<"list" | "map">("list");
 
   const areaCases = cases.filter((c) => c.centre_id !== null);
   const unassignedCases = cases.filter((c) => c.centre_id === null);
@@ -72,10 +87,57 @@ export default function CaseList({
     };
   }, [cases, unassignedCases.length]);
 
-  const filtered =
-    statusFilter === "all"
-      ? tabCases
-      : tabCases.filter((c) => c.status === statusFilter);
+  const q = query.trim().toLowerCase();
+  const filtered = tabCases
+    .filter((c) => statusFilter === "all" || c.status === statusFilter)
+    .filter((c) => {
+      if (!q) return true;
+      return [c.animal, c.title, c.description, c.reporter_name]
+        .filter(Boolean)
+        .some((v) => (v as string).toLowerCase().includes(q));
+    })
+    .sort((a, b) => {
+      if (sortBy === "urgent") {
+        const rank = (c: CaseRow) =>
+          c.verdict === "help" && c.status !== "closed" ? 0 : 1;
+        if (rank(a) !== rank(b)) return rank(a) - rank(b);
+      }
+      const ta = new Date(a.created_at).getTime();
+      const tb = new Date(b.created_at).getTime();
+      return sortBy === "oldest" ? ta - tb : tb - ta;
+    });
+
+  function exportCsv() {
+    const cols: (keyof CaseRow)[] = [
+      "created_at",
+      "animal",
+      "situation",
+      "verdict",
+      "status",
+      "title",
+      "description",
+      "reporter_name",
+      "reporter_phone",
+      "lat",
+      "lng",
+      "centre_id",
+    ];
+    const esc = (v: unknown) => {
+      const s = v == null ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = [
+      cols.join(","),
+      ...filtered.map((c) => cols.map((col) => esc(c[col])).join(",")),
+    ];
+    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `wildassist-cases-${tab}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   async function updateStatus(id: string, status: CaseRow["status"]) {
     const previous = cases;
@@ -141,6 +203,47 @@ export default function CaseList({
         </Tab>
       </div>
 
+      {/* Search / sort / export */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search animal, title, description, reporter…"
+          className="h-10 min-w-0 flex-1 rounded-xl border border-black/10 bg-white px-4 text-sm outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+        />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+          className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="urgent">Most urgent</option>
+        </select>
+        <button
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-black/10 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5 disabled:opacity-50"
+        >
+          Export CSV
+        </button>
+        <div className="flex h-10 overflow-hidden rounded-xl border border-black/10">
+          {(["list", "map"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              className={`px-3 text-sm font-medium capitalize transition-colors ${
+                view === v
+                  ? "bg-emerald-700 text-white"
+                  : "bg-white text-zinc-600 hover:bg-black/5"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Status filters */}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
         <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
@@ -157,8 +260,10 @@ export default function CaseList({
         ))}
       </div>
 
-      {/* List */}
-      {filtered.length === 0 ? (
+      {/* List or map */}
+      {view === "map" ? (
+        <CasesMap cases={filtered} center={centre} />
+      ) : filtered.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-black/10 bg-white/50 p-10 text-center">
           <p className="text-3xl">🕊️</p>
           <p className="mt-2 font-medium text-emerald-950">Nothing here</p>
