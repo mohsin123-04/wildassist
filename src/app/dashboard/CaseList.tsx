@@ -326,7 +326,7 @@ export default function CaseList({
                   </div>
                   <span
                     aria-hidden
-                    className={`mt-1 shrink-0 text-zinc-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    className={`mt-1 shrink-0 text-lg leading-none text-zinc-500 transition-transform ${expanded ? "rotate-180" : ""}`}
                   >
                     ▾
                   </span>

@@ -125,7 +125,7 @@ export default function AccountMenu() {
         </span>
         <span
           aria-hidden
-          className={`text-xs text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-base leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
         >
           ▾
         </span>

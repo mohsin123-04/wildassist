@@ -43,7 +43,7 @@ export default function CentreCodePanel() {
         </span>
         <span
           aria-hidden
-          className={`text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-xl leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
         >
           ▾
         </span>
