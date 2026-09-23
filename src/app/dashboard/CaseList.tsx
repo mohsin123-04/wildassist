@@ -14,6 +14,9 @@ export type CaseRow = {
   description: string | null;
   lat: number | null;
   lng: number | null;
+  reporter_name: string | null;
+  reporter_phone: string | null;
+  staff_notes: string | null;
 };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
@@ -36,6 +39,8 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
   const [filter, setFilter] = useState<Filter>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+  const [savingNoteId, setSavingNoteId] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -63,6 +68,21 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
       .eq("id", id);
     setSavingId(null);
     if (error) setCases(previous);
+  }
+
+  async function saveNotes(id: string) {
+    const notes = noteDrafts[id] ?? "";
+    setSavingNoteId(id);
+    const { error } = await createClient()
+      .from("cases")
+      .update({ staff_notes: notes.trim() || null })
+      .eq("id", id);
+    setSavingNoteId(null);
+    if (!error) {
+      setCases((cs) =>
+        cs.map((c) => (c.id === id ? { ...c, staff_notes: notes.trim() || null } : c))
+      );
+    }
   }
 
   return (
@@ -111,7 +131,11 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
             return (
               <li
                 key={c.id}
-                className="rounded-2xl border border-black/5 bg-white shadow-sm"
+                className={`rounded-2xl border bg-white shadow-sm ${
+                  c.verdict === "help" && c.status !== "closed"
+                    ? "border-black/5 border-l-4 border-l-rose-400"
+                    : "border-black/5"
+                }`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : c.id)}
@@ -188,6 +212,58 @@ export default function CaseList({ initialCases }: { initialCases: CaseRow[] }) 
                           ))}
                         </select>
                       </label>
+                    </div>
+
+                    {/* Reporter contact */}
+                    <div className="mt-4 border-t border-black/5 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                        Reported by
+                      </p>
+                      {c.reporter_name || c.reporter_phone ? (
+                        <p className="mt-1 text-sm text-zinc-700">
+                          {c.reporter_name && <span>{c.reporter_name}</span>}
+                          {c.reporter_name && c.reporter_phone && " · "}
+                          {c.reporter_phone && (
+                            <a
+                              href={`tel:${c.reporter_phone.replace(/[^0-9+]/g, "")}`}
+                              className="font-medium text-emerald-700 underline underline-offset-2"
+                            >
+                              {c.reporter_phone}
+                            </a>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm text-zinc-400">
+                          The finder didn&apos;t leave contact details.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Staff notes */}
+                    <div className="mt-4 border-t border-black/5 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                        Staff notes
+                      </p>
+                      <textarea
+                        rows={2}
+                        value={noteDrafts[c.id] ?? c.staff_notes ?? ""}
+                        onChange={(e) =>
+                          setNoteDrafts((d) => ({ ...d, [c.id]: e.target.value }))
+                        }
+                        placeholder="Add an internal note (e.g. volunteer driver assigned, ETA 3pm)."
+                        className="mt-1 w-full resize-none rounded-xl border border-black/10 bg-white p-3 text-sm outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+                      />
+                      <button
+                        onClick={() => saveNotes(c.id)}
+                        disabled={
+                          savingNoteId === c.id ||
+                          (noteDrafts[c.id] ?? c.staff_notes ?? "") ===
+                            (c.staff_notes ?? "")
+                        }
+                        className="mt-2 inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                      >
+                        {savingNoteId === c.id ? "Saving…" : "Save note"}
+                      </button>
                     </div>
                   </div>
                 )}

@@ -45,7 +45,7 @@ export default async function DashboardPage() {
   const { data: cases } = await supabase
     .from("cases")
     .select(
-      "id, created_at, animal, situation, verdict, title, status, description, lat, lng"
+      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes"
     )
     .eq("centre_id", profile.centre_id)
     .order("created_at", { ascending: false });

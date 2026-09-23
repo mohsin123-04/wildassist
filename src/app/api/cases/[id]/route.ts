@@ -3,9 +3,10 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 /**
  * PATCH /api/cases/[id]
- * Attaches the nearest centre (and the reporter's coordinates) to a case once
- * the finder resolves them. Server-side with the service role.
- * Body: { centreId, lat, lng }
+ * Public, server-side (service role) partial update of a case the visitor just
+ * created: the nearest centre + coordinates, and/or their contact details so
+ * the centre can follow up.
+ * Body (all optional): { centreId, lat, lng, reporterName, reporterPhone }
  */
 export async function PATCH(
   req: NextRequest,
@@ -17,25 +18,34 @@ export async function PATCH(
 
   const { id } = await params;
 
-  let body: { centreId?: string; lat?: number; lng?: number };
+  let body: {
+    centreId?: string;
+    lat?: number;
+    lng?: number;
+    reporterName?: string;
+    reporterPhone?: string;
+  };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { centreId, lat, lng } = body;
-  if (!centreId || typeof lat !== "number" || typeof lng !== "number") {
-    return Response.json({ error: "Missing centre or coordinates" }, {
-      status: 400,
-    });
+  const update: Record<string, unknown> = {};
+  if (typeof body.centreId === "string") update.centre_id = body.centreId;
+  if (typeof body.lat === "number") update.lat = body.lat;
+  if (typeof body.lng === "number") update.lng = body.lng;
+  if (typeof body.reporterName === "string")
+    update.reporter_name = body.reporterName.trim().slice(0, 120) || null;
+  if (typeof body.reporterPhone === "string")
+    update.reporter_phone = body.reporterPhone.trim().slice(0, 60) || null;
+
+  if (Object.keys(update).length === 0) {
+    return Response.json({ error: "Nothing to update" }, { status: 400 });
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("cases")
-    .update({ centre_id: centreId, lat, lng })
-    .eq("id", id);
+  const { error } = await supabase.from("cases").update(update).eq("id", id);
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
+import ReporterContact from "@/components/ReporterContact";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
 import {
@@ -373,7 +374,10 @@ function ResultView({
       </div>
 
       {result.showContactCentre && (
-        <CentreFinder animal={animal} caseId={caseId} />
+        <>
+          <CentreFinder animal={animal} caseId={caseId} />
+          <ReporterContact caseId={caseId} />
+        </>
       )}
 
       <div className="flex flex-wrap gap-3 pt-1">
