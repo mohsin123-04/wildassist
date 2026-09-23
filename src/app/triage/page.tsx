@@ -5,6 +5,7 @@ import { useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import Spinner from "@/components/Spinner";
+import AnimalIcon from "@/components/AnimalIcon";
 import {
   ANIMAL_OPTIONS,
   SITUATIONS,
@@ -118,9 +119,10 @@ export default function TriagePage() {
         (step === "situation" || step === "details") && (
           <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5">
             <span className="flex items-center gap-2 text-sm text-emerald-900">
-              <span aria-hidden className="text-base">
-                {animalOption.icon}
-              </span>
+              <AnimalIcon
+                name={animalOption.value}
+                className="h-4 w-4 text-emerald-700"
+              />
               <span className="font-medium">{animalOption.label}</span>
               {photoHint && (
                 <span className="text-emerald-700">
@@ -158,8 +160,8 @@ export default function TriagePage() {
                     : "border-black/5"
                 }`}
               >
-                <span aria-hidden className="text-3xl">
-                  {a.icon}
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 transition-colors group-hover:bg-emerald-100">
+                  <AnimalIcon name={a.value} className="h-6 w-6" />
                 </span>
                 <span className="font-medium text-emerald-950">{a.label}</span>
                 <span className="text-xs leading-snug text-zinc-500">
