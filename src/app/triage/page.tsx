@@ -162,6 +162,9 @@ export default function TriagePage() {
                   {a.icon}
                 </span>
                 <span className="font-medium text-emerald-950">{a.label}</span>
+                <span className="text-xs leading-snug text-zinc-500">
+                  {a.description}
+                </span>
               </button>
             ))}
           </div>

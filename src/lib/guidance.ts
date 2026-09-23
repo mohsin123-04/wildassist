@@ -223,6 +223,15 @@ export const GUIDANCE: GuidanceEntry[] = [
     text: "Most frogs, toads, and salamanders found in yards are healthy and do not need help; leave them be and let them move on. Their skin is delicate and absorbs chemicals easily, so if you must move one out of danger, do it gently with clean, wet, unscented hands and place it in nearby damp cover rather than relocating it far away. Only intervene if it is clearly injured, and contact a rehabilitator for advice.",
     source: "Amphibian-handling guidance (needs verification).",
   },
+
+  // ---- Fish ----
+  {
+    id: "fish",
+    animals: ["fish"],
+    situations: [],
+    text: "Wildlife rehabilitators generally do not treat fish, and a fish out of water for more than a short time usually cannot be saved. If you find a fish stranded but still lively (for example, washed onto a bank), you can gently return it to the water it came from with wet hands. For a fish tangled in line or hooks, handle it as little as possible. Report large numbers of dead or dying fish (a fish kill) or pollution to your local conservation authority or the provincial natural resources ministry rather than a wildlife centre.",
+    source: "General fish / conservation-authority guidance (needs verification).",
+  },
 ];
 
 /**

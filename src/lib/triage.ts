@@ -9,7 +9,13 @@
  * for the fuller knowledge base the LLM draws on.
  */
 
-export type AnimalType = "bird" | "mammal" | "reptile" | "amphibian" | "unsure";
+export type AnimalType =
+  | "bird"
+  | "mammal"
+  | "reptile"
+  | "amphibian"
+  | "fish"
+  | "unsure";
 
 export type Situation =
   | "bleeding"
@@ -37,10 +43,11 @@ export interface Recommendation {
 
 /** Broad categories used for centre matching, guidance retrieval, and rules. */
 export const ANIMAL_TYPES: { value: AnimalType; label: string; icon: string }[] = [
-  { value: "bird", label: "Bird", icon: "🐦" },
+  { value: "bird", label: "Bird", icon: "🕊️" },
   { value: "mammal", label: "Mammal", icon: "🦝" },
   { value: "reptile", label: "Reptile", icon: "🐢" },
   { value: "amphibian", label: "Amphibian", icon: "🐸" },
+  { value: "fish", label: "Fish", icon: "🐟" },
   { value: "unsure", label: "I'm not sure", icon: "❓" },
 ];
 
@@ -49,15 +56,53 @@ export interface AnimalOption {
   value: string;
   label: string;
   icon: string;
+  description: string;
   category: AnimalType;
 }
 
 export const ANIMAL_OPTIONS: AnimalOption[] = [
-  { value: "bird", label: "Bird", icon: "🐦", category: "bird" },
-  { value: "mammal", label: "Mammal", icon: "🦝", category: "mammal" },
-  { value: "reptile", label: "Reptile", icon: "🐢", category: "reptile" },
-  { value: "amphibian", label: "Amphibian", icon: "🐸", category: "amphibian" },
-  { value: "unsure", label: "I'm not sure", icon: "❓", category: "unsure" },
+  {
+    value: "bird",
+    label: "Bird",
+    icon: "🕊️",
+    description: "Robins, ducks, geese, hawks, owls, and other feathered animals.",
+    category: "bird",
+  },
+  {
+    value: "mammal",
+    label: "Mammal",
+    icon: "🦝",
+    description: "Squirrels, raccoons, rabbits, foxes, deer, bats, and other furry animals.",
+    category: "mammal",
+  },
+  {
+    value: "reptile",
+    label: "Reptile",
+    icon: "🐢",
+    description: "Turtles, snakes, and lizards.",
+    category: "reptile",
+  },
+  {
+    value: "amphibian",
+    label: "Amphibian",
+    icon: "🐸",
+    description: "Frogs, toads, and salamanders.",
+    category: "amphibian",
+  },
+  {
+    value: "fish",
+    label: "Fish",
+    icon: "🐟",
+    description: "Fish from a pond, lake, or stream.",
+    category: "fish",
+  },
+  {
+    value: "unsure",
+    label: "I'm not sure",
+    icon: "❓",
+    description: "Not sure what it is? Choose this and describe it.",
+    category: "unsure",
+  },
 ];
 
 export const SITUATIONS: { value: Situation; label: string }[] = [
