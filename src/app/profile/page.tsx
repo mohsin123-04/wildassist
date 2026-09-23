@@ -60,8 +60,6 @@ export default async function ProfilePage() {
         initialTitle={profile?.title ?? ""}
         initialPhone={profile?.phone ?? ""}
         initialBio={profile?.bio ?? ""}
-        initialCentreId={profile?.centre_id ?? ""}
-        centres={centres ?? []}
       />
 
       <AppearanceSection

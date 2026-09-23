@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
-type CentreOption = { id: string; name: string; town: string };
-
 const inputClass =
   "h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20";
 
@@ -15,22 +13,17 @@ export default function ProfileForm({
   initialTitle,
   initialPhone,
   initialBio,
-  initialCentreId,
-  centres,
 }: {
   initialName: string;
   initialTitle: string;
   initialPhone: string;
   initialBio: string;
-  initialCentreId: string;
-  centres: CentreOption[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [title, setTitle] = useState(initialTitle);
   const [phone, setPhone] = useState(initialPhone);
   const [bio, setBio] = useState(initialBio);
-  const [centreId, setCentreId] = useState(initialCentreId);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,8 +32,7 @@ export default function ProfileForm({
     name !== initialName ||
     title !== initialTitle ||
     phone !== initialPhone ||
-    bio !== initialBio ||
-    centreId !== initialCentreId;
+    bio !== initialBio;
 
   async function save() {
     setSaving(true);
@@ -62,7 +54,6 @@ export default function ProfileForm({
         title: title.trim() || null,
         phone: phone.trim() || null,
         bio: bio.trim() || null,
-        centre_id: centreId || null,
       })
       .eq("id", user.id);
     setSaving(false);
@@ -117,22 +108,6 @@ export default function ProfileForm({
             />
           </label>
         </div>
-
-        <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-zinc-700">Linked centre</span>
-          <select
-            className={inputClass + " px-3"}
-            value={centreId}
-            onChange={(e) => setCentreId(e.target.value)}
-          >
-            <option value="">No centre linked</option>
-            {centres.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} ({c.town})
-              </option>
-            ))}
-          </select>
-        </label>
 
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-zinc-700">Bio</span>
