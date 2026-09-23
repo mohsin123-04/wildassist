@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import Spinner from "@/components/Spinner";
 import { classifyPredictions, type Prediction } from "@/lib/vision";
-import type { AnimalType } from "@/lib/triage";
 
 type Status = "idle" | "loading-model" | "classifying" | "done" | "error";
 
@@ -30,7 +29,7 @@ async function getClassifier() {
 export default function PhotoIdentify({
   onIdentify,
 }: {
-  onIdentify: (animal: AnimalType | null, hint: string) => void;
+  onIdentify: (option: string | null, hint: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -54,16 +53,20 @@ export default function PhotoIdentify({
       const result = classifyPredictions(preds);
 
       setStatus("done");
-      if (result.animal) {
+      if (result.option) {
         setMessage(
-          `Looks like a ${result.topLabel}. We'll start you off as "${result.animal}". You can change it.`
+          `Looks like a ${result.topLabel}. We've picked the closest match for you. You can change it.`
+        );
+      } else if (result.category) {
+        setMessage(
+          `Our best guess was "${result.topLabel}". Please pick the specific animal below.`
         );
       } else {
         setMessage(
-          `Our best guess was "${result.topLabel}", but we're not confident. Please pick the animal type yourself.`
+          `We couldn't confidently identify it. Please pick the animal below.`
         );
       }
-      onIdentify(result.animal, result.topLabel);
+      onIdentify(result.option, result.topLabel);
     } catch {
       setStatus("error");
       setMessage(

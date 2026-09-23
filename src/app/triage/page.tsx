@@ -6,10 +6,11 @@ import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import Spinner from "@/components/Spinner";
 import {
-  ANIMAL_TYPES,
+  ANIMAL_OPTIONS,
   SITUATIONS,
   recommend,
   type AnimalType,
+  type AnimalOption,
   type Situation,
   type Recommendation,
 } from "@/lib/triage";
@@ -21,7 +22,7 @@ const STEP_ORDER: Step[] = ["animal", "situation", "details", "result"];
 
 export default function TriagePage() {
   const [step, setStep] = useState<Step>("animal");
-  const [animal, setAnimal] = useState<AnimalType | null>(null);
+  const [animalOption, setAnimalOption] = useState<AnimalOption | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
   const [description, setDescription] = useState("");
   const [photoHint, setPhotoHint] = useState("");
@@ -33,7 +34,7 @@ export default function TriagePage() {
   const stepIndex = STEP_ORDER.indexOf(step);
 
   function reset() {
-    setAnimal(null);
+    setAnimalOption(null);
     setSituation(null);
     setDescription("");
     setPhotoHint("");
@@ -44,13 +45,13 @@ export default function TriagePage() {
   }
 
   async function logCase(rec: Result, fullDescription: string) {
-    if (!animal || !situation) return;
+    if (!animalOption || !situation) return;
     try {
       const r = await fetch("/api/cases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          animal,
+          animal: animalOption.label,
           situation,
           description: fullDescription,
           verdict: rec.verdict,
@@ -65,23 +66,32 @@ export default function TriagePage() {
   }
 
   async function submit() {
-    if (!animal || !situation) return;
+    if (!animalOption || !situation) return;
     setLoading(true);
-    const fullDescription = photoHint
-      ? `Photo analysis suggests it may be a ${photoHint}. ${description}`.trim()
-      : description;
+    const category = animalOption.category;
+    const parts = [`The animal is a ${animalOption.label}.`];
+    if (photoHint) parts.push(`Photo analysis suggests it may be a ${photoHint}.`);
+    if (description.trim()) parts.push(description.trim());
+    const fullDescription = parts.join(" ");
     try {
       const res = await fetch("/api/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ animal, situation, description: fullDescription }),
+        body: JSON.stringify({
+          animal: category,
+          situation,
+          description: fullDescription,
+        }),
       });
       if (!res.ok) throw new Error("bad response");
       const data = await res.json();
       setResult(data);
       logCase(data, fullDescription);
     } catch {
-      const fallback = { ...recommend(animal, situation), source: "rules" as const };
+      const fallback = {
+        ...recommend(category, situation),
+        source: "rules" as const,
+      };
       setResult(fallback);
       logCase(fallback, fullDescription);
     } finally {
@@ -109,26 +119,28 @@ export default function TriagePage() {
           key="animal"
           eyebrow="Step 1 of 3"
           title="What did you find?"
-          subtitle="A rough idea is fine. Pick the closest match."
+          subtitle="Pick the closest match. It's okay to guess."
         >
-          <div className="grid grid-cols-2 gap-3">
-            {ANIMAL_TYPES.map((a) => (
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {ANIMAL_OPTIONS.map((a) => (
               <button
                 key={a.value}
                 onClick={() => {
-                  setAnimal(a.value);
+                  setAnimalOption(a);
                   setStep("situation");
                 }}
-                className={`group flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
-                  animal === a.value
+                className={`group flex flex-col items-start gap-1.5 rounded-2xl border bg-white p-3.5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
+                  animalOption?.value === a.value
                     ? "border-emerald-500 ring-2 ring-emerald-500/30"
                     : "border-black/5"
                 }`}
               >
-                <span aria-hidden className="text-3xl">
+                <span aria-hidden className="text-2xl">
                   {a.icon}
                 </span>
-                <span className="font-medium text-emerald-950">{a.label}</span>
+                <span className="text-sm font-medium leading-tight text-emerald-950">
+                  {a.label}
+                </span>
               </button>
             ))}
           </div>
@@ -143,9 +155,13 @@ export default function TriagePage() {
               </button>
             ) : (
               <PhotoIdentify
-                onIdentify={(detected, hint) => {
+                onIdentify={(optionValue, hint) => {
                   setPhotoHint(hint);
-                  if (detected) setAnimal(detected);
+                  const match = ANIMAL_OPTIONS.find((o) => o.value === optionValue);
+                  if (match) {
+                    setAnimalOption(match);
+                    setStep("situation");
+                  }
                 }}
               />
             )}
@@ -209,9 +225,9 @@ export default function TriagePage() {
         </Section>
       )}
 
-      {step === "result" && animal && result && (
+      {step === "result" && animalOption && result && (
         <ResultView
-          animal={animal}
+          animal={animalOption.category}
           result={result}
           caseId={caseId}
           onRestart={reset}

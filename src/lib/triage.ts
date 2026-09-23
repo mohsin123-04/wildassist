@@ -35,11 +35,37 @@ export interface Recommendation {
   showContactCentre: boolean;
 }
 
+/** Broad categories used for centre matching, guidance retrieval, and rules. */
 export const ANIMAL_TYPES: { value: AnimalType; label: string; icon: string }[] = [
   { value: "bird", label: "Bird", icon: "🐦" },
   { value: "mammal", label: "Mammal", icon: "🦝" },
   { value: "reptile", label: "Reptile or amphibian", icon: "🐢" },
   { value: "unsure", label: "I'm not sure", icon: "❓" },
+];
+
+/** Specific, recognizable animals shown in the UI. Each maps to a category. */
+export interface AnimalOption {
+  value: string;
+  label: string;
+  icon: string;
+  category: AnimalType;
+}
+
+export const ANIMAL_OPTIONS: AnimalOption[] = [
+  { value: "songbird", label: "Songbird", icon: "🐦", category: "bird" },
+  { value: "duck-goose", label: "Duck or goose", icon: "🦆", category: "bird" },
+  { value: "raptor", label: "Hawk or owl", icon: "🦅", category: "bird" },
+  { value: "squirrel", label: "Squirrel or chipmunk", icon: "🐿️", category: "mammal" },
+  { value: "rabbit", label: "Rabbit", icon: "🐰", category: "mammal" },
+  { value: "raccoon", label: "Raccoon, skunk, or opossum", icon: "🦝", category: "mammal" },
+  { value: "deer", label: "Deer or fawn", icon: "🦌", category: "mammal" },
+  { value: "fox-coyote", label: "Fox or coyote", icon: "🦊", category: "mammal" },
+  { value: "bat", label: "Bat", icon: "🦇", category: "mammal" },
+  { value: "turtle", label: "Turtle", icon: "🐢", category: "reptile" },
+  { value: "snake", label: "Snake", icon: "🐍", category: "reptile" },
+  { value: "frog-toad", label: "Frog or toad", icon: "🐸", category: "reptile" },
+  { value: "other-bird", label: "Another bird", icon: "🕊️", category: "bird" },
+  { value: "unsure", label: "I'm not sure", icon: "❓", category: "unsure" },
 ];
 
 export const SITUATIONS: { value: Situation; label: string }[] = [

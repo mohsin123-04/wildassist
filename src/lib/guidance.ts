@@ -121,6 +121,20 @@ export const GUIDANCE: GuidanceEntry[] = [
     text: "Baby songbirds fall into two stages. A NESTLING has few or no feathers and cannot stand, hop, or perch; it is too young to be out of the nest, so gently return it to the nest (usually very close by in a tree or bush) and watch from a distance for two hours for a parent. A FLEDGLING is fully feathered and can hop and grip; hopping on the ground with parents nearby is a normal stage, so leave it alone and only move it to nearby shelter if it is in immediate danger. Intervene only if the bird is clearly injured, cold, or the parents are confirmed dead.",
     source: "Toronto Wildlife Centre (needs verification).",
   },
+  {
+    id: "waterfowl",
+    animals: ["bird"],
+    situations: [],
+    text: "Ducklings and goslings follow their parents closely; if you see them with an adult, do not separate them, and never take a single duckling from its family. Adult geese can be aggressive, especially near young, so keep your distance. Waterfowl often get tangled in fishing line or hooks; if so, do not pull the line out, and contact a rehabilitator. A duckling truly alone with no parent in sight for a long time may need help.",
+    source: "Wildlife-rehabilitation guidance (needs verification).",
+  },
+  {
+    id: "raptor",
+    animals: ["bird"],
+    situations: [],
+    text: "Do not handle hawks, owls, falcons, or eagles; their talons and beaks can cause serious injury, and they need experienced handling. If a bird of prey is grounded or injured, keep people and pets away, and if it is safe you can drape a towel or box over it to keep it calm while you call a rehabilitator. Note the exact location and contact a licensed rehabilitator right away.",
+    source: "Wildlife-rehabilitation guidance (needs verification).",
+  },
 
   // ---- Mammals ----
   {
@@ -158,6 +172,27 @@ export const GUIDANCE: GuidanceEntry[] = [
     text: "Never handle a bat with bare hands, as bats can carry rabies. If a bat is grounded, injured, or found indoors where people or pets could have contacted it, do not release it; contain the room, avoid contact, and call public health and a wildlife rehabilitator for guidance.",
     source: "Public-health / wildlife guidance (needs verification).",
   },
+  {
+    id: "opossum",
+    animals: ["mammal"],
+    situations: [],
+    text: "Opossums are gentle and rarely a threat; a still or open-mouthed opossum is often just 'playing dead' from fear, not injured. Leave an uninjured adult alone. If an opossum has been hit by a car or killed, check the pouch, because live babies may be inside and will need a rehabilitator. Do not offer food or water, and avoid handling.",
+    source: "Wildlife-rehabilitation guidance (needs verification).",
+  },
+  {
+    id: "skunk",
+    animals: ["mammal"],
+    situations: [],
+    text: "Keep your distance from skunks, which can spray and may carry rabies. A common problem is a skunk with its head stuck in a container (like a cup or jar); if you can help safely from behind, you can try to free it, but otherwise call a rehabilitator. Never corner or chase a skunk. For any injured skunk, contact a rehabilitator rather than handling it.",
+    source: "Wildlife-rehabilitation guidance (needs verification).",
+  },
+  {
+    id: "fox-coyote",
+    animals: ["mammal"],
+    situations: [],
+    text: "Never handle a fox or coyote; keep people and pets well back and call a wildlife rehabilitator or animal control. An animal with severe hair loss and crusty skin likely has mange, which rehabilitators can treat. A pup alone is not necessarily orphaned, as parents leave young while hunting. Report injured or clearly sick animals rather than approaching them.",
+    source: "Wildlife-rehabilitation guidance (needs verification).",
+  },
 
   // ---- Reptiles & amphibians ----
   {
@@ -180,6 +215,13 @@ export const GUIDANCE: GuidanceEntry[] = [
     situations: [],
     text: "Almost all Ontario snakes are harmless and simply want to get away; give the snake space to leave and do not try to touch or catch it. Only the Massasauga rattlesnake is venomous, and bites are extremely rare. If a snake is clearly injured, keep people and pets back and contact a wildlife rehabilitator for advice.",
     source: "Ontario Nature / Wildlife Preservation Canada (needs verification).",
+  },
+  {
+    id: "frog-toad",
+    animals: ["reptile"],
+    situations: [],
+    text: "Most frogs and toads found in yards are healthy and do not need help; leave them be and let them move on. Their skin is delicate, so if you must move one out of danger, do it gently with clean, wet hands and place it in nearby damp cover rather than relocating it far away. Only intervene if it is clearly injured, and contact a rehabilitator for advice.",
+    source: "Amphibian-handling guidance (needs verification).",
   },
 ];
 

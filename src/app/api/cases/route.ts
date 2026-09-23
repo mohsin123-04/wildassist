@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { ANIMAL_TYPES, SITUATIONS } from "@/lib/triage";
+import { SITUATIONS } from "@/lib/triage";
 
 /**
  * POST /api/cases
@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
 
   const { animal, situation, description = "", verdict, title } = body;
 
-  const animalOk = ANIMAL_TYPES.some((a) => a.value === animal);
+  const animalOk =
+    typeof animal === "string" && animal.trim().length > 0 && animal.length <= 60;
   const situationOk = SITUATIONS.some((s) => s.value === situation);
   const verdictOk = ["leave", "help", "uncertain"].includes(verdict ?? "");
   if (!animalOk || !situationOk || !verdictOk) {
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("cases")
-    .insert({ animal, situation, description, verdict, title })
+    .insert({ animal: animal!.trim(), situation, description, verdict, title })
     .select("id")
     .single();
 
