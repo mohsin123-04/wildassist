@@ -45,6 +45,7 @@ export default function TriagePage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locStatus, setLocStatus] = useState<LocStatus>("idle");
+  const [locError, setLocError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export default function TriagePage() {
     setPhotoPreview(null);
     setCoords(null);
     setLocStatus("idle");
+    setLocError("");
     setResult(null);
     setCaseId(null);
     setAssignedCentre(null);
@@ -82,17 +84,44 @@ export default function TriagePage() {
 
   function useMyLocation() {
     if (!("geolocation" in navigator)) {
+      setLocError("This device or browser can't share a location.");
       setLocStatus("denied");
       return;
     }
     setLocStatus("locating");
+    setLocError("");
+
+    const onOk = (pos: GeolocationPosition) => {
+      setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      setLocStatus("done");
+    };
+
+    // Two-stage: a quick fast attempt, then a longer high-accuracy retry.
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocStatus("done");
+      onOk,
+      () => {
+        navigator.geolocation.getCurrentPosition(
+          onOk,
+          (err) => {
+            if (err.code === err.PERMISSION_DENIED) {
+              setLocError(
+                "Location permission is blocked. Enable it for this site in your browser settings, or continue without it."
+              );
+            } else if (err.code === err.TIMEOUT) {
+              setLocError(
+                "Getting your location took too long. Check that location services are on, then try again."
+              );
+            } else {
+              setLocError(
+                "We couldn't determine your location. You can still continue without it."
+              );
+            }
+            setLocStatus("denied");
+          },
+          { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 }
+        );
       },
-      () => setLocStatus("denied"),
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
   }
 
@@ -410,6 +439,8 @@ export default function TriagePage() {
               >
                 {locStatus === "locating" ? (
                   <Spinner label="Locating…" />
+                ) : locStatus === "denied" ? (
+                  "📍 Try again"
                 ) : (
                   "📍 Use my location"
                 )}
@@ -417,8 +448,8 @@ export default function TriagePage() {
             )}
             {locStatus === "denied" && (
               <p className="mt-2 text-xs text-amber-700">
-                Couldn&apos;t get your location. You can still continue, but the
-                report won&apos;t be routed automatically.
+                {locError ||
+                  "Couldn't get your location. You can still continue without it."}
               </p>
             )}
           </div>

@@ -48,26 +48,35 @@ export default function CentreFinder({
       return;
     }
     setStatus("locating");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const ranked = rankCentres(
+
+    const onOk = (pos: GeolocationPosition) => {
+      const ranked = rankCentres(
+        pos.coords.latitude,
+        pos.coords.longitude,
+        animal,
+        allCentres
+      );
+      setCentres(ranked);
+      setStatus("ranked");
+      if (ranked[0]) {
+        attachCentreToCase(
+          ranked[0].id,
           pos.coords.latitude,
-          pos.coords.longitude,
-          animal,
-          allCentres
+          pos.coords.longitude
         );
-        setCentres(ranked);
-        setStatus("ranked");
-        if (ranked[0]) {
-          attachCentreToCase(
-            ranked[0].id,
-            pos.coords.latitude,
-            pos.coords.longitude
-          );
-        }
-      },
-      () => showAll(),
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      }
+    };
+
+    // Quick attempt, then a longer high-accuracy retry before giving up.
+    navigator.geolocation.getCurrentPosition(
+      onOk,
+      () =>
+        navigator.geolocation.getCurrentPosition(onOk, () => showAll(), {
+          enableHighAccuracy: true,
+          timeout: 25000,
+          maximumAge: 0,
+        }),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     );
   }
 
