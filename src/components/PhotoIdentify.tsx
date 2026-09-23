@@ -28,15 +28,30 @@ async function getClassifier() {
   if (!classifierPromise) {
     classifierPromise = (async () => {
       const { pipeline } = await import("@huggingface/transformers");
+      // q8 quantized weights: ~4x smaller download, much less likely to stall.
       const pipe = await pipeline(
         "image-classification",
-        "Xenova/vit-base-patch16-224"
+        "Xenova/vit-base-patch16-224",
+        { dtype: "q8" }
       );
       return (input: string, opts: { top_k: number }) =>
         pipe(input, opts) as Promise<Prediction[]>;
-    })();
+    })().catch((e) => {
+      // Don't cache a failed load, so the next attempt can retry.
+      classifierPromise = null;
+      throw e;
+    });
   }
   return classifierPromise;
+}
+
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), ms)
+    ),
+  ]);
 }
 
 export default function PhotoIdentify({
@@ -61,10 +76,10 @@ export default function PhotoIdentify({
 
     try {
       setStatus((s) => (classifierPromise ? "classifying" : "loading-model"));
-      const classifier = await getClassifier();
+      const classifier = await withTimeout(getClassifier(), 45000);
       setStatus("classifying");
 
-      const preds = await classifier(url, { top_k: 5 });
+      const preds = await withTimeout(classifier(url, { top_k: 5 }), 20000);
       const result = classifyPredictions(preds);
 
       // Safety check: is this a dangerous animal? (specific option or label)
@@ -85,7 +100,7 @@ export default function PhotoIdentify({
     } catch {
       setStatus("error");
       setMessage(
-        "Couldn't analyze that photo. You can pick the animal type manually instead."
+        "Photo identification is taking too long or isn't available right now. No problem, just pick the animal type below and continue."
       );
     }
   }
@@ -156,8 +171,8 @@ export default function PhotoIdentify({
 
       {status === "loading-model" && (
         <p className="mt-3 text-sm text-zinc-500">
-          Downloading the vision model (first time only, ~90&nbsp;MB). It runs
-          entirely on your device. No photo is uploaded.
+          Downloading the vision model (first time only). It runs entirely on
+          your device. No photo is uploaded.
         </p>
       )}
 
