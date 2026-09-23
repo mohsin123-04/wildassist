@@ -16,14 +16,15 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("centre_id, full_name")
+    .select("centre_id, full_name, role")
     .eq("id", user.id)
     .single();
 
   const firstName = (profile?.full_name ?? "").trim().split(" ")[0];
+  const isAdmin = profile?.role === "admin";
 
-  // Staff hasn't linked a centre yet: show onboarding.
-  if (!profile?.centre_id) {
+  // Non-admin staff who haven't linked a centre yet: show onboarding.
+  if (!profile?.centre_id && !isAdmin) {
     const { data: centres } = await supabase
       .from("centres")
       .select("id, name, town")
@@ -56,19 +57,26 @@ export default async function DashboardPage() {
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
-          {firstName ? `Welcome back, ${firstName}` : "Centre dashboard"}
+          {isAdmin
+            ? "Admin overview"
+            : firstName
+              ? `Welcome back, ${firstName}`
+              : "Centre dashboard"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
-          {centre?.name ?? "Your centre"}
+          {isAdmin ? "All Ontario cases" : (centre?.name ?? "Your centre")}
         </h1>
         <p className="mt-1 text-zinc-600">
-          Cases routed to you from the public triage tool.
+          {isAdmin
+            ? "Every reported case across all centres."
+            : "Cases routed to you from the public triage tool."}
         </p>
       </div>
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
-        myCentreId={profile.centre_id}
+        myCentreId={profile.centre_id ?? ""}
         centreNames={centreNames}
+        isAdmin={isAdmin}
         centre={
           centre?.lat != null && centre?.lng != null
             ? [centre.lat, centre.lng]

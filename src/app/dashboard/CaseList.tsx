@@ -51,11 +51,13 @@ export default function CaseList({
   myCentreId,
   centreNames,
   centre,
+  isAdmin = false,
 }: {
   initialCases: CaseRow[];
   myCentreId: string;
   centreNames: Record<string, string>;
   centre: [number, number];
+  isAdmin?: boolean;
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
   const [tab, setTab] = useState<Tab>("area");
@@ -187,7 +189,7 @@ export default function CaseList({
     <div className="flex flex-col gap-5">
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="In your area" value={areaCases.length} />
+        <Stat label={isAdmin ? "All cases" : "In your area"} value={areaCases.length} />
         <Stat label="Open" value={stats.open} accent="text-emerald-700" />
         <Stat label="Needs help" value={stats.needsHelp} accent="text-rose-600" />
         <Stat label="Unassigned" value={stats.unassigned} accent="text-amber-600" />
@@ -196,7 +198,7 @@ export default function CaseList({
       {/* Tabs */}
       <div className="flex gap-2">
         <Tab active={tab === "area"} onClick={() => setTab("area")}>
-          In your area ({areaCases.length})
+          {isAdmin ? "All assigned" : "In your area"} ({areaCases.length})
         </Tab>
         <Tab active={tab === "unassigned"} onClick={() => setTab("unassigned")}>
           Unassigned ({unassignedCases.length})
@@ -373,7 +375,7 @@ export default function CaseList({
                         </span>
                       )}
 
-                      {c.centre_id === null ? (
+                      {c.centre_id === null && myCentreId ? (
                         <button
                           onClick={() => claim(c.id)}
                           disabled={claimingId === c.id}
@@ -381,6 +383,10 @@ export default function CaseList({
                         >
                           {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
                         </button>
+                      ) : c.centre_id === null ? (
+                        <span className="ml-auto text-sm text-zinc-400">
+                          Unassigned
+                        </span>
                       ) : (
                         <label className="ml-auto flex items-center gap-2 text-sm text-zinc-500">
                           Status
