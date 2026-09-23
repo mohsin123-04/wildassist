@@ -23,6 +23,7 @@ export default async function DashboardPage() {
 
   const firstName = (profile?.full_name ?? "").trim().split(" ")[0];
   const isAdmin = profile?.role === "admin";
+  const isManager = profile?.role === "manager";
 
   // Volunteers have their own transport view.
   if (profile?.role === "volunteer") redirect("/transport");
@@ -76,7 +77,7 @@ export default async function DashboardPage() {
             : "Cases routed to you from the public triage tool."}
         </p>
       </div>
-      {!isAdmin && <CentreCodePanel />}
+      {isManager && <CentreCodePanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}

@@ -16,11 +16,16 @@ async function centreOfUser() {
   if (!user) return { error: "Not signed in", status: 401 as const };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("centre_id")
+    .select("centre_id, role")
     .eq("id", user.id)
     .single();
   if (!profile?.centre_id)
     return { error: "You aren't linked to a centre", status: 400 as const };
+  if (profile.role !== "manager")
+    return {
+      error: "Only a centre manager can manage the join code",
+      status: 403 as const,
+    };
   return { centreId: profile.centre_id };
 }
 

@@ -41,11 +41,19 @@ export async function POST(req: Request) {
     );
   }
 
+  // The first person to join a centre becomes its manager (can manage the
+  // join code and invite staff); everyone after is regular staff.
+  const { count } = await admin
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("centre_id", centreId);
+  const role = (count ?? 0) === 0 ? "manager" : "staff";
+
   const { error } = await admin
     .from("profiles")
-    .update({ centre_id: centreId })
+    .update({ centre_id: centreId, role })
     .eq("id", user.id);
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, role });
 }
