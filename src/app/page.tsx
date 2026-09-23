@@ -17,7 +17,7 @@ export default function Home() {
 
       <div className="animate-in relative mx-auto flex w-full max-w-xl flex-col items-center gap-8 text-center">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/70 px-3 py-1 text-xs font-medium text-emerald-800">
-          🌿 Ontario wildlife help
+          🌿 Canada-wide wildlife help
         </span>
 
         <div className="flex flex-col gap-4">

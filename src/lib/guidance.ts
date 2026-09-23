@@ -65,7 +65,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "who-to-call",
     animals: [],
     situations: [],
-    text: "The safest next step is almost always to contact the nearest licensed wildlife rehabilitator and follow their advice before acting. In the Toronto area, the Toronto Wildlife Centre hotline (416-631-0662) can advise on most Ontario situations. Note the exact location where the animal was found.",
+    text: "The safest next step is almost always to contact the nearest licensed wildlife rehabilitator and follow their advice before acting. Note the exact location where the animal was found so a rehabilitator can advise or arrange transport.",
     source: "Toronto Wildlife Centre (needs verification).",
   },
 
@@ -199,7 +199,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "turtle-injured",
     animals: ["reptile"],
     situations: [],
-    text: "Injured turtles, including those hit by cars, can often be saved even with a badly cracked shell, so get it to a turtle trauma centre quickly. Place it in a ventilated container with no water. Note the exact location it was found, because turtles must be released where they came from. Snapping turtles bite and have long necks, so keep away from the head and lift with a shovel or board. In Ontario, the Ontario Turtle Conservation Centre (705-741-5000) treats injured turtles and runs a Turtle Taxi volunteer transport program.",
+    text: "Injured turtles, including those hit by cars, can often be saved even with a badly cracked shell, so get it to a wildlife centre or turtle trauma centre quickly. Place it in a ventilated container with no water. Note the exact location it was found, because turtles must be released where they came from. Snapping turtles bite and have long necks, so keep away from the head and lift with a shovel or board. Some regions have dedicated turtle hospitals and volunteer transport programs, so ask the nearest rehabilitator.",
     source: "Ontario Turtle Conservation Centre / Ontario Nature (needs verification).",
   },
   {
@@ -213,7 +213,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "snake",
     animals: ["reptile"],
     situations: [],
-    text: "Almost all Ontario snakes are harmless and simply want to get away; give the snake space to leave and do not try to touch or catch it. Only the Massasauga rattlesnake is venomous, and bites are extremely rare. If a snake is clearly injured, keep people and pets back and contact a wildlife rehabilitator for advice.",
+    text: "Almost all snakes in Canada are harmless and simply want to get away; give the snake space to leave and do not try to touch or catch it. Only a few species (such as the Massasauga rattlesnake in parts of Ontario, or rattlesnakes in western Canada) are venomous, and bites are very rare. If a snake is clearly injured, keep people and pets back and contact a wildlife rehabilitator for advice.",
     source: "Ontario Nature / Wildlife Preservation Canada (needs verification).",
   },
   {

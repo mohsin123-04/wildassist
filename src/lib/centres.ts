@@ -1,5 +1,5 @@
 /**
- * Ontario wildlife rehabilitation centres (SEED DATA).
+ * Canadian wildlife rehabilitation centres (SEED DATA).
  *
  * ⚠️ Coordinates are approximate (town-level) and contact details must be
  * verified against each centre's official site before this ships to real users.
@@ -96,6 +96,106 @@ export const ONTARIO_CENTRES: Centre[] = [
     lng: -81.48,
     takes: ["bird", "mammal", "reptile"],
     website: "https://www.salthaven.org",
+  },
+
+  // --- British Columbia ---
+  {
+    id: "wildarc",
+    name: "BC SPCA Wild ARC",
+    town: "Victoria, BC",
+    lat: 48.38,
+    lng: -123.48,
+    takes: ["bird", "mammal", "reptile", "amphibian"],
+    website: "https://spca.bc.ca",
+  },
+  {
+    id: "critter-care",
+    name: "Critter Care Wildlife Society",
+    town: "Langley, BC",
+    lat: 49.1,
+    lng: -122.66,
+    takes: ["mammal"],
+    website: "https://crittercarewildlife.org",
+  },
+  {
+    id: "ocean-wise-marine",
+    name: "Ocean Wise Marine Mammal Rescue",
+    town: "Vancouver, BC",
+    lat: 49.3,
+    lng: -123.13,
+    takes: ["mammal"],
+    website: "https://ocean.org",
+  },
+
+  // --- Alberta ---
+  {
+    id: "aiwc",
+    name: "Alberta Institute for Wildlife Conservation",
+    town: "Madden, AB (near Calgary)",
+    lat: 51.5,
+    lng: -114.53,
+    takes: ["bird", "mammal"],
+    website: "https://www.aiwc.ca",
+  },
+  {
+    id: "wildnorth",
+    name: "WILDNorth",
+    town: "Edmonton, AB",
+    lat: 53.55,
+    lng: -113.49,
+    takes: ["bird", "mammal"],
+    website: "https://wildnorth.ca",
+  },
+
+  // --- Saskatchewan / Manitoba ---
+  {
+    id: "living-sky",
+    name: "Living Sky Wildlife Rehabilitation",
+    town: "Saskatoon, SK",
+    lat: 52.13,
+    lng: -106.67,
+    takes: ["bird", "mammal"],
+    website: "https://livingskywildliferehabilitation.org",
+  },
+  {
+    id: "prairie-wildlife",
+    name: "Prairie Wildlife Rehabilitation Centre",
+    town: "Winnipeg, MB",
+    lat: 49.9,
+    lng: -97.14,
+    takes: ["bird", "mammal"],
+    website: "https://www.pwrconline.ca",
+  },
+
+  // --- Quebec ---
+  {
+    id: "le-nichoir",
+    name: "Le Nichoir Wild Bird Conservation Centre",
+    town: "Hudson, QC",
+    lat: 45.45,
+    lng: -74.15,
+    takes: ["bird"],
+    website: "https://lenichoir.org",
+  },
+
+  // --- Atlantic Canada ---
+  {
+    id: "hope-for-wildlife",
+    name: "Hope for Wildlife",
+    town: "Seaforth, NS",
+    lat: 44.71,
+    lng: -63.36,
+    takes: ["bird", "mammal", "reptile"],
+    website: "https://hopeforwildlife.net",
+  },
+  {
+    id: "cobequid",
+    name: "Cobequid Wildlife Rehabilitation Centre",
+    town: "Brookfield, NS",
+    lat: 45.26,
+    lng: -63.29,
+    takes: ["bird", "mammal"],
+    website: "https://cobequidwildlife.ca",
   },
 ];
 

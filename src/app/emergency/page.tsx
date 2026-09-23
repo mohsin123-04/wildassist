@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Wildlife emergency basics | WildAssist",
   description:
-    "Quick do's and don'ts for when you find an injured or orphaned wild animal in Ontario, plus how to reach a wildlife hotline.",
+    "Quick do's and don'ts for when you find an injured or orphaned wild animal in Canada, plus how to reach a wildlife hotline.",
 };
 
 const DOS = [
@@ -17,7 +17,7 @@ const DOS = [
 const DONTS = [
   "Don't give food or water. The wrong food can seriously harm or kill wildlife.",
   "Don't handle raptors, herons, raccoons, foxes, skunks, or bats. Bats and other mammals can carry rabies, so never touch a bat with bare hands.",
-  "Don't try to treat injuries yourself or keep the animal as a pet (it's also illegal in Ontario).",
+  "Don't try to treat injuries yourself or keep the animal as a pet (it's also illegal across Canada).",
   "Don't assume a lone baby animal is orphaned. A parent is often nearby.",
 ];
 
@@ -46,18 +46,18 @@ export default function EmergencyPage() {
 
       <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
         <h2 className="font-display text-lg font-semibold text-emerald-950">
-          Reach a wildlife hotline
+          Reach a wildlife rehabilitator
         </h2>
         <p className="mt-1 text-sm leading-6 text-zinc-600">
-          The Toronto Wildlife Centre runs a hotline that can advise on most
-          Ontario situations.
+          The fastest help comes from a licensed wildlife centre near you. Use the
+          guided tool to find and reach the nearest one for your situation.
         </p>
-        <a
-          href="tel:4166310662"
+        <Link
+          href="/triage"
           className="mt-4 inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-7 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98]"
         >
-          📞 Call 416-631-0662
-        </a>
+          Find the nearest centre
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

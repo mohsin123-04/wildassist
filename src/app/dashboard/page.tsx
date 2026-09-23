@@ -71,7 +71,7 @@ export default async function DashboardPage() {
               : "Centre dashboard"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
-          {isAdmin ? "All Ontario cases" : (centre?.name ?? "Your centre")}
+          {isAdmin ? "All cases" : (centre?.name ?? "Your centre")}
         </h1>
         <p className="mt-1 text-zinc-600">
           {isAdmin

@@ -66,7 +66,7 @@ function isValidRecommendation(x: unknown): x is Recommendation {
   );
 }
 
-const SYSTEM_PROMPT = `You are WildAssist, a calm, knowledgeable assistant that helps members of the public in Ontario, Canada decide what to do when they find a wild animal. The person may be worried, so be reassuring and clear.
+const SYSTEM_PROMPT = `You are WildAssist, a calm, knowledgeable assistant that helps members of the public in Canada decide what to do when they find a wild animal. The person may be worried, so be reassuring and clear.
 
 HOW TO ANSWER:
 - Read the person's description closely. If they name a specific animal or stage (for example a fledgling robin, a baby rabbit, a snapping turtle, a bat), select the VETTED GUIDANCE entries that fit that species and situation and tailor your advice to it. Be specific, not generic.
@@ -105,7 +105,7 @@ async function askLLM(
     .map((g, i) => `${i + 1}. ${g.text}`)
     .join("\n");
 
-  const userMessage = `A person in Ontario found an animal and needs guidance.
+  const userMessage = `A person in Canada found an animal and needs guidance.
 
 Animal type: ${labelFor(ANIMAL_TYPES, animal)}
 Situation they selected: ${labelFor(SITUATIONS, situation)}

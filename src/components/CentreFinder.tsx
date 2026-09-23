@@ -85,8 +85,8 @@ export default function CentreFinder({
       {status === "idle" && (
         <>
           <p className="mt-1 text-sm leading-6 text-zinc-600">
-            Share your location and we&apos;ll sort Ontario centres by how close
-            they are to you.
+            Share your location and we&apos;ll sort centres by how close they are
+            to you.
           </p>
           <button
             onClick={findNearest}
