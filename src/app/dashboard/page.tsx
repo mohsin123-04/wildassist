@@ -23,6 +23,9 @@ export default async function DashboardPage() {
   const firstName = (profile?.full_name ?? "").trim().split(" ")[0];
   const isAdmin = profile?.role === "admin";
 
+  // Volunteers have their own transport view.
+  if (profile?.role === "volunteer") redirect("/transport");
+
   // Non-admin staff who haven't linked a centre yet: show onboarding.
   if (!profile?.centre_id && !isAdmin) {
     const { data: centres } = await supabase
@@ -49,7 +52,7 @@ export default async function DashboardPage() {
   const { data: cases } = await supabase
     .from("cases")
     .select(
-      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url"
+      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_name"
     )
     .order("created_at", { ascending: false });
 

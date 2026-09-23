@@ -29,6 +29,7 @@ export type CaseRow = {
   staff_notes: string | null;
   centre_id: string | null;
   photo_url: string | null;
+  driver_name: string | null;
 };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
@@ -407,6 +408,16 @@ export default function CaseList({
                         </label>
                       )}
                     </div>
+
+                    {c.driver_name && (
+                      <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                        <span aria-hidden>🚗</span>
+                        <span>
+                          Being transported by{" "}
+                          <span className="font-medium">{c.driver_name}</span>
+                        </span>
+                      </div>
+                    )}
 
                     {/* Reporter contact */}
                     <div className="mt-4 border-t border-black/5 pt-3">
