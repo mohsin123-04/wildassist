@@ -52,6 +52,7 @@ export default function TriagePage() {
     null
   );
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const stepIndex = STEP_ORDER.indexOf(step);
 
@@ -306,8 +307,6 @@ export default function TriagePage() {
           subtitle="These help the centre respond. Everything here is optional."
           onBack={() => setStep("situation")}
         >
-          {danger && <SafetyBanner danger={danger} />}
-
           {/* Description */}
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700">
@@ -337,6 +336,14 @@ export default function TriagePage() {
               className="hidden"
               onChange={onPhotoPick}
             />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={onPhotoPick}
+            />
             {photoPreview ? (
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -356,12 +363,20 @@ export default function TriagePage() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => photoInputRef.current?.click()}
-                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
-              >
-                📷 Add a photo
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                >
+                  📷 Take photo
+                </button>
+                <button
+                  onClick={() => photoInputRef.current?.click()}
+                  className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                >
+                  🖼️ Choose from library
+                </button>
+              </div>
             )}
           </div>
 

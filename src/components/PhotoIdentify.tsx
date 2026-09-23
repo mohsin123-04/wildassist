@@ -45,6 +45,7 @@ export default function PhotoIdentify({
   onIdentify: (category: string | null, hint: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
@@ -100,6 +101,14 @@ export default function PhotoIdentify({
         className="hidden"
         onChange={handleFile}
       />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFile}
+      />
 
       {preview && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -110,16 +119,40 @@ export default function PhotoIdentify({
         />
       )}
 
-      <button
-        onClick={() => inputRef.current?.click()}
-        disabled={busy}
-        className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
-      >
-        {status === "idle" && "📷 Take or choose a photo"}
-        {status === "loading-model" && <Spinner label="Loading model…" />}
-        {status === "classifying" && <Spinner label="Looking…" />}
-        {(status === "done" || status === "error") && "Try another photo"}
-      </button>
+      {busy ? (
+        <button
+          disabled
+          className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm disabled:opacity-60"
+        >
+          {status === "loading-model" ? (
+            <Spinner label="Loading model…" />
+          ) : (
+            <Spinner label="Looking…" />
+          )}
+        </button>
+      ) : status === "done" || status === "error" ? (
+        <button
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-6 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+        >
+          Try another photo
+        </button>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => cameraRef.current?.click()}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-5 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
+          >
+            📷 Take photo
+          </button>
+          <button
+            onClick={() => inputRef.current?.click()}
+            className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+          >
+            🖼️ Choose from library
+          </button>
+        </div>
+      )}
 
       {status === "loading-model" && (
         <p className="mt-3 text-sm text-zinc-500">
