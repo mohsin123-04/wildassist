@@ -6,8 +6,10 @@ import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import ReporterContact from "@/components/ReporterContact";
 import ReportStatus from "@/components/ReportStatus";
+import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
+import { detectDanger, type DangerInfo } from "@/lib/safety";
 import {
   ANIMAL_OPTIONS,
   SITUATIONS,
@@ -37,6 +39,7 @@ export default function TriagePage() {
   const [situation, setSituation] = useState<Situation | null>(null);
   const [description, setDescription] = useState("");
   const [photoHint, setPhotoHint] = useState("");
+  const [danger, setDanger] = useState<DangerInfo | null>(null);
   const [showPhoto, setShowPhoto] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -57,6 +60,7 @@ export default function TriagePage() {
     setSituation(null);
     setDescription("");
     setPhotoHint("");
+    setDanger(null);
     setShowPhoto(false);
     setPhotoFile(null);
     setPhotoPreview(null);
@@ -99,6 +103,10 @@ export default function TriagePage() {
     if (photoHint) parts.push(`Photo analysis suggests it may be a ${photoHint}.`);
     if (description.trim()) parts.push(description.trim());
     const fullDescription = parts.join(" ");
+
+    // Deterministic safety check across everything we know about the animal.
+    const d = danger ?? detectDanger(description, photoHint, animalOption.label);
+    if (d) setDanger(d);
 
     // Upload the animal photo first (best-effort).
     let photoUrl: string | undefined;
@@ -243,6 +251,8 @@ export default function TriagePage() {
               <PhotoIdentify
                 onIdentify={(category, hint) => {
                   setPhotoHint(hint);
+                  const d = detectDanger(hint);
+                  if (d) setDanger(d);
                   const match = ANIMAL_OPTIONS.find(
                     (o) => o.category === category && o.value !== "unsure"
                   );
@@ -296,6 +306,8 @@ export default function TriagePage() {
           subtitle="These help the centre respond. Everything here is optional."
           onBack={() => setStep("situation")}
         >
+          {danger && <SafetyBanner danger={danger} />}
+
           {/* Description */}
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700">
@@ -412,6 +424,7 @@ export default function TriagePage() {
           result={result}
           caseId={caseId}
           assignedCentre={assignedCentre}
+          danger={danger}
           onRestart={reset}
         />
       )}
@@ -482,18 +495,21 @@ function ResultView({
   result,
   caseId,
   assignedCentre,
+  danger,
   onRestart,
 }: {
   animal: AnimalType;
   result: Result;
   caseId: string | null;
   assignedCentre: AssignedCentre | null;
+  danger: DangerInfo | null;
   onRestart: () => void;
 }) {
   const style = VERDICT_STYLES[result.verdict];
 
   return (
     <div className="animate-in flex flex-col gap-5">
+      {danger && <SafetyBanner danger={danger} />}
       <div className={`rounded-3xl border p-6 ${style.card}`}>
         <div className="flex items-center gap-2">
           <span

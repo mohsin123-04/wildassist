@@ -2,9 +2,22 @@
 
 import { useRef, useState } from "react";
 import Spinner from "@/components/Spinner";
+import SafetyBanner from "@/components/SafetyBanner";
 import { classifyPredictions, type Prediction } from "@/lib/vision";
+import { dangerForOption, detectDanger, type DangerInfo } from "@/lib/safety";
 
 type Status = "idle" | "loading-model" | "classifying" | "done" | "error";
+
+function notifyDanger(danger: DangerInfo) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  const show = () =>
+    new Notification("⚠️ Wildlife safety alert", {
+      body: `${danger.label}. ${danger.reason}`,
+    });
+  if (Notification.permission === "granted") show();
+  else if (Notification.permission !== "denied")
+    Notification.requestPermission().then((p) => p === "granted" && show());
+}
 
 // Cache the pipeline across uses so the model only downloads once per session.
 let classifierPromise: Promise<
@@ -35,6 +48,7 @@ export default function PhotoIdentify({
   const [status, setStatus] = useState<Status>("idle");
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
+  const [danger, setDanger] = useState<DangerInfo | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -51,6 +65,12 @@ export default function PhotoIdentify({
 
       const preds = await classifier(url, { top_k: 5 });
       const result = classifyPredictions(preds);
+
+      // Safety check: is this a dangerous animal? (specific option or label)
+      const d =
+        dangerForOption(result.option) || detectDanger(result.topLabel);
+      setDanger(d);
+      if (d) notifyDanger(d);
 
       setStatus("done");
       if (result.category) {
@@ -109,6 +129,12 @@ export default function PhotoIdentify({
       )}
 
       {message && <p className="mt-3 text-sm text-zinc-700">{message}</p>}
+
+      {danger && (
+        <div className="mt-3">
+          <SafetyBanner danger={danger} />
+        </div>
+      )}
     </div>
   );
 }
