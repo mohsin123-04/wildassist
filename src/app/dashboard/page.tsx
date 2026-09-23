@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import CentreOnboarding from "./CentreOnboarding";
 import CaseList, { type CaseRow } from "./CaseList";
+import CentreCodePanel from "./CentreCodePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +76,7 @@ export default async function DashboardPage() {
             : "Cases routed to you from the public triage tool."}
         </p>
       </div>
+      {!isAdmin && <CentreCodePanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}
