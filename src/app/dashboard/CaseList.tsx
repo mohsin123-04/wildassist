@@ -18,6 +18,7 @@ export type CaseRow = {
   reporter_phone: string | null;
   staff_notes: string | null;
   centre_id: string | null;
+  photo_url: string | null;
 };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
@@ -225,6 +226,21 @@ export default function CaseList({
 
                 {expanded && (
                   <div className="border-t border-black/5 px-4 py-3">
+                    {c.photo_url && (
+                      <a
+                        href={c.photo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mb-3 block"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={c.photo_url}
+                          alt="Reported animal"
+                          className="max-h-52 w-full rounded-xl object-cover"
+                        />
+                      </a>
+                    )}
                     {c.description && (
                       <div className="mb-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">

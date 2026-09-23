@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import ReporterContact from "@/components/ReporterContact";
+import ReportStatus from "@/components/ReportStatus";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
 import {
@@ -19,6 +20,14 @@ import {
 
 type Step = "animal" | "situation" | "details" | "result";
 type Result = Recommendation & { source?: "ai" | "rules" };
+type AssignedCentre = {
+  id: string;
+  name: string;
+  town: string;
+  phone?: string | null;
+  website?: string | null;
+};
+type LocStatus = "idle" | "locating" | "done" | "denied";
 
 const STEP_ORDER: Step[] = ["animal", "situation", "details", "result"];
 
@@ -29,9 +38,17 @@ export default function TriagePage() {
   const [description, setDescription] = useState("");
   const [photoHint, setPhotoHint] = useState("");
   const [showPhoto, setShowPhoto] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [locStatus, setLocStatus] = useState<LocStatus>("idle");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
+  const [assignedCentre, setAssignedCentre] = useState<AssignedCentre | null>(
+    null
+  );
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const stepIndex = STEP_ORDER.indexOf(step);
 
@@ -41,30 +58,37 @@ export default function TriagePage() {
     setDescription("");
     setPhotoHint("");
     setShowPhoto(false);
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setCoords(null);
+    setLocStatus("idle");
     setResult(null);
     setCaseId(null);
+    setAssignedCentre(null);
     setStep("animal");
   }
 
-  async function logCase(rec: Result, fullDescription: string) {
-    if (!animalOption || !situation) return;
-    try {
-      const r = await fetch("/api/cases", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          animal: animalOption.label,
-          situation,
-          description: fullDescription,
-          verdict: rec.verdict,
-          title: rec.title,
-        }),
-      });
-      const d = await r.json();
-      if (d.id) setCaseId(d.id);
-    } catch {
-      // Logging is best-effort; never block the user on it.
+  function onPhotoPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+
+  function useMyLocation() {
+    if (!("geolocation" in navigator)) {
+      setLocStatus("denied");
+      return;
     }
+    setLocStatus("locating");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocStatus("done");
+      },
+      () => setLocStatus("denied"),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+    );
   }
 
   async function submit() {
@@ -75,6 +99,23 @@ export default function TriagePage() {
     if (photoHint) parts.push(`Photo analysis suggests it may be a ${photoHint}.`);
     if (description.trim()) parts.push(description.trim());
     const fullDescription = parts.join(" ");
+
+    // Upload the animal photo first (best-effort).
+    let photoUrl: string | undefined;
+    if (photoFile) {
+      try {
+        const fd = new FormData();
+        fd.append("file", photoFile);
+        const r = await fetch("/api/case-photo", { method: "POST", body: fd });
+        const d = await r.json();
+        if (d.url) photoUrl = d.url;
+      } catch {
+        // keep going without the photo
+      }
+    }
+
+    // Get the care advice.
+    let advice: Result;
     try {
       const res = await fetch("/api/triage", {
         method: "POST",
@@ -86,20 +127,38 @@ export default function TriagePage() {
         }),
       });
       if (!res.ok) throw new Error("bad response");
-      const data = await res.json();
-      setResult(data);
-      logCase(data, fullDescription);
+      advice = await res.json();
     } catch {
-      const fallback = {
-        ...recommend(category, situation),
-        source: "rules" as const,
-      };
-      setResult(fallback);
-      logCase(fallback, fullDescription);
-    } finally {
-      setLoading(false);
-      setStep("result");
+      advice = { ...recommend(category, situation), source: "rules" as const };
     }
+    setResult(advice);
+
+    // Log the case (with location, photo, auto-routed centre).
+    try {
+      const r = await fetch("/api/cases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          animal: animalOption.label,
+          category,
+          situation,
+          description: fullDescription,
+          verdict: advice.verdict,
+          title: advice.title,
+          lat: coords?.lat,
+          lng: coords?.lng,
+          photoUrl,
+        }),
+      });
+      const d = await r.json();
+      if (d.id) setCaseId(d.id);
+      if (d.centre) setAssignedCentre(d.centre);
+    } catch {
+      // best-effort
+    }
+
+    setLoading(false);
+    setStep("result");
   }
 
   return (
@@ -234,22 +293,115 @@ export default function TriagePage() {
           key="details"
           eyebrow="Step 3 of 3"
           title="Tell us a bit more"
-          subtitle="In your own words. The more detail, the better the guidance. Optional."
+          subtitle="These help the centre respond. Everything here is optional."
           onBack={() => setStep("situation")}
         >
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
-            rows={5}
-            className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
-          />
+          {/* Description */}
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-zinc-700">
+              Describe what you see
+            </span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
+              rows={4}
+              className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+            />
+          </label>
+
+          {/* Photo of the animal */}
+          <div className="mt-4">
+            <p className="text-sm font-medium text-zinc-700">
+              Add a photo of the animal
+            </p>
+            <p className="mb-2 text-xs text-zinc-500">
+              A photo helps the centre understand its condition.
+            </p>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onPhotoPick}
+            />
+            {photoPreview ? (
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photoPreview}
+                  alt="The animal you photographed"
+                  className="h-16 w-16 rounded-xl object-cover"
+                />
+                <button
+                  onClick={() => {
+                    setPhotoFile(null);
+                    setPhotoPreview(null);
+                  }}
+                  className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => photoInputRef.current?.click()}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+              >
+                📷 Add a photo
+              </button>
+            )}
+          </div>
+
+          {/* Location */}
+          <div className="mt-4">
+            <p className="text-sm font-medium text-zinc-700">
+              Where is the animal?
+            </p>
+            <p className="mb-2 text-xs text-zinc-500">
+              Sharing your location routes this report to the nearest centre.
+            </p>
+            {locStatus === "done" ? (
+              <div className="flex items-center gap-2 text-sm text-emerald-800">
+                <span aria-hidden>📍</span>
+                <span className="font-medium">Location captured.</span>
+                <button
+                  onClick={() => {
+                    setCoords(null);
+                    setLocStatus("idle");
+                  }}
+                  className="text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+                >
+                  Clear
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={useMyLocation}
+                disabled={locStatus === "locating"}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50 disabled:opacity-60"
+              >
+                {locStatus === "locating" ? (
+                  <Spinner label="Locating…" />
+                ) : (
+                  "📍 Use my location"
+                )}
+              </button>
+            )}
+            {locStatus === "denied" && (
+              <p className="mt-2 text-xs text-amber-700">
+                Couldn&apos;t get your location. You can still continue, but the
+                report won&apos;t be routed automatically.
+              </p>
+            )}
+          </div>
+
           <button
             onClick={submit}
             disabled={loading}
-            className="mt-4 inline-flex h-13 items-center justify-center rounded-full bg-emerald-700 px-8 py-3.5 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 inline-flex h-13 items-center justify-center rounded-full bg-emerald-700 px-8 py-3.5 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
           >
-            {loading ? <Spinner label="Thinking…" /> : "Get advice"}
+            {loading ? <Spinner label="Submitting…" /> : "Get help & send report"}
           </button>
         </Section>
       )}
@@ -259,6 +411,7 @@ export default function TriagePage() {
           animal={animalOption.category}
           result={result}
           caseId={caseId}
+          assignedCentre={assignedCentre}
           onRestart={reset}
         />
       )}
@@ -328,11 +481,13 @@ function ResultView({
   animal,
   result,
   caseId,
+  assignedCentre,
   onRestart,
 }: {
   animal: AnimalType;
   result: Result;
   caseId: string | null;
+  assignedCentre: AssignedCentre | null;
   onRestart: () => void;
 }) {
   const style = VERDICT_STYLES[result.verdict];
@@ -375,7 +530,11 @@ function ResultView({
 
       {result.showContactCentre && (
         <>
-          <CentreFinder animal={animal} caseId={caseId} />
+          {assignedCentre ? (
+            <ReportStatus centre={assignedCentre} />
+          ) : (
+            <CentreFinder animal={animal} caseId={caseId} />
+          )}
           <ReporterContact caseId={caseId} />
         </>
       )}
