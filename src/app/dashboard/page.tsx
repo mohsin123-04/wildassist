@@ -4,6 +4,7 @@ import CentreOnboarding from "./CentreOnboarding";
 import CaseList, { type CaseRow } from "./CaseList";
 import CentreCodePanel from "./CentreCodePanel";
 import TeamPanel from "./TeamPanel";
+import AdminCentres from "./AdminCentres";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function DashboardPage() {
             : "Cases routed to you from the public triage tool."}
         </p>
       </div>
+      {isAdmin && <AdminCentres />}
       {isManager && <CentreCodePanel />}
       {isManager && <TeamPanel />}
       <CaseList

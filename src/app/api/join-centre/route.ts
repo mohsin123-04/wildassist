@@ -41,13 +41,24 @@ export async function POST(req: Request) {
     );
   }
 
-  // Everyone joins as staff. A centre's manager is designated deliberately
-  // (by the operator when onboarding, or promoted by an existing manager).
+  // The person the admin designated as manager (by email) becomes manager on
+  // join; everyone else joins as staff.
+  const { data: centre } = await admin
+    .from("centres")
+    .select("manager_email")
+    .eq("id", centreId)
+    .single();
+  const isDesignatedManager =
+    !!centre?.manager_email &&
+    !!user.email &&
+    centre.manager_email.trim().toLowerCase() === user.email.toLowerCase();
+  const role = isDesignatedManager ? "manager" : "staff";
+
   const { error } = await admin
     .from("profiles")
-    .update({ centre_id: centreId, role: "staff" })
+    .update({ centre_id: centreId, role })
     .eq("id", user.id);
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, role });
 }
