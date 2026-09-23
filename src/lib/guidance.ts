@@ -218,9 +218,9 @@ export const GUIDANCE: GuidanceEntry[] = [
   },
   {
     id: "frog-toad",
-    animals: ["reptile"],
+    animals: ["amphibian"],
     situations: [],
-    text: "Most frogs and toads found in yards are healthy and do not need help; leave them be and let them move on. Their skin is delicate, so if you must move one out of danger, do it gently with clean, wet hands and place it in nearby damp cover rather than relocating it far away. Only intervene if it is clearly injured, and contact a rehabilitator for advice.",
+    text: "Most frogs, toads, and salamanders found in yards are healthy and do not need help; leave them be and let them move on. Their skin is delicate and absorbs chemicals easily, so if you must move one out of danger, do it gently with clean, wet, unscented hands and place it in nearby damp cover rather than relocating it far away. Only intervene if it is clearly injured, and contact a rehabilitator for advice.",
     source: "Amphibian-handling guidance (needs verification).",
   },
 ];

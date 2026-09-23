@@ -29,7 +29,7 @@ async function getClassifier() {
 export default function PhotoIdentify({
   onIdentify,
 }: {
-  onIdentify: (option: string | null, hint: string) => void;
+  onIdentify: (category: string | null, hint: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -53,20 +53,14 @@ export default function PhotoIdentify({
       const result = classifyPredictions(preds);
 
       setStatus("done");
-      if (result.option) {
-        setMessage(
-          `Looks like a ${result.topLabel}. We've picked the closest match for you. You can change it.`
-        );
-      } else if (result.category) {
-        setMessage(
-          `Our best guess was "${result.topLabel}". Please pick the specific animal below.`
-        );
+      if (result.category) {
+        setMessage(`Looks like a ${result.topLabel}. Taking you to the next step.`);
       } else {
         setMessage(
           `We couldn't confidently identify it. Please pick the animal below.`
         );
       }
-      onIdentify(result.option, result.topLabel);
+      onIdentify(result.category, result.topLabel);
     } catch {
       setStatus("error");
       setMessage(

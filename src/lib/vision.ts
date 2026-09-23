@@ -34,7 +34,7 @@ const OPTION_WORDS: { option: string; category: AnimalType; words: string[] }[] 
   { option: "bat", category: "mammal", words: ["bat"] },
   { option: "turtle", category: "reptile", words: ["turtle", "terrapin", "tortoise"] },
   { option: "snake", category: "reptile", words: ["snake", "serpent", "boa", "python", "cobra", "viper", "mamba", "adder", "garter", "rattlesnake"] },
-  { option: "frog-toad", category: "reptile", words: ["frog", "toad", "bullfrog", "salamander", "newt"] },
+  { option: "frog-toad", category: "amphibian", words: ["frog", "toad", "bullfrog", "salamander", "newt", "axolotl", "eft"] },
   { option: "duck-goose", category: "bird", words: ["goose", "duck", "drake", "mallard", "merganser", "teal", "swan", "goosander"] },
   { option: "raptor", category: "bird", words: ["owl", "hawk", "eagle", "falcon", "kite", "vulture", "osprey", "buzzard", "harrier", "kestrel"] },
   { option: "songbird", category: "bird", words: ["robin", "jay", "finch", "sparrow", "chickadee", "magpie", "junco", "warbler", "wren", "starling", "bulbul", "bunting", "oriole", "cardinal", "titmouse", "nuthatch", "thrush", "grackle", "blackbird", "chickadee", "lorikeet", "hummingbird"] },

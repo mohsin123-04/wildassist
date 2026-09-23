@@ -114,6 +114,29 @@ export default function TriagePage() {
         ))}
       </div>
 
+      {animalOption &&
+        (step === "situation" || step === "details") && (
+          <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5">
+            <span className="flex items-center gap-2 text-sm text-emerald-900">
+              <span aria-hidden className="text-base">
+                {animalOption.icon}
+              </span>
+              <span className="font-medium">{animalOption.label}</span>
+              {photoHint && (
+                <span className="text-emerald-700">
+                  (looks like a {photoHint})
+                </span>
+              )}
+            </span>
+            <button
+              onClick={() => setStep("animal")}
+              className="shrink-0 text-sm font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+            >
+              Change
+            </button>
+          </div>
+        )}
+
       {step === "animal" && (
         <Section
           key="animal"
@@ -121,7 +144,7 @@ export default function TriagePage() {
           title="What did you find?"
           subtitle="Pick the closest match. It's okay to guess."
         >
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3">
             {ANIMAL_OPTIONS.map((a) => (
               <button
                 key={a.value}
@@ -129,18 +152,16 @@ export default function TriagePage() {
                   setAnimalOption(a);
                   setStep("situation");
                 }}
-                className={`group flex flex-col items-start gap-1.5 rounded-2xl border bg-white p-3.5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
+                className={`group flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
                   animalOption?.value === a.value
                     ? "border-emerald-500 ring-2 ring-emerald-500/30"
                     : "border-black/5"
                 }`}
               >
-                <span aria-hidden className="text-2xl">
+                <span aria-hidden className="text-3xl">
                   {a.icon}
                 </span>
-                <span className="text-sm font-medium leading-tight text-emerald-950">
-                  {a.label}
-                </span>
+                <span className="font-medium text-emerald-950">{a.label}</span>
               </button>
             ))}
           </div>
@@ -155,9 +176,11 @@ export default function TriagePage() {
               </button>
             ) : (
               <PhotoIdentify
-                onIdentify={(optionValue, hint) => {
+                onIdentify={(category, hint) => {
                   setPhotoHint(hint);
-                  const match = ANIMAL_OPTIONS.find((o) => o.value === optionValue);
+                  const match = ANIMAL_OPTIONS.find(
+                    (o) => o.category === category && o.value !== "unsure"
+                  );
                   if (match) {
                     setAnimalOption(match);
                     setStep("situation");

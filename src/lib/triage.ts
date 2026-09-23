@@ -9,7 +9,7 @@
  * for the fuller knowledge base the LLM draws on.
  */
 
-export type AnimalType = "bird" | "mammal" | "reptile" | "unsure";
+export type AnimalType = "bird" | "mammal" | "reptile" | "amphibian" | "unsure";
 
 export type Situation =
   | "bleeding"
@@ -39,7 +39,8 @@ export interface Recommendation {
 export const ANIMAL_TYPES: { value: AnimalType; label: string; icon: string }[] = [
   { value: "bird", label: "Bird", icon: "🐦" },
   { value: "mammal", label: "Mammal", icon: "🦝" },
-  { value: "reptile", label: "Reptile or amphibian", icon: "🐢" },
+  { value: "reptile", label: "Reptile", icon: "🐢" },
+  { value: "amphibian", label: "Amphibian", icon: "🐸" },
   { value: "unsure", label: "I'm not sure", icon: "❓" },
 ];
 
@@ -52,19 +53,10 @@ export interface AnimalOption {
 }
 
 export const ANIMAL_OPTIONS: AnimalOption[] = [
-  { value: "songbird", label: "Songbird", icon: "🐦", category: "bird" },
-  { value: "duck-goose", label: "Duck or goose", icon: "🦆", category: "bird" },
-  { value: "raptor", label: "Hawk or owl", icon: "🦅", category: "bird" },
-  { value: "squirrel", label: "Squirrel or chipmunk", icon: "🐿️", category: "mammal" },
-  { value: "rabbit", label: "Rabbit", icon: "🐰", category: "mammal" },
-  { value: "raccoon", label: "Raccoon, skunk, or opossum", icon: "🦝", category: "mammal" },
-  { value: "deer", label: "Deer or fawn", icon: "🦌", category: "mammal" },
-  { value: "fox-coyote", label: "Fox or coyote", icon: "🦊", category: "mammal" },
-  { value: "bat", label: "Bat", icon: "🦇", category: "mammal" },
-  { value: "turtle", label: "Turtle", icon: "🐢", category: "reptile" },
-  { value: "snake", label: "Snake", icon: "🐍", category: "reptile" },
-  { value: "frog-toad", label: "Frog or toad", icon: "🐸", category: "reptile" },
-  { value: "other-bird", label: "Another bird", icon: "🕊️", category: "bird" },
+  { value: "bird", label: "Bird", icon: "🐦", category: "bird" },
+  { value: "mammal", label: "Mammal", icon: "🦝", category: "mammal" },
+  { value: "reptile", label: "Reptile", icon: "🐢", category: "reptile" },
+  { value: "amphibian", label: "Amphibian", icon: "🐸", category: "amphibian" },
   { value: "unsure", label: "I'm not sure", icon: "❓", category: "unsure" },
 ];
 
