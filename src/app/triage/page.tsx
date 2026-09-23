@@ -472,21 +472,21 @@ function Section({
 const VERDICT_STYLES = {
   help: {
     card: "border-rose-200 bg-rose-50",
-    badge: "bg-rose-600",
+    badge: "bg-white text-rose-700 ring-1 ring-rose-200",
+    dot: "bg-rose-500",
     label: "Needs help",
-    icon: "🚑",
   },
   leave: {
     card: "border-emerald-200 bg-emerald-50",
-    badge: "bg-emerald-600",
+    badge: "bg-white text-emerald-700 ring-1 ring-emerald-200",
+    dot: "bg-emerald-500",
     label: "Leave it be",
-    icon: "🌿",
   },
   uncertain: {
     card: "border-amber-200 bg-amber-50",
-    badge: "bg-amber-600",
+    badge: "bg-white text-amber-700 ring-1 ring-amber-200",
+    dot: "bg-amber-500",
     label: "Check first",
-    icon: "👀",
   },
 } as const;
 
@@ -511,14 +511,12 @@ function ResultView({
     <div className="animate-in flex flex-col gap-5">
       {danger && <SafetyBanner danger={danger} />}
       <div className={`rounded-3xl border p-6 ${style.card}`}>
-        <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white ${style.badge}`}
-          >
-            <span aria-hidden>{style.icon}</span>
-            {style.label}
-          </span>
-        </div>
+        <span
+          className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${style.badge}`}
+        >
+          <span aria-hidden className={`h-2 w-2 rounded-full ${style.dot}`} />
+          {style.label}
+        </span>
         <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-zinc-900">
           {result.title}
         </h1>
@@ -526,13 +524,11 @@ function ResultView({
       </div>
 
       {result.verdict === "help" && (
-        <div className="flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-900">
-          <span aria-hidden className="text-base">
-            ⏱️
-          </span>
+        <div className="rounded-2xl border-l-4 border-rose-400 bg-rose-50 p-4 text-sm leading-6 text-rose-900">
+          <span className="font-semibold">Time-sensitive.</span>{" "}
           <span>
-            Time matters for an injured animal. Follow these steps and get it to
-            a centre as soon as you safely can. If it&apos;s a life-threatening
+            Follow these steps and get it to a centre as soon as you safely can.
+            If it&apos;s a life-threatening
             emergency, call a centre right now.
           </span>
         </div>
