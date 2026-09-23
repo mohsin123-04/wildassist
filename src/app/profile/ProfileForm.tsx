@@ -2,33 +2,45 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
 type CentreOption = { id: string; name: string; town: string };
 
+const inputClass =
+  "h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20";
+
 export default function ProfileForm({
-  email,
-  role,
   initialName,
+  initialTitle,
+  initialPhone,
+  initialBio,
   initialCentreId,
   centres,
 }: {
-  email: string;
-  role: string;
   initialName: string;
+  initialTitle: string;
+  initialPhone: string;
+  initialBio: string;
   initialCentreId: string;
   centres: CentreOption[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
+  const [title, setTitle] = useState(initialTitle);
+  const [phone, setPhone] = useState(initialPhone);
+  const [bio, setBio] = useState(initialBio);
   const [centreId, setCentreId] = useState(initialCentreId);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const dirty = name !== initialName || centreId !== initialCentreId;
+  const dirty =
+    name !== initialName ||
+    title !== initialTitle ||
+    phone !== initialPhone ||
+    bio !== initialBio ||
+    centreId !== initialCentreId;
 
   async function save() {
     setSaving(true);
@@ -45,7 +57,13 @@ export default function ProfileForm({
     }
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: name.trim() || null, centre_id: centreId || null })
+      .update({
+        full_name: name.trim() || null,
+        title: title.trim() || null,
+        phone: phone.trim() || null,
+        bio: bio.trim() || null,
+        centre_id: centreId || null,
+      })
       .eq("id", user.id);
     setSaving(false);
     if (error) {
@@ -53,92 +71,93 @@ export default function ProfileForm({
       return;
     }
     setSaved(true);
-    // Tell the account menu to refresh its display, and re-render server data.
     window.dispatchEvent(new Event("profile-updated"));
     router.refresh();
   }
 
-  const initial = (name || email).charAt(0).toUpperCase();
-
   return (
-    <div className="flex flex-col gap-5">
-      <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-        {/* Identity header */}
-        <div className="flex items-center gap-3 border-b border-black/5 pb-5">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-lg font-semibold text-white">
-            {initial}
-          </span>
-          <div className="min-w-0">
-            <p className="truncate font-medium text-emerald-950">
-              {name || "Unnamed staff"}
-            </p>
-            <p className="truncate text-sm text-zinc-500">{email}</p>
-          </div>
-          <span className="ml-auto shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold capitalize text-emerald-800">
-            {role}
-          </span>
-        </div>
+    <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-emerald-950">
+        Profile
+      </h2>
+      <p className="mt-0.5 text-sm text-zinc-500">
+        How you appear to your centre team.
+      </p>
 
-        {/* Fields */}
-        <div className="mt-5 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-zinc-700">Display name</span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Alex Rivera"
-              className="h-11 rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
-            />
-          </label>
+      <div className="mt-5 flex flex-col gap-4">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-zinc-700">Display name</span>
+          <input
+            className={inputClass}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Alex Rivera"
+          />
+        </label>
 
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-zinc-700">
-              Linked centre
+              Role / title
             </span>
-            <select
-              value={centreId}
-              onChange={(e) => setCentreId(e.target.value)}
-              className="h-11 rounded-xl border border-black/10 bg-white px-3 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
-            >
-              <option value="">No centre linked</option>
-              {centres.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.town})
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-zinc-700">Email</span>
             <input
-              value={email}
-              disabled
-              className="h-11 cursor-not-allowed rounded-xl border border-black/5 bg-zinc-50 px-4 text-zinc-500"
+              className={inputClass}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Rehabilitator"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-zinc-700">Phone</span>
+            <input
+              className={inputClass}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. 416-555-0199"
             />
           </label>
         </div>
 
-        {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
-        {saved && !dirty && (
-          <p className="mt-4 text-sm text-emerald-700">Saved.</p>
-        )}
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-zinc-700">Linked centre</span>
+          <select
+            className={inputClass + " px-3"}
+            value={centreId}
+            onChange={(e) => setCentreId(e.target.value)}
+          >
+            <option value="">No centre linked</option>
+            {centres.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.town})
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <button
-          onClick={save}
-          disabled={saving || !dirty}
-          className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-50"
-        >
-          {saving ? <Spinner label="Saving…" /> : "Save changes"}
-        </button>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-zinc-700">Bio</span>
+          <textarea
+            rows={3}
+            className="w-full resize-none rounded-xl border border-black/10 bg-white p-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            placeholder="A sentence about you and your work at the centre."
+          />
+        </label>
       </div>
 
-      <Link
-        href="/dashboard"
-        className="self-start text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+      {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
+      {saved && !dirty && (
+        <p className="mt-4 text-sm text-emerald-700">Saved.</p>
+      )}
+
+      <button
+        onClick={save}
+        disabled={saving || !dirty}
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-50"
       >
-        Go to dashboard
-      </Link>
-    </div>
+        {saving ? <Spinner label="Saving…" /> : "Save changes"}
+      </button>
+    </section>
   );
 }

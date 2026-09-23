@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import Avatar from "@/components/Avatar";
 
 export default function AccountMenu() {
   const router = useRouter();
@@ -12,6 +13,8 @@ export default function AccountMenu() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [centreName, setCentreName] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarColor, setAvatarColor] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -26,6 +29,8 @@ export default function AccountMenu() {
       if (!session?.user) {
         setCentreName(null);
         setDisplayName(null);
+        setAvatarUrl(null);
+        setAvatarColor(null);
       }
     });
 
@@ -47,11 +52,13 @@ export default function AccountMenu() {
     const supabase = createClient();
     supabase
       .from("profiles")
-      .select("full_name, centres(name)")
+      .select("full_name, avatar_url, avatar_color, centres(name)")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDisplayName(data?.full_name ?? null);
+        setAvatarUrl(data?.avatar_url ?? null);
+        setAvatarColor(data?.avatar_color ?? null);
         const centres = data?.centres as
           | { name: string }
           | { name: string }[]
@@ -99,7 +106,6 @@ export default function AccountMenu() {
 
   const email = user.email ?? "Account";
   const label = displayName || email;
-  const initial = label.charAt(0).toUpperCase();
 
   return (
     <div className="relative" ref={menuRef}>
@@ -107,9 +113,13 @@ export default function AccountMenu() {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded-full border border-black/5 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-emerald-50"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-sm font-semibold text-white">
-          {initial}
-        </span>
+        <Avatar
+          url={avatarUrl}
+          name={displayName}
+          email={email}
+          color={avatarColor}
+          size={28}
+        />
         <span className="hidden max-w-[10rem] truncate text-sm font-medium text-emerald-950 sm:block">
           {label}
         </span>
@@ -125,9 +135,13 @@ export default function AccountMenu() {
         <div className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg">
           <div className="border-b border-black/5 px-4 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-base font-semibold text-white">
-                {initial}
-              </span>
+              <Avatar
+                url={avatarUrl}
+                name={displayName}
+                email={email}
+                color={avatarColor}
+                size={36}
+              />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-emerald-950">
                   {label}
