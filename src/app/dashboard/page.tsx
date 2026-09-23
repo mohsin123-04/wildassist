@@ -20,6 +20,8 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single();
 
+  const firstName = (profile?.full_name ?? "").trim().split(" ")[0];
+
   // Staff hasn't linked a centre yet: show onboarding.
   if (!profile?.centre_id) {
     const { data: centres } = await supabase
@@ -42,7 +44,9 @@ export default async function DashboardPage() {
 
   const { data: cases } = await supabase
     .from("cases")
-    .select("id, created_at, animal, situation, verdict, title, status")
+    .select(
+      "id, created_at, animal, situation, verdict, title, status, description, lat, lng"
+    )
     .eq("centre_id", profile.centre_id)
     .order("created_at", { ascending: false });
 
@@ -50,13 +54,13 @@ export default async function DashboardPage() {
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
-          Centre dashboard
+          {firstName ? `Welcome back, ${firstName}` : "Centre dashboard"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
           {centre?.name ?? "Your centre"}
         </h1>
         <p className="mt-1 text-zinc-600">
-          Incoming cases routed to you from the public triage tool.
+          Cases routed to you from the public triage tool.
         </p>
       </div>
       <CaseList initialCases={(cases ?? []) as CaseRow[]} />

@@ -34,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <header className="sticky top-0 z-20 border-b border-black/5 bg-[var(--background)]/80 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-2xl items-center justify-between px-5 py-3">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3">
             <Link
               href="/"
               className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-emerald-900"
