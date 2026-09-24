@@ -3,86 +3,70 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export type Member = { id: string; full_name: string | null; role: string };
-
+type Member = { id: string; full_name: string | null; role: string };
+type Conversation = { id: string; kind: string; label: string };
 type Message = {
   id: string;
+  conversation_id: string;
   sender_id: string | null;
   sender_name: string | null;
-  recipient_id: string | null;
   body: string;
   created_at: string;
 };
 
-const MAIN = "main";
-
 export default function MessagesClient({
-  centreId,
   myId,
   myName,
-  members,
 }: {
-  centreId: string;
   myId: string;
   myName: string;
-  members: Member[];
 }) {
-  const [selected, setSelected] = useState<string>(MAIN); // "main" or a member id
+  const supabase = createClient();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
-  const [sending, setSending] = useState(false);
+  const [composer, setComposer] = useState<null | "menu" | "group">(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const selectedRef = useRef(selected);
+  const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
 
-  const supabase = createClient();
-
-  function belongsToOpen(m: Message): boolean {
-    if (selectedRef.current === MAIN) return m.recipient_id === null;
-    const other = selectedRef.current;
-    return (
-      (m.sender_id === myId && m.recipient_id === other) ||
-      (m.sender_id === other && m.recipient_id === myId)
-    );
-  }
-
-  async function loadMessages() {
-    let query = supabase
-      .from("messages")
-      .select("id, sender_id, sender_name, recipient_id, body, created_at")
-      .order("created_at", { ascending: true });
-
-    if (selected === MAIN) {
-      query = query.is("recipient_id", null);
-    } else {
-      query = query.or(
-        `and(sender_id.eq.${myId},recipient_id.eq.${selected}),and(sender_id.eq.${selected},recipient_id.eq.${myId})`
-      );
-    }
-    const { data } = await query;
-    setMessages((data ?? []) as Message[]);
+  async function loadConversations(pick?: string) {
+    const r = await fetch("/api/conversations");
+    const d = await r.json();
+    const convs: Conversation[] = d.conversations ?? [];
+    setConversations(convs);
+    setMembers(d.members ?? []);
+    setSelected((cur) => pick ?? cur ?? convs[0]?.id ?? null);
   }
 
   useEffect(() => {
-    loadMessages();
+    loadConversations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!selected) return;
+    supabase
+      .from("messages")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at")
+      .eq("conversation_id", selected)
+      .order("created_at", { ascending: true })
+      .then(({ data }) => setMessages((data ?? []) as Message[]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // Realtime: new messages in this centre bump the open conversation.
+  // Realtime: RLS only delivers messages in conversations I can access.
   useEffect(() => {
     const channel = supabase
       .channel("messages")
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `centre_id=eq.${centreId}`,
-        },
+        { event: "INSERT", schema: "public", table: "messages" },
         (payload) => {
           const m = payload.new as Message;
-          if (belongsToOpen(m)) {
+          if (m.conversation_id === selectedRef.current) {
             setMessages((prev) =>
               prev.some((x) => x.id === m.id) ? prev : [...prev, m]
             );
@@ -94,7 +78,7 @@ export default function MessagesClient({
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [centreId]);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,58 +86,113 @@ export default function MessagesClient({
 
   async function send() {
     const text = body.trim();
-    if (!text) return;
-    setSending(true);
+    if (!text || !selected) return;
     setBody("");
     await supabase.from("messages").insert({
-      centre_id: centreId,
+      conversation_id: selected,
       sender_id: myId,
       sender_name: myName,
-      recipient_id: selected === MAIN ? null : selected,
       body: text,
     });
-    setSending(false);
   }
 
-  const conversations = [
-    { key: MAIN, label: "Main channel", sub: "Everyone at your centre" },
-    ...members.map((m) => ({
-      key: m.id,
-      label: m.full_name || "Unnamed",
-      sub: "Direct message",
-    })),
-  ];
-  const activeLabel =
-    conversations.find((c) => c.key === selected)?.label ?? "Main channel";
+  async function startDm(memberId: string) {
+    const r = await fetch("/api/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dmWith: memberId }),
+    });
+    const d = await r.json();
+    setComposer(null);
+    if (d.id) await loadConversations(d.id);
+  }
+
+  async function createGroup(title: string, memberIds: string[]) {
+    const r = await fetch("/api/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, memberIds }),
+    });
+    const d = await r.json();
+    setComposer(null);
+    if (d.id) await loadConversations(d.id);
+  }
+
+  const active = conversations.find((c) => c.id === selected);
+  const iconFor = (kind: string) =>
+    kind === "channel" ? "# " : kind === "group" ? "👥 " : "";
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Conversation switcher */}
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        {conversations.map((c) => (
+      {/* Conversation switcher + New */}
+      <div className="flex items-center gap-2">
+        <div className="-mx-1 flex flex-1 gap-2 overflow-x-auto px-1 pb-1">
+          {conversations.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setSelected(c.id)}
+              className={`flex shrink-0 items-center rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                selected === c.id
+                  ? "border-zinc-900 bg-zinc-900 text-white"
+                  : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              {iconFor(c.kind)}
+              {c.label}
+            </button>
+          ))}
+        </div>
+        <div className="relative">
           <button
-            key={c.key}
-            onClick={() => setSelected(c.key)}
-            className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              selected === c.key
-                ? "border-zinc-900 bg-zinc-900 text-white"
-                : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
-            }`}
+            onClick={() => setComposer(composer ? null : "menu")}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-lg text-zinc-600 hover:bg-zinc-50"
+            aria-label="New conversation"
           >
-            {c.key === MAIN ? "# " : ""}
-            {c.label}
+            +
           </button>
-        ))}
+          {composer === "menu" && (
+            <div className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+              <p className="border-b border-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
+                Direct message
+              </p>
+              <div className="max-h-40 overflow-y-auto">
+                {members.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => startDm(m.id)}
+                    className="block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
+                  >
+                    {m.full_name || "Unnamed"}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setComposer("group")}
+                className="block w-full border-t border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
+              >
+                👥 New group chat
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {composer === "group" && (
+        <GroupCreator
+          members={members}
+          onCancel={() => setComposer(null)}
+          onCreate={createGroup}
+        />
+      )}
 
       {/* Thread */}
       <div className="flex h-[26rem] flex-col rounded-2xl border border-zinc-200 bg-white">
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
           {messages.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-sm text-zinc-400">
-              {selected === MAIN
+              {active?.kind === "channel"
                 ? "No messages yet. Say hello to your team."
-                : `Start a conversation with ${activeLabel}.`}
+                : `Start the conversation${active ? ` in ${active.label}` : ""}.`}
             </div>
           ) : (
             messages.map((m) => {
@@ -163,7 +202,7 @@ export default function MessagesClient({
                   key={m.id}
                   className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
                 >
-                  {!mine && selected === MAIN && (
+                  {!mine && active?.kind !== "dm" && (
                     <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
                       {m.sender_name || "Someone"}
                     </span>
@@ -190,7 +229,6 @@ export default function MessagesClient({
           <div ref={bottomRef} />
         </div>
 
-        {/* Composer */}
         <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
           <input
             value={body}
@@ -201,18 +239,80 @@ export default function MessagesClient({
                 send();
               }
             }}
-            placeholder={`Message ${selected === MAIN ? "the team" : activeLabel}…`}
-            className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+            placeholder={`Message ${active?.label ?? "…"}`}
+            disabled={!selected}
+            className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 disabled:opacity-50"
           />
           <button
             onClick={send}
-            disabled={sending || !body.trim()}
+            disabled={!body.trim() || !selected}
             className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             Send
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GroupCreator({
+  members,
+  onCancel,
+  onCreate,
+}: {
+  members: Member[];
+  onCancel: () => void;
+  onCreate: (title: string, memberIds: string[]) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [picked, setPicked] = useState<string[]>([]);
+  const toggle = (id: string) =>
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  return (
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+      <p className="text-sm font-medium text-zinc-900">New group chat</p>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Group name (e.g. Weekend drivers)"
+        className="mt-3 h-10 w-full rounded-xl border border-zinc-200 px-4 text-sm outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+      />
+      <p className="mt-3 text-xs font-medium uppercase tracking-wide text-zinc-400">
+        Add teammates
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {members.map((m) => (
+          <button
+            key={m.id}
+            onClick={() => toggle(m.id)}
+            className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              picked.includes(m.id)
+                ? "border-zinc-900 bg-zinc-900 text-white"
+                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            {m.full_name || "Unnamed"}
+          </button>
+        ))}
+      </div>
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={() => onCreate(title, picked)}
+          disabled={picked.length < 2}
+          className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
+        >
+          Create group
+        </button>
+        <button
+          onClick={onCancel}
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+        >
+          Cancel
+        </button>
+      </div>
+      <p className="mt-2 text-xs text-zinc-400">Pick at least two teammates.</p>
     </div>
   );
 }

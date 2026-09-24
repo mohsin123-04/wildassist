@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import MessagesClient, { type Member } from "./MessagesClient";
+import MessagesClient from "./MessagesClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function MessagesPage() {
 
   const { data: me } = await supabase
     .from("profiles")
-    .select("centre_id, full_name, role")
+    .select("centre_id, full_name")
     .eq("id", user.id)
     .single();
 
@@ -38,13 +38,6 @@ export default async function MessagesPage() {
     );
   }
 
-  const { data: members } = await supabase
-    .from("profiles")
-    .select("id, full_name, role")
-    .eq("centre_id", me.centre_id)
-    .neq("id", user.id)
-    .order("full_name");
-
   const { data: centre } = await supabase
     .from("centres")
     .select("name")
@@ -61,12 +54,7 @@ export default async function MessagesPage() {
           Messages
         </h1>
       </div>
-      <MessagesClient
-        centreId={me.centre_id}
-        myId={user.id}
-        myName={me.full_name ?? "You"}
-        members={(members ?? []) as Member[]}
-      />
+      <MessagesClient myId={user.id} myName={me.full_name ?? "You"} />
     </main>
   );
 }
