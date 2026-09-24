@@ -27,9 +27,10 @@ export default function MessagesClient({
   const [selected, setSelected] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
-  const [composer, setComposer] = useState<null | "menu" | "group">(null);
   const [creating, setCreating] = useState(false);
   const [unread, setUnread] = useState<Record<string, number>>({});
+  const [newMenu, setNewMenu] = useState<null | "menu" | "group">(null);
+  const [mobileThread, setMobileThread] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
@@ -38,14 +39,9 @@ export default function MessagesClient({
   async function markRead(convId: string) {
     setUnread((u) => ({ ...u, [convId]: 0 }));
     await supabase.from("conversation_reads").upsert(
-      {
-        conversation_id: convId,
-        user_id: myId,
-        last_read: new Date().toISOString(),
-      },
+      { conversation_id: convId, user_id: myId, last_read: new Date().toISOString() },
       { onConflict: "conversation_id,user_id" }
     );
-    // Keep the header's unread badge in sync.
     window.dispatchEvent(new Event("messages-read"));
   }
 
@@ -77,7 +73,6 @@ export default function MessagesClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // Realtime: RLS only delivers messages in conversations I can access.
   useEffect(() => {
     const channel = supabase
       .channel("messages")
@@ -92,9 +87,8 @@ export default function MessagesClient({
             );
             if (m.sender_id !== myId) markRead(m.conversation_id);
           } else if (m.sender_id !== myId) {
-            // A new message in another conversation: bump its unread badge.
             if (!convIdsRef.current.includes(m.conversation_id)) {
-              loadConversations(); // a new DM/group someone started with me
+              loadConversations();
             } else {
               setUnread((u) => ({
                 ...u,
@@ -119,18 +113,45 @@ export default function MessagesClient({
     const text = body.trim();
     if (!text || !selected) return;
     setBody("");
-    await supabase.from("messages").insert({
+    // Optimistic: show it instantly, then reconcile with the saved row.
+    const tempId = `temp-${Date.now()}`;
+    const optimistic: Message = {
+      id: tempId,
       conversation_id: selected,
       sender_id: myId,
       sender_name: myName,
       body: text,
-    });
+      created_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimistic]);
+    const { data } = await supabase
+      .from("messages")
+      .insert({
+        conversation_id: selected,
+        sender_id: myId,
+        sender_name: myName,
+        body: text,
+      })
+      .select("id, conversation_id, sender_id, sender_name, body, created_at")
+      .single();
+    if (data) {
+      setMessages((prev) =>
+        prev.some((x) => x.id === data.id)
+          ? prev.filter((x) => x.id !== tempId)
+          : prev.map((x) => (x.id === tempId ? (data as Message) : x))
+      );
+    }
+  }
+
+  function openConversation(id: string) {
+    setSelected(id);
+    setMobileThread(true);
   }
 
   async function startDm(memberId: string) {
     if (creating) return;
     setCreating(true);
-    setComposer(null);
+    setNewMenu(null);
     try {
       const r = await fetch("/api/conversations", {
         method: "POST",
@@ -138,7 +159,10 @@ export default function MessagesClient({
         body: JSON.stringify({ dmWith: memberId }),
       });
       const d = await r.json();
-      if (d.id) await loadConversations(d.id);
+      if (d.id) {
+        await loadConversations(d.id);
+        setMobileThread(true);
+      }
     } finally {
       setCreating(false);
     }
@@ -147,7 +171,7 @@ export default function MessagesClient({
   async function createGroup(title: string, memberIds: string[]) {
     if (creating) return;
     setCreating(true);
-    setComposer(null);
+    setNewMenu(null);
     try {
       const r = await fetch("/api/conversations", {
         method: "POST",
@@ -155,60 +179,46 @@ export default function MessagesClient({
         body: JSON.stringify({ title, memberIds }),
       });
       const d = await r.json();
-      if (d.id) await loadConversations(d.id);
+      if (d.id) {
+        await loadConversations(d.id);
+        setMobileThread(true);
+      }
     } finally {
       setCreating(false);
     }
   }
 
   const active = conversations.find((c) => c.id === selected);
-  const iconFor = (kind: string) =>
-    kind === "channel" ? "# " : kind === "group" ? "👥 " : "";
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Conversation switcher + New */}
-      <div className="flex items-center gap-2">
-        <div className="-mx-1 flex flex-1 gap-2 overflow-x-auto px-1 pb-1">
-          {conversations.map((c) => {
-            const n = unread[c.id] ?? 0;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setSelected(c.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                  selected === c.id
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
-                }`}
-              >
-                <span>
-                  {iconFor(c.kind)}
-                  {c.label}
-                </span>
-                {n > 0 && selected !== c.id && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-semibold text-white">
-                    {n > 9 ? "9+" : n}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        <div className="relative">
+    <div className="flex h-[32rem] overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      {/* Sidebar */}
+      <aside
+        className={`w-full flex-col border-r border-zinc-200 sm:flex sm:w-64 ${
+          mobileThread ? "hidden" : "flex"
+        }`}
+      >
+        <div className="relative flex items-center justify-between border-b border-zinc-200 px-3 py-2.5">
+          <span className="text-sm font-semibold text-zinc-900">Conversations</span>
           <button
-            onClick={() => setComposer(composer ? null : "menu")}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-lg text-zinc-600 hover:bg-zinc-50"
+            onClick={() => setNewMenu(newMenu ? null : "menu")}
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-200 text-lg text-zinc-600 hover:bg-zinc-50"
             aria-label="New conversation"
           >
             +
           </button>
-          {composer === "menu" && (
-            <div className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-              <p className="border-b border-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
+          {newMenu === "menu" && (
+            <div className="absolute right-2 top-11 z-20 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+              <button
+                onClick={() => setNewMenu("group")}
+                className="block w-full border-b border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
+              >
+                👥 New group chat
+              </button>
+              <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-400">
                 Direct message
               </p>
-              <div className="max-h-40 overflow-y-auto">
+              <div className="max-h-48 overflow-y-auto pb-1">
                 {members.map((m) => (
                   <button
                     key={m.id}
@@ -219,93 +229,159 @@ export default function MessagesClient({
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setComposer("group")}
-                className="block w-full border-t border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
-              >
-                👥 New group chat
-              </button>
             </div>
           )}
         </div>
-      </div>
 
-      {composer === "group" && (
-        <GroupCreator
-          members={members}
-          onCancel={() => setComposer(null)}
-          onCreate={createGroup}
-        />
-      )}
+        <div className="flex-1 overflow-y-auto p-2">
+          {conversations.map((c) => {
+            const n = unread[c.id] ?? 0;
+            const isSel = selected === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => openConversation(c.id)}
+                className={`mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                  isSel ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100"
+                }`}
+              >
+                <ConvIcon kind={c.kind} label={c.label} selected={isSel} />
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {c.label}
+                </span>
+                {n > 0 && !isSel && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-semibold text-white">
+                    {n > 9 ? "9+" : n}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </aside>
 
       {/* Thread */}
-      <div className="flex h-[26rem] flex-col rounded-2xl border border-zinc-200 bg-white">
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {messages.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-center text-sm text-zinc-400">
-              {active?.kind === "channel"
-                ? "No messages yet. Say hello to your team."
-                : `Start the conversation${active ? ` in ${active.label}` : ""}.`}
-            </div>
-          ) : (
-            messages.map((m) => {
-              const mine = m.sender_id === myId;
-              return (
-                <div
-                  key={m.id}
-                  className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
-                >
-                  {!mine && active?.kind !== "dm" && (
-                    <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
-                      {m.sender_name || "Someone"}
-                    </span>
-                  )}
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
-                      mine
-                        ? "rounded-br-md bg-zinc-900 text-white"
-                        : "rounded-bl-md bg-zinc-100 text-zinc-800"
-                    }`}
-                  >
-                    {m.body}
-                  </div>
-                  <span className="mt-0.5 px-1 text-[10px] text-zinc-400">
-                    {new Date(m.created_at).toLocaleTimeString([], {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-              );
-            })
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
-          <input
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            placeholder={`Message ${active?.label ?? "…"}`}
-            disabled={!selected}
-            className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 disabled:opacity-50"
+      <section
+        className={`flex-1 flex-col ${mobileThread ? "flex" : "hidden sm:flex"}`}
+      >
+        {newMenu === "group" ? (
+          <GroupCreator
+            members={members}
+            onCancel={() => setNewMenu(null)}
+            onCreate={createGroup}
           />
-          <button
-            onClick={send}
-            disabled={!body.trim() || !selected}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
-          >
-            Send
-          </button>
-        </div>
-      </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-2 border-b border-zinc-200 px-4 py-2.5">
+              <button
+                onClick={() => setMobileThread(false)}
+                className="text-sm text-zinc-500 hover:text-zinc-900 sm:hidden"
+                aria-label="Back"
+              >
+                ←
+              </button>
+              <p className="truncate text-sm font-semibold text-zinc-900">
+                {active ? `${active.kind === "channel" ? "# " : ""}${active.label}` : "Select a conversation"}
+              </p>
+            </div>
+
+            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+              {messages.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-center text-sm text-zinc-400">
+                  {active?.kind === "channel"
+                    ? "No messages yet. Say hello to your team."
+                    : "Start the conversation."}
+                </div>
+              ) : (
+                messages.map((m) => {
+                  const mine = m.sender_id === myId;
+                  return (
+                    <div
+                      key={m.id}
+                      className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
+                    >
+                      {!mine && active?.kind !== "dm" && (
+                        <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
+                          {m.sender_name || "Someone"}
+                        </span>
+                      )}
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
+                          mine
+                            ? "rounded-br-md bg-zinc-900 text-white"
+                            : "rounded-bl-md bg-zinc-100 text-zinc-800"
+                        }`}
+                      >
+                        {m.body}
+                      </div>
+                      <span className="mt-0.5 px-1 text-[10px] text-zinc-400">
+                        {new Date(m.created_at).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
+              <input
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                  }
+                }}
+                placeholder={`Message ${active?.label ?? "…"}`}
+                disabled={!selected}
+                className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 disabled:opacity-50"
+              />
+              <button
+                onClick={send}
+                disabled={!body.trim() || !selected}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+              >
+                Send
+              </button>
+            </div>
+          </>
+        )}
+      </section>
     </div>
+  );
+}
+
+function ConvIcon({
+  kind,
+  label,
+  selected,
+}: {
+  kind: string;
+  label: string;
+  selected: boolean;
+}) {
+  const base = "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold";
+  if (kind === "channel")
+    return (
+      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-zinc-200 text-zinc-600"}`}>
+        #
+      </span>
+    );
+  if (kind === "group")
+    return (
+      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-zinc-200 text-zinc-600"}`}>
+        👥
+      </span>
+    );
+  return (
+    <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-emerald-100 text-emerald-700"}`}>
+      {label.charAt(0).toUpperCase()}
+    </span>
   );
 }
 
@@ -324,15 +400,15 @@ function GroupCreator({
     setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
-      <p className="text-sm font-medium text-zinc-900">New group chat</p>
+    <div className="flex-1 overflow-y-auto p-5">
+      <p className="text-sm font-semibold text-zinc-900">New group chat</p>
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Group name (e.g. Weekend drivers)"
         className="mt-3 h-10 w-full rounded-xl border border-zinc-200 px-4 text-sm outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
       />
-      <p className="mt-3 text-xs font-medium uppercase tracking-wide text-zinc-400">
+      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-400">
         Add teammates
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -350,7 +426,7 @@ function GroupCreator({
           </button>
         ))}
       </div>
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 flex gap-2">
         <button
           onClick={() => onCreate(title, picked)}
           disabled={picked.length < 2}
