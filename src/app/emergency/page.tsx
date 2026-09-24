@@ -23,20 +23,20 @@ const DONTS = [
 
 export default function EmergencyPage() {
   return (
-    <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-5 py-8">
+    <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-5 py-10">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
           Quick reference
         </p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-emerald-950">
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-zinc-900">
           Wildlife emergency basics
         </h1>
-        <p className="mt-2 text-zinc-600">
+        <p className="mt-2 text-zinc-500">
           A fast reference while you get expert help. Not sure what you&apos;re
           dealing with?{" "}
           <Link
             href="/triage"
-            className="font-medium text-emerald-700 underline underline-offset-4"
+            className="font-medium text-emerald-600 underline underline-offset-4 hover:text-emerald-700"
           >
             Answer a few questions
           </Link>
@@ -44,8 +44,8 @@ export default function EmergencyPage() {
         </p>
       </div>
 
-      <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
-        <h2 className="font-display text-lg font-semibold text-emerald-950">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+        <h2 className="font-display text-lg font-semibold tracking-tight text-zinc-900">
           Reach a wildlife rehabilitator
         </h2>
         <p className="mt-1 text-sm leading-6 text-zinc-600">
@@ -54,37 +54,43 @@ export default function EmergencyPage() {
         </p>
         <Link
           href="/triage"
-          className="mt-4 inline-flex h-12 items-center justify-center rounded-full bg-emerald-700 px-7 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98]"
+          className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98]"
         >
           Find the nearest centre
         </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
-          <h2 className="mb-3 font-display text-lg font-semibold text-emerald-900">
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-emerald-700">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">
+              ✓
+            </span>
             Do
           </h2>
-          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-emerald-950">
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-zinc-700">
             {DOS.map((d, i) => (
               <li key={i} className="flex gap-2">
-                <span aria-hidden className="text-emerald-600">
-                  ✓
+                <span aria-hidden className="mt-0.5 text-emerald-500">
+                  •
                 </span>
                 <span>{d}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-6">
-          <h2 className="mb-3 font-display text-lg font-semibold text-rose-900">
+        <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-rose-700">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-xs text-white">
+              ✕
+            </span>
             Don&apos;t
           </h2>
-          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-rose-950">
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-zinc-700">
             {DONTS.map((d, i) => (
               <li key={i} className="flex gap-2">
-                <span aria-hidden className="text-rose-500">
-                  ✕
+                <span aria-hidden className="mt-0.5 text-rose-400">
+                  •
                 </span>
                 <span>{d}</span>
               </li>
@@ -96,13 +102,13 @@ export default function EmergencyPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white transition-colors hover:bg-emerald-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
         >
           Start guided help
         </Link>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
         >
           Home
         </Link>

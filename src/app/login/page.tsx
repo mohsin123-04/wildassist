@@ -10,7 +10,7 @@ type Mode = "signin" | "signup";
 type Role = "staff" | "volunteer";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20";
+  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
 
 const ROLES: { value: Role; icon: string; title: string; desc: string }[] = [
   {
@@ -91,15 +91,15 @@ export default function LoginPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
-      <div className="rounded-3xl border border-black/5 bg-white p-7 shadow-sm">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-7">
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-lg"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-base text-white"
           >
             🦉
           </span>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-emerald-950">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
             {mode === "signin" ? "Sign in" : "Create your account"}
           </h1>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
           . Found an animal?{" "}
           <Link
             href="/triage"
-            className="font-medium text-emerald-700 underline underline-offset-2"
+            className="font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
           >
             You don&apos;t need an account, just report it.
           </Link>
@@ -128,15 +128,15 @@ export default function LoginPage() {
                     onClick={() => setRole(r.value)}
                     className={`flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-all ${
                       role === r.value
-                        ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500/30"
-                        : "border-black/10 bg-white hover:border-emerald-300"
+                        ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
+                        : "border-zinc-200 bg-white hover:border-zinc-300"
                     }`}
                   >
                     <span aria-hidden className="text-xl">
                       {r.icon}
                     </span>
                     <span>
-                      <span className="block text-sm font-semibold text-emerald-950">
+                      <span className="block text-sm font-semibold text-zinc-900">
                         {r.title}
                       </span>
                       <span className="mt-0.5 block text-xs leading-5 text-zinc-500">
@@ -174,12 +174,12 @@ export default function LoginPage() {
           />
 
           {error && <p className="text-sm text-rose-600">{error}</p>}
-          {notice && <p className="text-sm text-emerald-700">{notice}</p>}
+          {notice && <p className="text-sm text-emerald-600">{notice}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-1 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? (
               <Spinner label="Please wait…" />
@@ -197,7 +197,7 @@ export default function LoginPage() {
             setError(null);
             setNotice(null);
           }}
-          className="mt-4 text-sm text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+          className="mt-4 text-sm text-emerald-600 underline underline-offset-4 hover:text-emerald-900"
         >
           {mode === "signin"
             ? "New here? Create an account"
