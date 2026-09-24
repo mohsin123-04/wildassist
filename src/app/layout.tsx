@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
+import NotificationBell from "@/components/NotificationBell";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 Emergency
               </Link>
+              <NotificationBell />
               <AccountMenu />
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 
@@ -62,6 +62,20 @@ export default function CaseList({
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
   const [tab, setTab] = useState<Tab>("area");
+
+  // Viewing the dashboard marks all current cases as seen (clears the bell).
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      supabase
+        .from("profiles")
+        .update({ last_seen_cases: new Date().toISOString() })
+        .eq("id", data.user.id)
+        .then(() => window.dispatchEvent(new Event("cases-seen")));
+    });
+  }, []);
+
   const [statusFilter, setStatusFilter] = useState<"all" | CaseRow["status"]>(
     "all"
   );
