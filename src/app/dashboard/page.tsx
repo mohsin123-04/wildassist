@@ -63,14 +63,14 @@ export default async function DashboardPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
           {isAdmin
             ? "Admin overview"
             : firstName
               ? `Welcome back, ${firstName}`
               : "Centre dashboard"}
         </p>
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
+        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">
           {isAdmin ? "All cases" : (centre?.name ?? "Your centre")}
         </h1>
         <p className="mt-1 text-zinc-600">

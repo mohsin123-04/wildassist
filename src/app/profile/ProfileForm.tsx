@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20";
+  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
 
 export default function ProfileForm({
   initialName,
@@ -67,8 +67,8 @@ export default function ProfileForm({
   }
 
   return (
-    <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-emerald-950">
+    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-zinc-900">
         Profile
       </h2>
       <p className="mt-0.5 text-sm text-zinc-500">
@@ -113,7 +113,7 @@ export default function ProfileForm({
           <span className="text-sm font-medium text-zinc-700">Bio</span>
           <textarea
             rows={3}
-            className="w-full resize-none rounded-xl border border-black/10 bg-white p-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="A sentence about you and your work at the centre."
@@ -129,7 +129,7 @@ export default function ProfileForm({
       <button
         onClick={save}
         disabled={saving || !dirty}
-        className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-50"
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50"
       >
         {saving ? <Spinner label="Saving…" /> : "Save changes"}
       </button>

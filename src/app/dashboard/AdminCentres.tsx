@@ -14,7 +14,7 @@ type CentreRow = {
 const SPECIES = ["bird", "mammal", "reptile", "amphibian", "fish"] as const;
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20";
+  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
 
 export default function AdminCentres() {
   const [centres, setCentres] = useState<CentreRow[]>([]);
@@ -69,12 +69,12 @@ export default function AdminCentres() {
   }
 
   return (
-    <div className="mb-5 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="text-sm font-medium text-emerald-950">
+        <span className="text-sm font-medium text-zinc-900">
           Centres ({centres.length})
         </span>
         <span
@@ -112,7 +112,7 @@ export default function AdminCentres() {
                     className={`rounded-full border px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
                       takes.includes(s)
                         ? "border-emerald-500 bg-emerald-50 text-emerald-800"
-                        : "border-black/10 bg-white text-zinc-500"
+                        : "border-zinc-200 bg-white text-zinc-500"
                     }`}
                   >
                     {s}
@@ -153,7 +153,7 @@ export default function AdminCentres() {
               <button
                 onClick={submit}
                 disabled={busy || !name.trim() || !address.trim()}
-                className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                className="inline-flex h-11 w-fit items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-colors hover:bg-zinc-800 disabled:opacity-50"
               >
                 {busy ? <Spinner label="Creating…" /> : "Create centre"}
               </button>
@@ -167,10 +167,10 @@ export default function AdminCentres() {
               {centres.map((c) => (
                 <li
                   key={c.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-black/5 bg-[var(--background)] px-3 py-2 text-sm"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-[var(--background)] px-3 py-2 text-sm"
                 >
                   <span>
-                    <span className="font-medium text-emerald-950">{c.name}</span>
+                    <span className="font-medium text-zinc-900">{c.name}</span>
                     <span className="text-zinc-500"> · {c.town}</span>
                     {c.manager_email && (
                       <span className="text-zinc-400"> · mgr {c.manager_email}</span>

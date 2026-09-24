@@ -98,14 +98,14 @@ export default function TransportList({
                   <button
                     onClick={() => act(j.id, "deliver")}
                     disabled={busyId === j.id}
-                    className="inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
                   >
                     Mark delivered
                   </button>
                   <button
                     onClick={() => act(j.id, "release")}
                     disabled={busyId === j.id}
-                    className="inline-flex h-9 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-zinc-600 transition-colors hover:bg-black/5 disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-50"
                   >
                     Release
                   </button>
@@ -130,7 +130,7 @@ export default function TransportList({
                 <button
                   onClick={() => act(j.id, "claim")}
                   disabled={busyId === j.id}
-                  className="inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                  className="inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
                 >
                   {busyId === j.id ? "Claiming…" : "Claim pickup"}
                 </button>
@@ -152,7 +152,7 @@ function Section({
 }) {
   return (
     <div>
-      <h2 className="mb-2.5 font-display text-lg font-semibold text-emerald-950">
+      <h2 className="mb-2.5 font-display text-lg font-semibold text-zinc-900">
         {title}
       </h2>
       <div className="flex flex-col gap-3">{children}</div>
@@ -162,7 +162,7 @@ function Section({
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-black/10 bg-white/50 p-6 text-center text-sm text-zinc-500">
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-6 text-center text-sm text-zinc-500">
       {text}
     </div>
   );
@@ -180,11 +180,11 @@ function JobCard({
   actions: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium capitalize text-emerald-950">
+            <span className="text-sm font-medium capitalize text-zinc-900">
               {job.animal}
             </span>
             {distance != null && (

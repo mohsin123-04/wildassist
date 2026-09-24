@@ -66,8 +66,8 @@ export default function AppearanceSection({
   }
 
   return (
-    <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-emerald-950">
+    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-zinc-900">
         Appearance
       </h2>
       <p className="mt-0.5 text-sm text-zinc-500">
@@ -87,7 +87,7 @@ export default function AppearanceSection({
           <button
             onClick={() => inputRef.current?.click()}
             disabled={busy}
-            className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
           >
             {busy ? <Spinner label="Working…" /> : "Upload photo"}
           </button>
@@ -95,7 +95,7 @@ export default function AppearanceSection({
             <button
               onClick={removePhoto}
               disabled={busy}
-              className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5 disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
             >
               Remove
             </button>

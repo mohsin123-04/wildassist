@@ -36,8 +36,8 @@ export default function CentreOnboarding({
   }
 
   return (
-    <div className="rounded-3xl border border-black/5 bg-white p-7 shadow-sm">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-emerald-950">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
         Join your centre
       </h1>
       <p className="mt-1 text-sm leading-6 text-zinc-600">
@@ -52,7 +52,7 @@ export default function CentreOnboarding({
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
-            className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
           >
             <option value="">Select a centre…</option>
             {centres.map((c) => (
@@ -69,7 +69,7 @@ export default function CentreOnboarding({
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="e.g. TWC-2026"
-            className="h-11 w-full rounded-xl border border-black/10 bg-white px-4 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
           />
         </label>
       </div>
@@ -79,7 +79,7 @@ export default function CentreOnboarding({
       <button
         onClick={join}
         disabled={!selected || !code.trim() || loading}
-        className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-50"
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50"
       >
         {loading ? <Spinner label="Joining…" /> : "Join centre"}
       </button>

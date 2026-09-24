@@ -33,12 +33,12 @@ export default function CentreCodePanel() {
   }
 
   return (
-    <div className="mb-5 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="text-sm font-medium text-emerald-950">
+        <span className="text-sm font-medium text-zinc-900">
           Invite staff to your centre
         </span>
         <span
@@ -63,7 +63,7 @@ export default function CentreCodePanel() {
             <button
               onClick={copy}
               disabled={!code}
-              className="inline-flex h-9 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5 disabled:opacity-50"
+              className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
             >
               {copied ? "Copied" : "Copy"}
             </button>
@@ -85,7 +85,7 @@ export default function CentreCodePanel() {
                 <button
                   onClick={regenerate}
                   disabled={busy}
-                  className="inline-flex h-8 items-center justify-center rounded-full bg-rose-600 px-4 font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
+                  className="inline-flex h-8 items-center justify-center rounded-xl bg-rose-600 px-4 font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
                 >
                   {busy ? "Working…" : "Regenerate"}
                 </button>

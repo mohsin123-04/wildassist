@@ -42,7 +42,7 @@ export default async function ProfilePage() {
           size={64}
         />
         <div className="min-w-0">
-          <h1 className="truncate font-display text-2xl font-semibold tracking-tight text-emerald-950">
+          <h1 className="truncate font-display text-2xl font-semibold tracking-tight text-zinc-900">
             {profile?.full_name || "Your profile"}
           </h1>
           <p className="truncate text-sm text-zinc-600">

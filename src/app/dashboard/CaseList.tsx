@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-black/5 bg-white text-sm text-zinc-400">
+    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">
       Loading map…
     </div>
   ),
@@ -226,12 +226,12 @@ export default function CaseList({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search animal, title, description, reporter…"
-          className="h-10 min-w-0 flex-1 rounded-xl border border-black/10 bg-white px-4 text-sm outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+          className="h-10 min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
+          className="h-10 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
         >
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>
@@ -240,19 +240,19 @@ export default function CaseList({
         <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
-          className="inline-flex h-10 items-center justify-center rounded-xl border border-black/10 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5 disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
         >
           Export CSV
         </button>
-        <div className="flex h-10 overflow-hidden rounded-xl border border-black/10">
+        <div className="flex h-10 overflow-hidden rounded-xl border border-zinc-200">
           {(["list", "map"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
               className={`px-3 text-sm font-medium capitalize transition-colors ${
                 view === v
-                  ? "bg-emerald-700 text-white"
-                  : "bg-white text-zinc-600 hover:bg-black/5"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white text-zinc-600 hover:bg-zinc-50"
               }`}
             >
               {v}
@@ -281,9 +281,9 @@ export default function CaseList({
       {view === "map" ? (
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-black/10 bg-white/50 p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-10 text-center">
           <p className="text-3xl">🕊️</p>
-          <p className="mt-2 font-medium text-emerald-950">Nothing here</p>
+          <p className="mt-2 font-medium text-zinc-900">Nothing here</p>
           <p className="mt-1 text-sm text-zinc-500">
             {tab === "unassigned"
               ? "No unassigned cases right now."
@@ -317,7 +317,7 @@ export default function CaseList({
                       >
                         {c.verdict}
                       </span>
-                      <span className="text-sm font-medium capitalize text-emerald-950">
+                      <span className="text-sm font-medium capitalize text-zinc-900">
                         {c.animal}
                       </span>
                       {otherCentre && (
@@ -394,7 +394,7 @@ export default function CaseList({
                         <button
                           onClick={() => claim(c.id)}
                           disabled={claimingId === c.id}
-                          className="ml-auto inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                          className="ml-auto inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
                         >
                           {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
                         </button>
@@ -411,7 +411,7 @@ export default function CaseList({
                             onChange={(e) =>
                               updateStatus(c.id, e.target.value as CaseRow["status"])
                             }
-                            className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
+                            className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
                           >
                             {STATUSES.map((s) => (
                               <option key={s.value} value={s.value}>
@@ -470,7 +470,7 @@ export default function CaseList({
                           setNoteDrafts((d) => ({ ...d, [c.id]: e.target.value }))
                         }
                         placeholder="Add an internal note (e.g. volunteer driver assigned, ETA 3pm)."
-                        className="mt-1 w-full resize-none rounded-xl border border-black/10 bg-white p-3 text-sm outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+                        className="mt-1 w-full resize-none rounded-xl border border-zinc-200 bg-white p-3 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
                       />
                       <button
                         onClick={() => saveNotes(c.id)}
@@ -479,7 +479,7 @@ export default function CaseList({
                           (noteDrafts[c.id] ?? c.staff_notes ?? "") ===
                             (c.staff_notes ?? "")
                         }
-                        className="mt-2 inline-flex h-9 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+                        className="mt-2 inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
                       >
                         {savingNoteId === c.id ? "Saving…" : "Save note"}
                       </button>
@@ -498,14 +498,14 @@ export default function CaseList({
 function Stat({
   label,
   value,
-  accent = "text-emerald-950",
+  accent = "text-zinc-900",
 }: {
   label: string;
   value: number;
   accent?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
     </div>
@@ -526,8 +526,8 @@ function Tab({
       onClick={onClick}
       className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
         active
-          ? "bg-emerald-700 text-white"
-          : "border border-black/10 bg-white text-zinc-600 hover:bg-black/5"
+          ? "bg-zinc-900 text-white"
+          : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
       }`}
     >
       {children}
@@ -549,8 +549,8 @@ function Chip({
       onClick={onClick}
       className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "bg-emerald-100 text-emerald-800"
-          : "border border-black/10 bg-white text-zinc-600 hover:bg-black/5"
+          ? "bg-zinc-900 text-white"
+          : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
       }`}
     >
       {children}

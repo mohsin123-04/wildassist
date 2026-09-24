@@ -35,7 +35,7 @@ export default function DangerSection() {
   }
 
   return (
-    <section className="rounded-3xl border border-rose-200 bg-rose-50/50 p-6">
+    <section className="rounded-2xl border border-rose-200 bg-rose-50/50 p-6">
       <h2 className="font-display text-lg font-semibold text-rose-900">
         Danger zone
       </h2>
@@ -53,7 +53,7 @@ export default function DangerSection() {
           <button
             onClick={signOutEverywhere}
             disabled={busy !== null}
-            className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
           >
             {busy === "out" ? <Spinner label="Signing out…" /> : "Sign out all"}
           </button>
@@ -70,7 +70,7 @@ export default function DangerSection() {
           {!confirming ? (
             <button
               onClick={() => setConfirming(true)}
-              className="mt-3 inline-flex h-10 items-center justify-center rounded-full bg-rose-600 px-5 text-sm font-medium text-white transition-colors hover:bg-rose-700"
+              className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-rose-600 px-5 text-sm font-medium text-white transition-colors hover:bg-rose-700"
             >
               Delete my account
             </button>
@@ -83,14 +83,14 @@ export default function DangerSection() {
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className="h-10 rounded-xl border border-black/10 px-3 outline-none focus:border-rose-400"
+                className="h-10 rounded-xl border border-zinc-200 px-3 outline-none focus:border-rose-400"
               />
               {error && <p className="text-sm text-rose-600">{error}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={deleteAccount}
                   disabled={confirmText !== "DELETE" || busy !== null}
-                  className="inline-flex h-10 items-center justify-center rounded-full bg-rose-600 px-5 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
+                  className="inline-flex h-10 items-center justify-center rounded-xl bg-rose-600 px-5 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50"
                 >
                   {busy === "delete" ? (
                     <Spinner label="Deleting…" />
@@ -104,7 +104,7 @@ export default function DangerSection() {
                     setConfirmText("");
                     setError(null);
                   }}
-                  className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/5"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 >
                   Cancel
                 </button>
