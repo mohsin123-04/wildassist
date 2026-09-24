@@ -38,19 +38,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  async function routeByRole() {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return router.push("/dashboard");
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-    router.push(profile?.role === "volunteer" ? "/transport" : "/dashboard");
-    router.refresh();
+  function routeByRole() {
+    // The dashboard redirects volunteers to /transport server-side, so we can
+    // navigate straight there without extra round-trips to look up the role.
+    router.replace("/dashboard");
   }
 
   async function handleSubmit(e: React.FormEvent) {

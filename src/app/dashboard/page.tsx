@@ -44,21 +44,21 @@ export default async function DashboardPage() {
     );
   }
 
-  const { data: allCentres } = await supabase
-    .from("centres")
-    .select("id, name, town, lat, lng");
+  // These two are independent (cases are filtered by RLS, not a centre id),
+  // so fetch them concurrently to cut the dashboard's load time.
+  const [{ data: allCentres }, { data: cases }] = await Promise.all([
+    supabase.from("centres").select("id, name, town, lat, lng"),
+    supabase
+      .from("cases")
+      .select(
+        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_name"
+      )
+      .order("created_at", { ascending: false }),
+  ]);
   const centreNames = Object.fromEntries(
     (allCentres ?? []).map((c) => [c.id, c.name])
   );
   const centre = allCentres?.find((c) => c.id === profile.centre_id);
-
-  // RLS returns cases in the staff member's area plus all unassigned cases.
-  const { data: cases } = await supabase
-    .from("cases")
-    .select(
-      "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_name"
-    )
-    .order("created_at", { ascending: false });
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">

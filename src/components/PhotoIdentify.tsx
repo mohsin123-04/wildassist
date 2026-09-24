@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Spinner from "@/components/Spinner";
 import SafetyBanner from "@/components/SafetyBanner";
 import { classifyPredictions, type Prediction } from "@/lib/vision";
@@ -65,6 +65,12 @@ export default function PhotoIdentify({
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
   const [danger, setDanger] = useState<DangerInfo | null>(null);
+
+  // Warm up the model as soon as this panel opens, so by the time the user has
+  // taken/chosen a photo it's likely already downloaded. Fire-and-forget.
+  useEffect(() => {
+    getClassifier().catch(() => {});
+  }, []);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
