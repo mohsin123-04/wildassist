@@ -8,6 +8,12 @@ const OPTIONS = [
     swatch: ["#ffffff", "#09090b", "#059669"],
   },
   {
+    href: "/preview/colors",
+    name: "Color playground",
+    desc: "The clean layout with a live accent-color switcher. Try emerald, teal, ocean, terracotta, and more.",
+    swatch: ["#0d9488", "#2563eb", "#c2410c"],
+  },
+  {
     href: "/preview/warm",
     name: "Warm & trustworthy nonprofit",
     desc: "Softer, earthy, serif headings. Feels like a caring wildlife charity.",
