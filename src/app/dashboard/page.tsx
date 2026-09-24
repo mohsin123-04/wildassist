@@ -71,9 +71,22 @@ export default async function DashboardPage() {
               ? `Welcome back, ${firstName}`
               : "Centre dashboard"}
         </p>
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">
-          {isAdmin ? "All cases" : (centre?.name ?? "Your centre")}
-        </h1>
+        <div className="mt-1 flex flex-wrap items-center gap-2.5">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+            {isAdmin ? "All cases" : (centre?.name ?? "Your centre")}
+          </h1>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
+              isAdmin
+                ? "bg-violet-100 text-violet-700"
+                : isManager
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-zinc-100 text-zinc-600"
+            }`}
+          >
+            {profile?.role ?? "staff"}
+          </span>
+        </div>
         <p className="mt-1 text-zinc-600">
           {isAdmin
             ? "Every reported case across all centres."
@@ -83,7 +96,7 @@ export default async function DashboardPage() {
       {isAdmin && <AdminCentres />}
       {(isAdmin || isManager) && <AdminVolunteers />}
       {isManager && <CentreCodePanel />}
-      {isManager && <TeamPanel />}
+      {!isAdmin && <TeamPanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}

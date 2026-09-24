@@ -2,11 +2,23 @@
 
 import { useEffect, useState } from "react";
 
-type Member = { id: string; full_name: string | null; role: string };
+type Member = {
+  id: string;
+  full_name: string | null;
+  role: string;
+  title: string | null;
+};
+
+const ROLE_BADGE: Record<string, string> = {
+  manager: "bg-emerald-100 text-emerald-700",
+  admin: "bg-violet-100 text-violet-700",
+  staff: "bg-zinc-100 text-zinc-600",
+};
 
 export default function TeamPanel() {
   const [members, setMembers] = useState<Member[]>([]);
   const [me, setMe] = useState<string | null>(null);
+  const [canManage, setCanManage] = useState(false);
   const [open, setOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +28,7 @@ export default function TeamPanel() {
     const d = await r.json();
     if (Array.isArray(d.members)) setMembers(d.members);
     setMe(d.me ?? null);
+    setCanManage(!!d.canManage);
   }
 
   useEffect(() => {
@@ -39,6 +52,8 @@ export default function TeamPanel() {
     await load();
   }
 
+  const managers = members.filter((m) => m.role === "manager").length;
+
   return (
     <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
       <button
@@ -46,7 +61,7 @@ export default function TeamPanel() {
         className="flex w-full items-center justify-between text-left"
       >
         <span className="text-sm font-medium text-zinc-900">
-          Manage your team ({members.length})
+          Your team ({members.length})
         </span>
         <span
           aria-hidden
@@ -58,8 +73,10 @@ export default function TeamPanel() {
 
       {open && (
         <div className="mt-3">
-          <p className="text-sm leading-6 text-zinc-600">
-            Promote a colleague to co-manager, or remove someone who has left.
+          <p className="text-sm leading-6 text-zinc-500">
+            {canManage
+              ? "Everyone at your centre. Promote a colleague to co-manager, or remove someone who has left."
+              : `Everyone at your centre. ${managers} manager${managers === 1 ? "" : "s"} can manage the team and join code.`}
           </p>
           {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
 
@@ -70,47 +87,48 @@ export default function TeamPanel() {
               return (
                 <li
                   key={m.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-[var(--background)] px-3 py-2"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2"
                 >
                   <span className="flex items-center gap-2 text-sm">
                     <span className="font-medium text-zinc-900">
                       {m.full_name || "Unnamed"}
                     </span>
+                    {m.title && (
+                      <span className="text-xs text-zinc-400">{m.title}</span>
+                    )}
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        isManager
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-zinc-100 text-zinc-600"
-                      }`}
+                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${ROLE_BADGE[m.role] ?? "bg-zinc-100 text-zinc-600"}`}
                     >
                       {m.role}
                     </span>
                     {isMe && <span className="text-xs text-zinc-400">you</span>}
                   </span>
 
-                  <span className="flex gap-2">
-                    {isManager ? (
-                      <ActionBtn
-                        onClick={() => act(m.id, "demote")}
-                        disabled={busyId === m.id}
-                        label="Make staff"
-                      />
-                    ) : (
-                      <ActionBtn
-                        onClick={() => act(m.id, "promote")}
-                        disabled={busyId === m.id}
-                        label="Make manager"
-                      />
-                    )}
-                    {!isMe && (
-                      <ActionBtn
-                        onClick={() => act(m.id, "remove")}
-                        disabled={busyId === m.id}
-                        label="Remove"
-                        danger
-                      />
-                    )}
-                  </span>
+                  {canManage && (
+                    <span className="flex gap-2">
+                      {isManager ? (
+                        <ActionBtn
+                          onClick={() => act(m.id, "demote")}
+                          disabled={busyId === m.id}
+                          label="Make staff"
+                        />
+                      ) : (
+                        <ActionBtn
+                          onClick={() => act(m.id, "promote")}
+                          disabled={busyId === m.id}
+                          label="Make manager"
+                        />
+                      )}
+                      {!isMe && (
+                        <ActionBtn
+                          onClick={() => act(m.id, "remove")}
+                          disabled={busyId === m.id}
+                          label="Remove"
+                          danger
+                        />
+                      )}
+                    </span>
+                  )}
                 </li>
               );
             })}

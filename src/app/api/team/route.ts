@@ -18,19 +18,35 @@ async function requireManager() {
   return { userId: user.id, centreId: profile.centre_id };
 }
 
-/** GET /api/team — members of the manager's centre. */
+/** GET /api/team — roster of the signed-in user's centre (any member can view). */
 export async function GET() {
-  const ctx = await requireManager();
-  if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return Response.json({ error: "Not signed in" }, { status: 401 });
+
+  const { data: me } = await supabase
+    .from("profiles")
+    .select("centre_id, role, title")
+    .eq("id", user.id)
+    .single();
+  if (!me?.centre_id) {
+    return Response.json({ error: "No centre", status: 400 }, { status: 400 });
+  }
 
   const admin = createAdminClient();
   const { data } = await admin
     .from("profiles")
-    .select("id, full_name, role")
-    .eq("centre_id", ctx.centreId)
+    .select("id, full_name, role, title")
+    .eq("centre_id", me.centre_id)
     .order("role");
 
-  return Response.json({ members: data ?? [], me: ctx.userId });
+  return Response.json({
+    members: data ?? [],
+    me: user.id,
+    canManage: me.role === "manager",
+  });
 }
 
 /** POST /api/team  { targetId, action: 'promote'|'demote'|'remove' } */

@@ -13,6 +13,7 @@ export default function AccountMenu() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [centreName, setCentreName] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarColor, setAvatarColor] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
@@ -52,11 +53,12 @@ export default function AccountMenu() {
     const supabase = createClient();
     supabase
       .from("profiles")
-      .select("full_name, avatar_url, avatar_color, centres(name)")
+      .select("full_name, role, avatar_url, avatar_color, centres(name)")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         setDisplayName(data?.full_name ?? null);
+        setRole(data?.role ?? null);
         setAvatarUrl(data?.avatar_url ?? null);
         setAvatarColor(data?.avatar_color ?? null);
         const centres = data?.centres as
@@ -143,9 +145,24 @@ export default function AccountMenu() {
                 size={36}
               />
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-emerald-950">
-                  {label}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate text-sm font-medium text-emerald-950">
+                    {label}
+                  </p>
+                  {role && role !== "staff" && (
+                    <span
+                      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold capitalize ${
+                        role === "admin"
+                          ? "bg-violet-100 text-violet-700"
+                          : role === "manager"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-zinc-100 text-zinc-600"
+                      }`}
+                    >
+                      {role}
+                    </span>
+                  )}
+                </div>
                 <p className="truncate text-xs text-zinc-500">
                   {displayName ? email : (centreName ?? "No centre linked yet")}
                 </p>
