@@ -1,6 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 
-async function requireAdmin() {
+/** Admins and centre managers can review and approve volunteers. */
+async function requireApprover() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,13 +12,15 @@ async function requireAdmin() {
     .select("role")
     .eq("id", user.id)
     .single();
-  if (me?.role !== "admin") return { error: "Admins only", status: 403 as const };
+  if (me?.role !== "admin" && me?.role !== "manager") {
+    return { error: "Not allowed", status: 403 as const };
+  }
   return { ok: true as const };
 }
 
-/** GET /api/admin/volunteers — all volunteers with approval status (admin). */
+/** GET /api/admin/volunteers — all volunteers with approval status. */
 export async function GET() {
-  const ctx = await requireAdmin();
+  const ctx = await requireApprover();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });
 
   const admin = createAdminClient();
@@ -33,7 +36,7 @@ export async function GET() {
 
 /** POST /api/admin/volunteers  { userId, approved } — approve or revoke. */
 export async function POST(req: Request) {
-  const ctx = await requireAdmin();
+  const ctx = await requireApprover();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });
 
   let body: { userId?: string; approved?: boolean };

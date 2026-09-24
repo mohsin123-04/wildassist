@@ -44,14 +44,41 @@ export default async function TransportPage() {
       {profile?.volunteer_approved ? (
         <TransportList centreNames={centreNames} />
       ) : (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
-          <p className="text-2xl">⏳</p>
-          <p className="mt-2 font-medium text-zinc-900">Approval pending</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-zinc-500">
-            Thanks for signing up to help. To protect the people and animals
-            involved, transport jobs are only shown to approved volunteers. An
-            administrator will review your account shortly.
-          </p>
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8">
+          <div className="mx-auto max-w-md text-center">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-2xl">
+              🕓
+            </span>
+            <p className="mt-4 font-display text-lg font-semibold tracking-tight text-zinc-900">
+              You&apos;re almost ready to help
+            </p>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              Thanks for signing up to drive for wildlife. Because transport
+              requests include animal locations and finders&apos; contact
+              details, a wildlife centre reviews new volunteers first. This
+              usually happens within a day or two.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-6 max-w-md">
+            <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+              What happens next
+            </p>
+            <ol className="mt-2 flex flex-col gap-2 text-sm text-zinc-700">
+              <li className="flex gap-2.5">
+                <span className="font-mono text-xs text-emerald-600">01</span>
+                A centre reviews and approves your account.
+              </li>
+              <li className="flex gap-2.5">
+                <span className="font-mono text-xs text-emerald-600">02</span>
+                You&apos;ll see injured animals near you that need a lift.
+              </li>
+              <li className="flex gap-2.5">
+                <span className="font-mono text-xs text-emerald-600">03</span>
+                Claim a pickup, drive it to the centre, mark it delivered.
+              </li>
+            </ol>
+          </div>
         </div>
       )}
     </main>

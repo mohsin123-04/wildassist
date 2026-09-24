@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         </p>
       </div>
       {isAdmin && <AdminCentres />}
-      {isAdmin && <AdminVolunteers />}
+      {(isAdmin || isManager) && <AdminVolunteers />}
       {isManager && <CentreCodePanel />}
       {isManager && <TeamPanel />}
       <CaseList
