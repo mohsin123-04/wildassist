@@ -8,6 +8,7 @@ import {
   type Recommendation,
 } from "@/lib/triage";
 import { retrieveGuidance } from "@/lib/guidance";
+import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 /**
  * POST /api/triage
@@ -149,6 +150,9 @@ Return the JSON recommendation now.`;
 }
 
 export async function POST(req: NextRequest) {
+  // Protect the paid LLM: cap per-IP requests.
+  if (!(await rateLimit(`triage:${clientIp(req)}`, 20, 60))) return tooMany();
+
   let body: { animal?: AnimalType; situation?: Situation; description?: string };
   try {
     body = await req.json();

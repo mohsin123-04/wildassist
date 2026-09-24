@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 const ALLOWED = ["image/png", "image/jpeg", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -12,6 +13,7 @@ export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ ok: false, reason: "no-db" });
   }
+  if (!(await rateLimit(`photo:${clientIp(req)}`, 10, 60))) return tooMany();
 
   const form = await req.formData();
   const file = form.get("file");

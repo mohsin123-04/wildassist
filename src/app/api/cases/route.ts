@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SITUATIONS, type AnimalType } from "@/lib/triage";
 import { rankCentres, type Centre } from "@/lib/centres";
+import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 /**
  * POST /api/cases
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ ok: false, reason: "no-db" });
   }
+  if (!(await rateLimit(`cases:${clientIp(req)}`, 30, 60))) return tooMany();
 
   let body: {
     animal?: string;
