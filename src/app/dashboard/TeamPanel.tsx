@@ -84,28 +84,49 @@ export default function TeamPanel() {
             {members.map((m) => {
               const isMe = m.id === me;
               const isManager = m.role === "manager";
+              const name = m.full_name || "Unnamed";
               return (
                 <li
                   key={m.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-2.5"
                 >
-                  <span className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-zinc-900">
-                      {m.full_name || "Unnamed"}
-                    </span>
-                    {m.title && (
-                      <span className="text-xs text-zinc-400">{m.title}</span>
-                    )}
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                      isManager
+                        ? "bg-emerald-600 text-white"
+                        : "bg-zinc-200 text-zinc-600"
+                    }`}
+                  >
+                    {name.charAt(0).toUpperCase()}
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-sm font-medium text-zinc-900">
+                        {name}
+                      </span>
+                      {isMe && (
+                        <span className="shrink-0 rounded-md bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                          You
+                        </span>
+                      )}
+                    </div>
+                    <p className="truncate text-xs text-zinc-500">
+                      {m.title ||
+                        m.role.charAt(0).toUpperCase() + m.role.slice(1)}
+                    </p>
+                  </div>
+
+                  {!canManage && (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${ROLE_BADGE[m.role] ?? "bg-zinc-100 text-zinc-600"}`}
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${ROLE_BADGE[m.role] ?? "bg-zinc-100 text-zinc-600"}`}
                     >
                       {m.role}
                     </span>
-                    {isMe && <span className="text-xs text-zinc-400">you</span>}
-                  </span>
+                  )}
 
                   {canManage && (
-                    <span className="flex gap-2">
+                    <span className="flex shrink-0 gap-1.5">
                       {isManager ? (
                         <ActionBtn
                           onClick={() => act(m.id, "demote")}
