@@ -176,6 +176,15 @@ export default function AccountMenu() {
           >
             Dashboard
           </Link>
+          {centreName && (
+            <Link
+              href="/messages"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+            >
+              Messages
+            </Link>
+          )}
           <Link
             href="/profile"
             onClick={() => setOpen(false)}

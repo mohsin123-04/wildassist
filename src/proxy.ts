@@ -42,5 +42,10 @@ export const config = {
   // Only run session refresh on the pages that read the session server-side.
   // Public pages and API routes (which do their own auth) skip the extra
   // Supabase round-trip entirely.
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/transport/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/transport/:path*",
+    "/messages/:path*",
+  ],
 };
