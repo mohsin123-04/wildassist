@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Member = { id: string; full_name: string | null; role: string };
-type Conversation = { id: string; kind: string; label: string };
+type Conversation = { id: string; kind: string; label: string; unread?: number };
 type Message = {
   id: string;
   conversation_id: string;
@@ -28,9 +28,26 @@ export default function MessagesClient({
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
   const [composer, setComposer] = useState<null | "menu" | "group">(null);
+  const [creating, setCreating] = useState(false);
+  const [unread, setUnread] = useState<Record<string, number>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
+  const convIdsRef = useRef<string[]>([]);
+
+  async function markRead(convId: string) {
+    setUnread((u) => ({ ...u, [convId]: 0 }));
+    await supabase.from("conversation_reads").upsert(
+      {
+        conversation_id: convId,
+        user_id: myId,
+        last_read: new Date().toISOString(),
+      },
+      { onConflict: "conversation_id,user_id" }
+    );
+    // Keep the header's unread badge in sync.
+    window.dispatchEvent(new Event("messages-read"));
+  }
 
   async function loadConversations(pick?: string) {
     const r = await fetch("/api/conversations");
@@ -38,6 +55,8 @@ export default function MessagesClient({
     const convs: Conversation[] = d.conversations ?? [];
     setConversations(convs);
     setMembers(d.members ?? []);
+    convIdsRef.current = convs.map((c) => c.id);
+    setUnread(Object.fromEntries(convs.map((c) => [c.id, c.unread ?? 0])));
     setSelected((cur) => pick ?? cur ?? convs[0]?.id ?? null);
   }
 
@@ -54,6 +73,7 @@ export default function MessagesClient({
       .eq("conversation_id", selected)
       .order("created_at", { ascending: true })
       .then(({ data }) => setMessages((data ?? []) as Message[]));
+    markRead(selected);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
@@ -70,6 +90,17 @@ export default function MessagesClient({
             setMessages((prev) =>
               prev.some((x) => x.id === m.id) ? prev : [...prev, m]
             );
+            if (m.sender_id !== myId) markRead(m.conversation_id);
+          } else if (m.sender_id !== myId) {
+            // A new message in another conversation: bump its unread badge.
+            if (!convIdsRef.current.includes(m.conversation_id)) {
+              loadConversations(); // a new DM/group someone started with me
+            } else {
+              setUnread((u) => ({
+                ...u,
+                [m.conversation_id]: (u[m.conversation_id] ?? 0) + 1,
+              }));
+            }
           }
         }
       )
@@ -97,25 +128,37 @@ export default function MessagesClient({
   }
 
   async function startDm(memberId: string) {
-    const r = await fetch("/api/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dmWith: memberId }),
-    });
-    const d = await r.json();
+    if (creating) return;
+    setCreating(true);
     setComposer(null);
-    if (d.id) await loadConversations(d.id);
+    try {
+      const r = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dmWith: memberId }),
+      });
+      const d = await r.json();
+      if (d.id) await loadConversations(d.id);
+    } finally {
+      setCreating(false);
+    }
   }
 
   async function createGroup(title: string, memberIds: string[]) {
-    const r = await fetch("/api/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, memberIds }),
-    });
-    const d = await r.json();
+    if (creating) return;
+    setCreating(true);
     setComposer(null);
-    if (d.id) await loadConversations(d.id);
+    try {
+      const r = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, memberIds }),
+      });
+      const d = await r.json();
+      if (d.id) await loadConversations(d.id);
+    } finally {
+      setCreating(false);
+    }
   }
 
   const active = conversations.find((c) => c.id === selected);
@@ -127,20 +170,30 @@ export default function MessagesClient({
       {/* Conversation switcher + New */}
       <div className="flex items-center gap-2">
         <div className="-mx-1 flex flex-1 gap-2 overflow-x-auto px-1 pb-1">
-          {conversations.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSelected(c.id)}
-              className={`flex shrink-0 items-center rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                selected === c.id
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
-              }`}
-            >
-              {iconFor(c.kind)}
-              {c.label}
-            </button>
-          ))}
+          {conversations.map((c) => {
+            const n = unread[c.id] ?? 0;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setSelected(c.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  selected === c.id
+                    ? "border-zinc-900 bg-zinc-900 text-white"
+                    : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+                }`}
+              >
+                <span>
+                  {iconFor(c.kind)}
+                  {c.label}
+                </span>
+                {n > 0 && selected !== c.id && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-semibold text-white">
+                    {n > 9 ? "9+" : n}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
         <div className="relative">
           <button

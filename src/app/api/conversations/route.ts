@@ -78,7 +78,7 @@ export async function GET() {
     }
   }
 
-  const conversations = [
+  const convList = [
     { id: channel!.id, kind: "channel", label: "Main channel" },
     ...mine.map((conv) => {
       if (conv.kind === "dm") {
@@ -89,10 +89,38 @@ export async function GET() {
     }),
   ];
 
+  // Unread counts: messages newer than the user's last_read, not sent by them.
+  const allIds = convList.map((c2) => c2.id);
+  const { data: reads } = await admin
+    .from("conversation_reads")
+    .select("conversation_id, last_read")
+    .eq("user_id", c.userId)
+    .in("conversation_id", allIds);
+  const lastRead: Record<string, string> = {};
+  for (const r of reads ?? []) lastRead[r.conversation_id] = r.last_read;
+
+  const { data: msgs } = await admin
+    .from("messages")
+    .select("conversation_id, sender_id, created_at")
+    .in("conversation_id", allIds);
+
+  const unread: Record<string, number> = {};
+  for (const m of msgs ?? []) {
+    if (m.sender_id === c.userId) continue;
+    const lr = lastRead[m.conversation_id];
+    if (!lr || new Date(m.created_at) > new Date(lr)) {
+      unread[m.conversation_id] = (unread[m.conversation_id] ?? 0) + 1;
+    }
+  }
+
+  const conversations = convList.map((cv) => ({ ...cv, unread: unread[cv.id] ?? 0 }));
+  const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
+
   return Response.json({
     conversations,
     members: (members ?? []).filter((m) => m.id !== c.userId),
     me: c.userId,
+    totalUnread,
   });
 }
 
@@ -129,33 +157,27 @@ export async function POST(req: Request) {
     }
   }
 
-  // DM: reuse an existing 1:1 if present.
+  // DM: race-proof via a canonical dm_key (sorted pair). A duplicate can't be
+  // created because dm_key is unique; concurrent taps resolve to the same row.
   if (body.dmWith) {
-    const { data: myDms } = await admin
-      .from("conversation_members")
-      .select("conversation_id, conversations!inner(kind)")
-      .eq("user_id", c.userId);
-    for (const row of myDms ?? []) {
-      const kind = (row.conversations as unknown as { kind: string }).kind;
-      if (kind !== "dm") continue;
-      const { data: pair } = await admin
-        .from("conversation_members")
-        .select("user_id")
-        .eq("conversation_id", row.conversation_id);
-      const users = (pair ?? []).map((p) => p.user_id);
-      if (users.length === 2 && users.includes(body.dmWith)) {
-        return Response.json({ id: row.conversation_id });
-      }
-    }
+    const dmKey = [c.userId, body.dmWith].sort().join(":");
     const { data: conv } = await admin
       .from("conversations")
-      .insert({ centre_id: c.centreId, kind: "dm", created_by: c.userId })
+      .upsert(
+        { centre_id: c.centreId, kind: "dm", created_by: c.userId, dm_key: dmKey },
+        { onConflict: "dm_key" }
+      )
       .select("id")
       .single();
-    await admin.from("conversation_members").insert([
-      { conversation_id: conv!.id, user_id: c.userId },
-      { conversation_id: conv!.id, user_id: body.dmWith },
-    ]);
+    await admin
+      .from("conversation_members")
+      .upsert(
+        [
+          { conversation_id: conv!.id, user_id: c.userId },
+          { conversation_id: conv!.id, user_id: body.dmWith },
+        ],
+        { onConflict: "conversation_id,user_id", ignoreDuplicates: true }
+      );
     return Response.json({ id: conv!.id });
   }
 

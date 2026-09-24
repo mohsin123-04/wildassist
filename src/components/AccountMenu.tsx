@@ -14,6 +14,7 @@ export default function AccountMenu() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [centreName, setCentreName] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [msgUnread, setMsgUnread] = useState(0);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarColor, setAvatarColor] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
@@ -70,6 +71,42 @@ export default function AccountMenu() {
       });
   }, [user, reload]);
 
+  // Unread message count for the Messages link.
+  useEffect(() => {
+    if (!user || !centreName) return;
+    const supabase = createClient();
+    let active = true;
+
+    async function refreshUnread() {
+      const r = await fetch("/api/conversations");
+      if (!r.ok || !active) return;
+      const d = await r.json();
+      setMsgUnread(d.totalUnread ?? 0);
+    }
+    refreshUnread();
+
+    const onRead = () => refreshUnread();
+    window.addEventListener("messages-read", onRead);
+
+    const channel = supabase
+      .channel("account-msgs")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        (payload) => {
+          const m = payload.new as { sender_id: string | null };
+          if (m.sender_id !== user!.id) setMsgUnread((n) => n + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      window.removeEventListener("messages-read", onRead);
+      supabase.removeChannel(channel);
+    };
+  }, [user, centreName]);
+
   // Close the dropdown on outside click.
   useEffect(() => {
     if (!open) return;
@@ -113,8 +150,11 @@ export default function AccountMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-black/5 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-emerald-50"
+        className="relative flex items-center gap-2 rounded-full border border-black/5 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-emerald-50"
       >
+        {msgUnread > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+        )}
         <Avatar
           url={avatarUrl}
           name={displayName}
@@ -180,9 +220,14 @@ export default function AccountMenu() {
             <Link
               href="/messages"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+              className="flex items-center justify-between px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
             >
               Messages
+              {msgUnread > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-xs font-semibold text-white">
+                  {msgUnread > 9 ? "9+" : msgUnread}
+                </span>
+              )}
             </Link>
           )}
           <Link
