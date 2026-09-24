@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
@@ -15,13 +15,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["600"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "WildAssist | Found an injured animal?",
   description:
@@ -32,27 +25,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="sticky top-0 z-20 border-b border-black/5 bg-[var(--background)]/80 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3">
+        <header className="sticky top-0 z-20 border-b border-zinc-200/80 bg-white/70 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3.5">
             <Link
               href="/"
-              className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-emerald-900"
+              className="group flex items-center gap-2.5 font-display text-[15px] font-semibold tracking-tight text-zinc-900"
             >
               <span
                 aria-hidden
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-base"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-sm text-white shadow-sm"
               >
                 🦉
               </span>
               <span>WildAssist</span>
             </Link>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Link
                 href="/emergency"
-                className="text-sm font-medium text-zinc-500 transition-colors hover:text-emerald-800"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
               >
                 Emergency
               </Link>
@@ -64,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <div className="flex flex-1 flex-col">{children}</div>
 
-        <footer className="border-t border-black/5 px-5 py-5 text-center text-xs leading-5 text-zinc-500">
+        <footer className="border-t border-zinc-200 px-5 py-6 text-center text-xs leading-5 text-zinc-400">
           WildAssist offers general guidance only. In an emergency, contact a
           licensed wildlife rehabilitator directly.
         </footer>

@@ -86,8 +86,8 @@ export default function CentreFinder({
   }
 
   return (
-    <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-emerald-950">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-zinc-900">
         Find a wildlife centre
       </h2>
 
@@ -99,7 +99,7 @@ export default function CentreFinder({
           </p>
           <button
             onClick={findNearest}
-            className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
+            className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
           >
             📍 Find nearest centre
           </button>
@@ -126,7 +126,7 @@ export default function CentreFinder({
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-medium text-emerald-950">{c.name}</p>
+                  <p className="font-medium text-zinc-900">{c.name}</p>
                   <p className="text-sm text-zinc-500">{c.town}</p>
                 </div>
                 {"distanceKm" in c && (

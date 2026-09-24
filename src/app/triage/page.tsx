@@ -206,8 +206,8 @@ export default function TriagePage() {
         {STEP_ORDER.map((s, i) => (
           <div
             key={s}
-            className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-              i <= stepIndex ? "bg-emerald-600" : "bg-emerald-600/15"
+            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+              i <= stepIndex ? "bg-zinc-900" : "bg-zinc-200"
             }`}
           />
         ))}
@@ -215,22 +215,22 @@ export default function TriagePage() {
 
       {animalOption &&
         (step === "situation" || step === "details") && (
-          <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5">
-            <span className="flex items-center gap-2 text-sm text-emerald-900">
+          <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5">
+            <span className="flex items-center gap-2 text-sm text-zinc-700">
               <AnimalIcon
                 name={animalOption.value}
-                className="h-4 w-4 text-emerald-700"
+                className="h-4 w-4 text-emerald-600"
               />
-              <span className="font-medium">{animalOption.label}</span>
+              <span className="font-medium text-zinc-900">
+                {animalOption.label}
+              </span>
               {photoHint && (
-                <span className="text-emerald-700">
-                  (looks like a {photoHint})
-                </span>
+                <span className="text-zinc-500">(looks like a {photoHint})</span>
               )}
             </span>
             <button
               onClick={() => setStep("animal")}
-              className="shrink-0 text-sm font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+              className="shrink-0 text-sm font-medium text-zinc-500 hover:text-zinc-900"
             >
               Change
             </button>
@@ -252,16 +252,16 @@ export default function TriagePage() {
                   setAnimalOption(a);
                   setStep("situation");
                 }}
-                className={`group flex flex-col items-start gap-2 rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md ${
+                className={`group flex flex-col items-start gap-2.5 rounded-xl border bg-white p-4 text-left transition-all hover:border-zinc-300 hover:shadow-sm ${
                   animalOption?.value === a.value
-                    ? "border-emerald-500 ring-2 ring-emerald-500/30"
-                    : "border-black/5"
+                    ? "border-zinc-900 ring-1 ring-zinc-900"
+                    : "border-zinc-200"
                 }`}
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 transition-colors group-hover:bg-emerald-100">
-                  <AnimalIcon name={a.value} className="h-6 w-6" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                  <AnimalIcon name={a.value} className="h-5 w-5" />
                 </span>
-                <span className="font-medium text-emerald-950">{a.label}</span>
+                <span className="font-medium text-zinc-900">{a.label}</span>
                 <span className="text-xs leading-snug text-zinc-500">
                   {a.description}
                 </span>
@@ -273,7 +273,7 @@ export default function TriagePage() {
             {!showPhoto ? (
               <button
                 onClick={() => setShowPhoto(true)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-900"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700"
               >
                 📷 Not sure? Identify it with a photo
               </button>
@@ -313,12 +313,12 @@ export default function TriagePage() {
                   setSituation(s.value);
                   setStep("details");
                 }}
-                className="group flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3.5 text-left shadow-sm transition-all hover:border-emerald-400 hover:shadow-md"
+                className="group flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-left transition-all hover:border-zinc-300 hover:bg-zinc-50"
               >
-                <span className="text-emerald-950">{s.label}</span>
+                <span className="text-zinc-800">{s.label}</span>
                 <span
                   aria-hidden
-                  className="text-emerald-400 transition-transform group-hover:translate-x-0.5"
+                  className="text-zinc-300 transition-all group-hover:translate-x-0.5 group-hover:text-zinc-500"
                 >
                   →
                 </span>
@@ -346,7 +346,7 @@ export default function TriagePage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
               rows={4}
-              className="w-full resize-none rounded-2xl border border-black/10 bg-white p-4 text-zinc-800 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 text-zinc-800 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
             />
           </label>
 
@@ -395,13 +395,13 @@ export default function TriagePage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                  className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 >
                   📷 Take photo
                 </button>
                 <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                  className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 >
                   🖼️ Choose from library
                 </button>
@@ -418,7 +418,7 @@ export default function TriagePage() {
               Sharing your location routes this report to the nearest centre.
             </p>
             {locStatus === "done" ? (
-              <div className="flex items-center gap-2 text-sm text-emerald-800">
+              <div className="flex items-center gap-2 text-sm text-zinc-700">
                 <span aria-hidden>📍</span>
                 <span className="font-medium">Location captured.</span>
                 <button
@@ -435,7 +435,7 @@ export default function TriagePage() {
               <button
                 onClick={useMyLocation}
                 disabled={locStatus === "locating"}
-                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50 disabled:opacity-60"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
               >
                 {locStatus === "locating" ? (
                   <Spinner label="Locating…" />
@@ -457,7 +457,7 @@ export default function TriagePage() {
           <button
             onClick={submit}
             disabled={loading}
-            className="mt-6 inline-flex h-13 items-center justify-center rounded-full bg-emerald-700 px-8 py-3.5 font-medium text-white shadow-lg shadow-emerald-700/20 transition-all hover:bg-emerald-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-zinc-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? <Spinner label="Submitting…" /> : "Get help & send report"}
           </button>
@@ -494,19 +494,19 @@ function Section({
   return (
     <div className="animate-in flex flex-col gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
           {eyebrow}
         </p>
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-emerald-950">
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
           {title}
         </h1>
-        <p className="mt-1 text-zinc-600">{subtitle}</p>
+        <p className="mt-1.5 text-zinc-500">{subtitle}</p>
       </div>
       {children}
       {onBack && (
         <button
           onClick={onBack}
-          className="mt-1 self-start text-sm text-zinc-500 transition-colors hover:text-zinc-800"
+          className="mt-1 self-start text-sm text-zinc-500 transition-colors hover:text-zinc-900"
         >
           ← Back
         </button>
@@ -556,11 +556,11 @@ function ResultView({
   return (
     <div className="animate-in flex flex-col gap-5">
       {danger && <SafetyBanner danger={danger} />}
-      <div className={`rounded-3xl border p-6 ${style.card}`}>
+      <div className={`rounded-2xl border p-6 ${style.card}`}>
         <span
-          className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${style.badge}`}
+          className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${style.badge}`}
         >
-          <span aria-hidden className={`h-2 w-2 rounded-full ${style.dot}`} />
+          <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
           {style.label}
         </span>
         <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-zinc-900">
@@ -581,16 +581,16 @@ function ResultView({
       )}
 
       <div>
-        <h2 className="mb-2.5 font-display text-lg font-semibold text-emerald-950">
+        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
           What to do
         </h2>
-        <ol className="flex flex-col gap-2.5">
+        <ol className="flex flex-col gap-2">
           {result.steps.map((s, i) => (
             <li
               key={i}
-              className="flex gap-3 rounded-2xl border border-black/5 bg-white p-3.5 shadow-sm"
+              className="flex gap-3 rounded-xl border border-zinc-200 bg-white p-3.5"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-800">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white">
                 {i + 1}
               </span>
               <span className="leading-6 text-zinc-700">{s}</span>
@@ -613,13 +613,13 @@ function ResultView({
       <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onRestart}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white transition-colors hover:bg-emerald-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
         >
           Start over
         </button>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-6 font-medium text-zinc-700 transition-colors hover:bg-black/5"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
         >
           Home
         </Link>

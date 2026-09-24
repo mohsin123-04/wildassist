@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f3; /* warm cream */
-  --foreground: #1b2a20; /* deep forest ink */
+  --background: #ffffff;
+  --foreground: #09090b; /* zinc-950 */
+  --muted: #fafafa; /* subtle section bg */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-fraunces);
+  /* Headings use the same crisp sans as body (clean SaaS look). */
+  --font-display: var(--font-geist-sans);
 }
 
 body {
@@ -18,13 +21,18 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Gentle entrance used on step / page content */
+/* Tighter tracking on display headings for a modern feel. */
+.font-display {
+  letter-spacing: -0.02em;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -33,5 +41,5 @@ body {
 }
 
 .animate-in {
-  animation: fadeInUp 0.35s ease-out both;
+  animation: fadeInUp 0.3s ease-out both;
 }

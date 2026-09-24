@@ -9,11 +9,11 @@ type AssignedCentre = {
 /** Confirmation shown after a report is routed to a centre. */
 export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
   return (
-    <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
+    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
       <div className="flex items-center gap-2">
         <span
           aria-hidden
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-sm text-white"
+          className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-600 text-sm text-white"
         >
           ✓
         </span>
@@ -21,7 +21,7 @@ export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
           Report sent to a centre
         </p>
       </div>
-      <p className="mt-2 leading-7 text-emerald-950">
+      <p className="mt-2 leading-7 text-zinc-900">
         Based on your location, this report was routed to{" "}
         <span className="font-semibold">{centre.name}</span> in {centre.town}.
         Their staff can see it on their dashboard.
@@ -31,7 +31,7 @@ export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
         {centre.phone && (
           <a
             href={`tel:${centre.phone.replace(/[^0-9+]/g, "")}`}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-6 font-medium text-white shadow-sm transition-colors hover:bg-emerald-800"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
           >
             📞 Call {centre.phone}
           </a>

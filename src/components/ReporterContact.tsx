@@ -34,15 +34,15 @@ export default function ReporterContact({ caseId }: { caseId: string | null }) {
 
   if (saved) {
     return (
-      <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
         Thanks. We've shared your contact with the centre so they can follow up.
       </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-black/5 bg-white p-5 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-emerald-950">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-zinc-900">
         Want the centre to reach you?
       </h2>
       <p className="mt-1 text-sm leading-6 text-zinc-600">
@@ -65,7 +65,7 @@ export default function ReporterContact({ caseId }: { caseId: string | null }) {
       <button
         onClick={share}
         disabled={saving || (!name.trim() && !phone.trim())}
-        className="mt-3 inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
+        className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
       >
         {saving ? <Spinner label="Sharing…" /> : "Share my contact"}
       </button>
