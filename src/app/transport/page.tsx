@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import TransportList, { type Job } from "./TransportList";
+import TransportList from "./TransportList";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function TransportPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, full_name")
+    .select("role, full_name, volunteer_approved")
     .eq("id", user.id)
     .single();
   if (profile?.role !== "volunteer") redirect("/dashboard");
@@ -25,16 +25,6 @@ export default async function TransportPage() {
   const centreNames = Object.fromEntries(
     (centres ?? []).map((c) => [c.id, c.name])
   );
-
-  // RLS returns 'help' cases to volunteers; we want active transport jobs.
-  const { data: jobs } = await supabase
-    .from("cases")
-    .select(
-      "id, created_at, animal, title, description, lat, lng, status, driver_id, centre_id, reporter_name, reporter_phone"
-    )
-    .in("status", ["reported", "in_transit"])
-    .not("lat", "is", null)
-    .order("created_at", { ascending: false });
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
@@ -50,11 +40,20 @@ export default async function TransportPage() {
           drive, then mark it delivered.
         </p>
       </div>
-      <TransportList
-        initialJobs={(jobs ?? []) as Job[]}
-        myId={user.id}
-        centreNames={centreNames}
-      />
+
+      {profile?.volunteer_approved ? (
+        <TransportList centreNames={centreNames} />
+      ) : (
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
+          <p className="text-2xl">⏳</p>
+          <p className="mt-2 font-medium text-zinc-900">Approval pending</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-zinc-500">
+            Thanks for signing up to help. To protect the people and animals
+            involved, transport jobs are only shown to approved volunteers. An
+            administrator will review your account shortly.
+          </p>
+        </div>
+      )}
     </main>
   );
 }

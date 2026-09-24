@@ -1,65 +1,64 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { haversineKm } from "@/lib/centres";
 
 export type Job = {
   id: string;
   created_at: string;
   animal: string;
   title: string | null;
-  description: string | null;
+  status: "reported" | "in_transit" | "at_centre" | "closed";
   lat: number | null;
   lng: number | null;
-  status: "reported" | "in_transit" | "at_centre" | "closed";
-  driver_id: string | null;
   centre_id: string | null;
-  reporter_name: string | null;
-  reporter_phone: string | null;
+  distanceKm: number | null;
+  // Only present on the volunteer's own claimed jobs:
+  reporter_name?: string | null;
+  reporter_phone?: string | null;
 };
 
 export default function TransportList({
-  initialJobs,
-  myId,
   centreNames,
 }: {
-  initialJobs: Job[];
-  myId: string;
   centreNames: Record<string, string>;
 }) {
-  const [jobs, setJobs] = useState<Job[]>(initialJobs);
-  const [me, setMe] = useState<{ lat: number; lng: number } | null>(null);
+  const [available, setAvailable] = useState<Job[]>([]);
+  const [mine, setMine] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    if (!("geolocation" in navigator)) return;
+    if (!("geolocation" in navigator)) {
+      load(null);
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
-      (p) => setMe({ lat: p.coords.latitude, lng: p.coords.longitude }),
-      () => {},
+      (p) => {
+        const c = { lat: p.coords.latitude, lng: p.coords.longitude };
+        setCoords(c);
+        load(c);
+      },
+      () => load(null),
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function distanceKm(j: Job): number | null {
-    if (!me || j.lat == null || j.lng == null) return null;
-    return haversineKm(me.lat, me.lng, j.lat, j.lng);
+  async function load(c: { lat: number; lng: number } | null) {
+    setLoading(true);
+    const q = c ? `?lat=${c.lat}&lng=${c.lng}` : "";
+    try {
+      const r = await fetch(`/api/transport/jobs${q}`);
+      const d = await r.json();
+      setAvailable(d.available ?? []);
+      setMine(d.mine ?? []);
+    } catch {
+      // leave empty
+    } finally {
+      setLoading(false);
+    }
   }
-
-  function sortByDistance(list: Job[]) {
-    return [...list].sort((a, b) => {
-      const da = distanceKm(a);
-      const db = distanceKm(b);
-      if (da == null || db == null) return 0;
-      return da - db;
-    });
-  }
-
-  const mine = sortByDistance(
-    jobs.filter((j) => j.driver_id === myId && j.status === "in_transit")
-  );
-  const available = sortByDistance(
-    jobs.filter((j) => j.driver_id === null && j.status === "reported")
-  );
 
   async function act(id: string, action: "claim" | "deliver" | "release") {
     setBusyId(id);
@@ -69,15 +68,14 @@ export default function TransportList({
       body: JSON.stringify({ caseId: id, action }),
     });
     setBusyId(null);
-    if (!res.ok) return;
-    setJobs((js) =>
-      js.map((j) => {
-        if (j.id !== id) return j;
-        if (action === "claim")
-          return { ...j, driver_id: myId, status: "in_transit" };
-        if (action === "deliver") return { ...j, status: "at_centre" };
-        return { ...j, driver_id: null, status: "reported" };
-      })
+    if (res.ok) await load(coords);
+  }
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
+        Finding transport requests near you…
+      </div>
     );
   }
 
@@ -91,8 +89,8 @@ export default function TransportList({
             <JobCard
               key={j.id}
               job={j}
-              distance={distanceKm(j)}
               centreName={j.centre_id ? centreNames[j.centre_id] : null}
+              showContact
               actions={
                 <>
                   <button
@@ -118,13 +116,12 @@ export default function TransportList({
 
       <Section title={`Available nearby (${available.length})`}>
         {available.length === 0 ? (
-          <Empty text="No animals need transport right now. Check back soon." />
+          <Empty text="No animals need transport near you right now. Check back soon." />
         ) : (
           available.map((j) => (
             <JobCard
               key={j.id}
               job={j}
-              distance={distanceKm(j)}
               centreName={j.centre_id ? centreNames[j.centre_id] : null}
               actions={
                 <button
@@ -143,16 +140,10 @@ export default function TransportList({
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="mb-2.5 font-display text-lg font-semibold text-zinc-900">
+      <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
         {title}
       </h2>
       <div className="flex flex-col gap-3">{children}</div>
@@ -162,7 +153,7 @@ function Section({
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-6 text-center text-sm text-zinc-500">
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-6 text-center text-sm text-zinc-500">
       {text}
     </div>
   );
@@ -170,34 +161,30 @@ function Empty({ text }: { text: string }) {
 
 function JobCard({
   job,
-  distance,
   centreName,
+  showContact,
   actions,
 }: {
   job: Job;
-  distance: number | null;
   centreName: string | null;
+  showContact?: boolean;
   actions: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium capitalize text-zinc-900">
-              {job.animal}
-            </span>
-            {distance != null && (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
-                {Math.round(distance)} km away
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-sm text-zinc-700">
-            {job.title ?? "Injured animal needs transport"}
-          </p>
-        </div>
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium capitalize text-zinc-900">
+          {job.animal}
+        </span>
+        {job.distanceKm != null && (
+          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+            {Math.round(job.distanceKm)} km away
+          </span>
+        )}
       </div>
+      <p className="mt-1 text-sm text-zinc-700">
+        {job.title ?? "Injured animal needs transport"}
+      </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
         {job.lat != null && job.lng != null && (
@@ -205,16 +192,16 @@ function JobCard({
             href={`https://www.openstreetmap.org/?mlat=${job.lat}&mlon=${job.lng}#map=15/${job.lat}/${job.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-emerald-700 underline underline-offset-2"
+            className="font-medium text-emerald-600 underline underline-offset-2"
           >
             📍 Pickup location
           </a>
         )}
         {centreName && <span className="text-zinc-500">→ {centreName}</span>}
-        {job.reporter_phone && (
+        {showContact && job.reporter_phone && (
           <a
             href={`tel:${job.reporter_phone.replace(/[^0-9+]/g, "")}`}
-            className="font-medium text-emerald-700 underline underline-offset-2"
+            className="font-medium text-emerald-600 underline underline-offset-2"
           >
             Call {job.reporter_name ?? "finder"}
           </a>

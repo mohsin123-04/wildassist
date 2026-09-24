@@ -17,11 +17,17 @@ export async function POST(req: Request) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, full_name")
+    .select("role, full_name, volunteer_approved")
     .eq("id", user.id)
     .single();
   if (profile?.role !== "volunteer") {
     return Response.json({ error: "Volunteers only" }, { status: 403 });
+  }
+  if (!profile.volunteer_approved) {
+    return Response.json(
+      { error: "Your volunteer account is pending approval." },
+      { status: 403 }
+    );
   }
 
   let body: { caseId?: string; action?: "claim" | "deliver" | "release" };

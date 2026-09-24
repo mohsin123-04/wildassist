@@ -1,0 +1,115 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Vol = {
+  id: string;
+  full_name: string | null;
+  volunteer_approved: boolean;
+  created_at: string;
+};
+
+export default function AdminVolunteers() {
+  const [vols, setVols] = useState<Vol[]>([]);
+  const [open, setOpen] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function load() {
+    const r = await fetch("/api/admin/volunteers");
+    const d = await r.json();
+    if (Array.isArray(d.volunteers)) setVols(d.volunteers);
+  }
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function setApproved(userId: string, approved: boolean) {
+    setBusyId(userId);
+    await fetch("/api/admin/volunteers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, approved }),
+    });
+    setBusyId(null);
+    load();
+  }
+
+  const pending = vols.filter((v) => !v.volunteer_approved).length;
+
+  return (
+    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <span className="text-sm font-medium text-zinc-900">
+          Volunteers ({vols.length})
+          {pending > 0 && (
+            <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+              {pending} pending
+            </span>
+          )}
+        </span>
+        <span
+          aria-hidden
+          className={`text-xl leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
+        >
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-3">
+          <p className="mb-3 text-sm leading-6 text-zinc-600">
+            Approve volunteers before they can see and claim transport jobs. This
+            protects finders&apos; contact details and animal locations.
+          </p>
+          {vols.length === 0 ? (
+            <p className="text-sm text-zinc-400">No volunteers yet.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {vols.map((v) => (
+                <li
+                  key={v.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2"
+                >
+                  <span className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-zinc-900">
+                      {v.full_name || "Unnamed volunteer"}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        v.volunteer_approved
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {v.volunteer_approved ? "approved" : "pending"}
+                    </span>
+                  </span>
+                  {v.volunteer_approved ? (
+                    <button
+                      onClick={() => setApproved(v.id, false)}
+                      disabled={busyId === v.id}
+                      className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 transition-colors hover:bg-white disabled:opacity-50"
+                    >
+                      Revoke
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setApproved(v.id, true)}
+                      disabled={busyId === v.id}
+                      className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                    >
+                      Approve
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

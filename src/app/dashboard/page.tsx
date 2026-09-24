@@ -5,6 +5,7 @@ import CaseList, { type CaseRow } from "./CaseList";
 import CentreCodePanel from "./CentreCodePanel";
 import TeamPanel from "./TeamPanel";
 import AdminCentres from "./AdminCentres";
+import AdminVolunteers from "./AdminVolunteers";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
         </p>
       </div>
       {isAdmin && <AdminCentres />}
+      {isAdmin && <AdminVolunteers />}
       {isManager && <CentreCodePanel />}
       {isManager && <TeamPanel />}
       <CaseList
