@@ -242,7 +242,7 @@ export default function MessagesClient({
                 key={c.id}
                 onClick={() => openConversation(c.id)}
                 className={`mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                  isSel ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100"
+                  isSel ? "bg-emerald-600 text-white" : "text-zinc-700 hover:bg-zinc-100"
                 }`}
               >
                 <ConvIcon kind={c.kind} label={c.label} selected={isSel} />
@@ -308,7 +308,7 @@ export default function MessagesClient({
                       <div
                         className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
                           mine
-                            ? "rounded-br-md bg-zinc-900 text-white"
+                            ? "rounded-br-md bg-emerald-600 text-white"
                             : "rounded-bl-md bg-zinc-100 text-zinc-800"
                         }`}
                       >
@@ -344,7 +344,7 @@ export default function MessagesClient({
               <button
                 onClick={send}
                 disabled={!body.trim() || !selected}
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
               >
                 Send
               </button>
