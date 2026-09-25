@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -35,9 +35,22 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [country, setCountry] = useState("Canada");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Landing "become a volunteer" link opens signup with the volunteer role.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get("signup");
+    if (p === "volunteer") {
+      setMode("signup");
+      setRole("volunteer");
+    }
+  }, []);
 
   function routeByRole() {
     // The dashboard redirects volunteers to /transport server-side, so we can
@@ -64,7 +77,13 @@ export default function LoginPage() {
           await fetch("/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: data.user.id, role }),
+            body: JSON.stringify({
+              userId: data.user.id,
+              role,
+              ...(role === "volunteer"
+                ? { phone, city, province, country }
+                : {}),
+            }),
           });
         }
         if (data.session) {
@@ -155,6 +174,40 @@ export default function LoginPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+              {role === "volunteer" && (
+                <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/60 p-3.5">
+                  <p className="text-xs font-medium text-zinc-500">
+                    So a centre can verify and reach you about pickups.
+                  </p>
+                  <input
+                    className={inputClass}
+                    type="tel"
+                    placeholder="Phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                  <input
+                    className={inputClass}
+                    placeholder="City / town"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      className={inputClass}
+                      placeholder="Province / state"
+                      value={province}
+                      onChange={(e) => setProvince(e.target.value)}
+                    />
+                    <input
+                      className={inputClass}
+                      placeholder="Country"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
 

@@ -26,7 +26,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data } = await admin
     .from("profiles")
-    .select("id, full_name, volunteer_approved, created_at")
+    .select("id, full_name, volunteer_approved, created_at, phone, city, province, country")
     .eq("role", "volunteer")
     .order("volunteer_approved")
     .order("created_at", { ascending: false });

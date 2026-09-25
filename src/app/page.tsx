@@ -87,6 +87,31 @@ export default function Home() {
           difference.
         </p>
       </section>
+
+      {/* Volunteer recruitment */}
+      <section className="border-t border-zinc-200 bg-zinc-50">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-5 py-14 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div className="max-w-xl">
+            <p className="text-xs font-medium uppercase tracking-widest text-emerald-600">
+              Get involved
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
+              Can you drive an animal to a centre?
+            </h2>
+            <p className="mt-2 leading-7 text-zinc-600">
+              Volunteer drivers are the link between a finder and a rehabilitation
+              centre. Sign up, get approved by a centre near you, and claim
+              pickups when you are free.
+            </p>
+          </div>
+          <Link
+            href="/login?signup=volunteer"
+            className="inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-emerald-600 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
+          >
+            Become a volunteer
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

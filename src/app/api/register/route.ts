@@ -1,17 +1,25 @@
 import { createAdminClient } from "@/lib/supabase/server";
 
 /**
- * POST /api/register  { userId, role }
- * Sets the role chosen at signup. Only allowed to set 'staff' or 'volunteer'
- * (never 'admin'), and only on a fresh default profile (role still 'staff' and
- * no centre linked), so it can't be used to flip established accounts.
+ * POST /api/register  { userId, role, phone?, city?, province?, country? }
+ * Sets the role chosen at signup and, for volunteers, their contact and
+ * location details. Only allowed to set 'staff' or 'volunteer' (never 'admin'),
+ * and only on a fresh default profile (role still 'staff' and no centre linked),
+ * so it can't be used to flip established accounts.
  */
 export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ ok: false, reason: "no-db" });
   }
 
-  let body: { userId?: string; role?: string };
+  let body: {
+    userId?: string;
+    role?: string;
+    phone?: string;
+    city?: string;
+    province?: string;
+    country?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -23,10 +31,19 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid role" }, { status: 400 });
   }
 
+  const update: Record<string, unknown> = { role };
+  if (role === "volunteer") {
+    const clean = (v?: string) => v?.trim().slice(0, 120) || null;
+    update.phone = clean(body.phone);
+    update.city = clean(body.city);
+    update.province = clean(body.province);
+    update.country = clean(body.country);
+  }
+
   const admin = createAdminClient();
   const { error } = await admin
     .from("profiles")
-    .update({ role })
+    .update(update)
     .eq("id", userId)
     .eq("role", "staff")
     .is("centre_id", null);

@@ -7,6 +7,10 @@ type Vol = {
   full_name: string | null;
   volunteer_approved: boolean;
   created_at: string;
+  phone: string | null;
+  city: string | null;
+  province: string | null;
+  country: string | null;
 };
 
 export default function AdminVolunteers() {
@@ -68,24 +72,44 @@ export default function AdminVolunteers() {
             <p className="text-sm text-zinc-400">No volunteers yet.</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {vols.map((v) => (
+              {vols.map((v) => {
+                const location = [v.city, v.province, v.country]
+                  .filter(Boolean)
+                  .join(", ");
+                return (
                 <li
                   key={v.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2"
                 >
-                  <span className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-zinc-900">
-                      {v.full_name || "Unnamed volunteer"}
+                  <span className="min-w-0 text-sm">
+                    <span className="flex items-center gap-2">
+                      <span className="font-medium text-zinc-900">
+                        {v.full_name || "Unnamed volunteer"}
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          v.volunteer_approved
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {v.volunteer_approved ? "approved" : "pending"}
+                      </span>
                     </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        v.volunteer_approved
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {v.volunteer_approved ? "approved" : "pending"}
-                    </span>
+                    {(v.phone || location) && (
+                      <span className="mt-0.5 block text-xs text-zinc-500">
+                        {v.phone && (
+                          <a
+                            href={`tel:${v.phone.replace(/[^0-9+]/g, "")}`}
+                            className="font-medium text-emerald-700 underline underline-offset-2"
+                          >
+                            {v.phone}
+                          </a>
+                        )}
+                        {v.phone && location && " · "}
+                        {location}
+                      </span>
+                    )}
                   </span>
                   {v.volunteer_approved ? (
                     <button
@@ -105,7 +129,8 @@ export default function AdminVolunteers() {
                     </button>
                   )}
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>
