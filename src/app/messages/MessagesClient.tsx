@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 
 type Member = { id: string; full_name: string | null; role: string };
 type Conversation = { id: string; kind: string; label: string; unread?: number };
+type CaseRef = {
+  id: string;
+  animal: string;
+  title: string;
+  status?: string;
+};
 type Message = {
   id: string;
   conversation_id: string;
@@ -12,6 +18,7 @@ type Message = {
   sender_name: string | null;
   body: string;
   created_at: string;
+  case_ref?: CaseRef | null;
 };
 
 export default function MessagesClient({
@@ -65,7 +72,7 @@ export default function MessagesClient({
     if (!selected) return;
     supabase
       .from("messages")
-      .select("id, conversation_id, sender_id, sender_name, body, created_at")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref")
       .eq("conversation_id", selected)
       .order("created_at", { ascending: true })
       .then(({ data }) => setMessages((data ?? []) as Message[]));
@@ -132,7 +139,7 @@ export default function MessagesClient({
         sender_name: myName,
         body: text,
       })
-      .select("id, conversation_id, sender_id, sender_name, body, created_at")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref")
       .single();
     if (data) {
       setMessages((prev) =>
@@ -305,15 +312,32 @@ export default function MessagesClient({
                           {m.sender_name || "Someone"}
                         </span>
                       )}
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
-                          mine
-                            ? "rounded-br-md bg-emerald-600 text-white"
-                            : "rounded-bl-md bg-zinc-100 text-zinc-800"
-                        }`}
-                      >
-                        {m.body}
-                      </div>
+                      {m.case_ref ? (
+                        <a
+                          href="/dashboard"
+                          className="block max-w-[85%] rounded-2xl border border-zinc-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-zinc-50"
+                        >
+                          <span className="text-xs font-medium uppercase tracking-wide text-emerald-600">
+                            Shared case
+                          </span>
+                          <span className="mt-0.5 block text-sm font-medium capitalize text-zinc-900">
+                            {m.case_ref.animal} · {m.case_ref.title}
+                          </span>
+                          <span className="mt-1 inline-block text-xs text-zinc-500">
+                            View in dashboard →
+                          </span>
+                        </a>
+                      ) : (
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
+                            mine
+                              ? "rounded-br-md bg-emerald-600 text-white"
+                              : "rounded-bl-md bg-zinc-100 text-zinc-800"
+                          }`}
+                        >
+                          {m.body}
+                        </div>
+                      )}
                       <span className="mt-0.5 px-1 text-[10px] text-zinc-400">
                         {new Date(m.created_at).toLocaleTimeString([], {
                           hour: "numeric",

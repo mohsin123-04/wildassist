@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
+import ShareCase from "@/components/ShareCase";
 
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
@@ -525,6 +526,11 @@ export default function CaseList({
                       >
                         {savingNoteId === c.id ? "Saving…" : "Save note"}
                       </button>
+                    </div>
+
+                    {/* Share to team */}
+                    <div className="mt-4 border-t border-black/5 pt-3">
+                      <ShareCase caseId={c.id} />
                     </div>
                   </div>
                 )}
