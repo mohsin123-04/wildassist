@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import ShareCase from "@/components/ShareCase";
+import CaseTimeline from "@/components/CaseTimeline";
 
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
@@ -556,6 +557,9 @@ export default function CaseList({
                     <div className="mt-4 border-t border-black/5 pt-3">
                       <ShareCase caseId={c.id} />
                     </div>
+
+                    {/* Status history */}
+                    <CaseTimeline caseId={c.id} reportedAt={c.created_at} />
                   </div>
                 )}
               </li>
