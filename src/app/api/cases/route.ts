@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SITUATIONS, type AnimalType } from "@/lib/triage";
-import { rankCentres, type Centre } from "@/lib/centres";
+import { rankCentres, haversineKm, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 /**
@@ -81,6 +81,30 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Possible duplicate: an open report of the same animal, within ~1.5 km, in
+  // the last 24 hours. Flag it so staff can merge or dismiss rather than
+  // getting two cases for one animal.
+  let duplicateOf: string | null = null;
+  if (typeof lat === "number" && typeof lng === "number") {
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recent } = await supabase
+      .from("cases")
+      .select("id, lat, lng")
+      .eq("animal", animal!.trim())
+      .neq("status", "closed")
+      .gte("created_at", dayAgo)
+      .not("lat", "is", null);
+    let best = Infinity;
+    for (const r of recent ?? []) {
+      if (r.lat == null || r.lng == null) continue;
+      const km = haversineKm(lat, lng, r.lat, r.lng);
+      if (km <= 1.5 && km < best) {
+        best = km;
+        duplicateOf = r.id;
+      }
+    }
+  }
+
   const { data, error } = await supabase
     .from("cases")
     .insert({
@@ -93,6 +117,7 @@ export async function POST(req: NextRequest) {
       lng: typeof lng === "number" ? lng : null,
       centre_id: assignedCentre?.id ?? null,
       photo_url: typeof photoUrl === "string" ? photoUrl : null,
+      duplicate_of: duplicateOf,
     })
     .select("id")
     .single();

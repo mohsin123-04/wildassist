@@ -30,6 +30,7 @@ export type CaseRow = {
   centre_id: string | null;
   photo_url: string | null;
   driver_name: string | null;
+  duplicate_of: string | null;
 };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
@@ -166,6 +167,13 @@ export default function CaseList({
       .eq("id", id);
     setSavingId(null);
     if (error) setCases(previous);
+  }
+
+  async function dismissDuplicate(id: string) {
+    setCases((cs) =>
+      cs.map((c) => (c.id === id ? { ...c, duplicate_of: null } : c))
+    );
+    await createClient().from("cases").update({ duplicate_of: null }).eq("id", id);
   }
 
   async function saveNotes(id: string) {
@@ -330,6 +338,11 @@ export default function CaseList({
                           unassigned
                         </span>
                       )}
+                      {c.duplicate_of && (
+                        <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
+                          possible duplicate
+                        </span>
+                      )}
                     </div>
                     <p className="mt-1.5 text-sm text-zinc-700">
                       {c.title ?? c.situation.replace(/-/g, " ")}
@@ -348,6 +361,35 @@ export default function CaseList({
 
                 {expanded && (
                   <div className="border-t border-black/5 px-4 py-3">
+                    {c.duplicate_of && (
+                      <div className="mb-3 rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm">
+                        <p className="font-medium text-orange-900">
+                          Possible duplicate
+                        </p>
+                        <p className="mt-0.5 leading-6 text-orange-800">
+                          {(() => {
+                            const orig = cases.find((x) => x.id === c.duplicate_of);
+                            return orig
+                              ? `Looks like the same ${orig.animal.toLowerCase()} reported nearby around ${new Date(orig.created_at).toLocaleString()}.`
+                              : "An earlier report of the same animal was made nearby.";
+                          })()}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => updateStatus(c.id, "closed")}
+                            className="inline-flex h-8 items-center justify-center rounded-lg bg-orange-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
+                          >
+                            Close as duplicate
+                          </button>
+                          <button
+                            onClick={() => dismissDuplicate(c.id)}
+                            className="inline-flex h-8 items-center justify-center rounded-lg border border-orange-200 px-3 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-100"
+                          >
+                            Not a duplicate
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     {c.photo_url && (
                       <a
                         href={c.photo_url}
