@@ -1,5 +1,5 @@
--- Case audit trail: log every status change (who + when).
--- Additive and backwards-compatible. Run in the Supabase SQL editor.
+-- Case audit trail: log every case status change (who + when).
+-- Additive and backwards-compatible. Run once in the Supabase SQL editor.
 
 create table if not exists public.case_events (
   id uuid primary key default gen_random_uuid(),
@@ -15,11 +15,7 @@ create table if not exists public.case_events (
 create index if not exists case_events_case_idx
   on public.case_events (case_id, created_at);
 
--- Trigger: on any status change, record it. Runs security definer so it
--- writes regardless of who made the change (staff via RLS client, or a
--- volunteer/system change via the service role). Attributes the actor to the
--- signed-in user when known, else to the driver name set on the case.
-create or replace function public.log_case_status_change()
+create or replace function public.audit_case_status()
 returns trigger
 language plpgsql
 security definer
@@ -46,17 +42,17 @@ end;
 $$;
 
 drop trigger if exists case_status_audit on public.cases;
+
 create trigger case_status_audit
   after update on public.cases
   for each row
-  execute function public.log_case_status_change();
+  execute function public.audit_case_status();
 
--- RLS: a user can read a case's events if they can see the case itself.
--- No insert policy: events are written only by the trigger above.
 alter table public.case_events enable row level security;
 
 drop policy if exists "read events for visible cases"
   on public.case_events;
+
 create policy "read events for visible cases"
   on public.case_events for select
   using (
