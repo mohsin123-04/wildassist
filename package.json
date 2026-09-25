@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy:staging": "./scripts/deploy-staging.sh",
+    "deploy:prod": "./scripts/deploy-prod.sh"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.0",
