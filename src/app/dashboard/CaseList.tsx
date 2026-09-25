@@ -30,7 +30,9 @@ export type CaseRow = {
   staff_notes: string | null;
   centre_id: string | null;
   photo_url: string | null;
+  driver_id: string | null;
   driver_name: string | null;
+  driver_phone?: string | null;
   duplicate_of: string | null;
 };
 
@@ -467,12 +469,34 @@ export default function CaseList({
                     </div>
 
                     {c.driver_name && (
-                      <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-                        <span aria-hidden>🚗</span>
-                        <span>
-                          Being transported by{" "}
-                          <span className="font-medium">{c.driver_name}</span>
-                        </span>
+                      <div className="mt-3 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
+                        <div className="flex items-center gap-2">
+                          <span aria-hidden>🚗</span>
+                          <span>
+                            Being transported by{" "}
+                            <span className="font-medium">
+                              {c.driver_name}
+                            </span>
+                          </span>
+                        </div>
+                        {c.driver_id && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {c.driver_phone && (
+                              <a
+                                href={`tel:${c.driver_phone.replace(/[^0-9+]/g, "")}`}
+                                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                              >
+                                <span aria-hidden>📞</span> Call driver
+                              </a>
+                            )}
+                            <a
+                              href={`/messages?dm=${c.driver_id}`}
+                              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+                            >
+                              <span aria-hidden>💬</span> Message driver
+                            </a>
+                          </div>
+                        )}
                       </div>
                     )}
 

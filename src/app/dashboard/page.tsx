@@ -52,13 +52,30 @@ export default async function DashboardPage() {
     supabase
       .from("cases")
       .select(
-        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_name, duplicate_of"
+        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of"
       )
       .order("created_at", { ascending: false }),
   ]);
   const centreNames = Object.fromEntries(
     (allCentres ?? []).map((c) => [c.id, c.name])
   );
+
+  // Attach the assigned driver's phone so staff can call/text them directly.
+  const driverIds = [
+    ...new Set((cases ?? []).map((c) => c.driver_id).filter(Boolean)),
+  ];
+  if (driverIds.length) {
+    const { data: drivers } = await supabase
+      .from("profiles")
+      .select("id, phone")
+      .in("id", driverIds as string[]);
+    const phoneById = Object.fromEntries(
+      (drivers ?? []).map((d) => [d.id, d.phone])
+    );
+    for (const c of cases ?? []) {
+      (c as CaseRow).driver_phone = phoneById[c.driver_id] ?? null;
+    }
+  }
   const centre = allCentres?.find((c) => c.id === profile.centre_id);
 
   return (

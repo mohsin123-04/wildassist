@@ -68,6 +68,16 @@ export default function MessagesClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Deep link from the dashboard: /messages?dm=<userId> opens (or creates) that DM.
+  useEffect(() => {
+    const dm = new URLSearchParams(window.location.search).get("dm");
+    if (dm) {
+      startDm(dm);
+      window.history.replaceState(null, "", "/messages");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!selected) return;
     supabase

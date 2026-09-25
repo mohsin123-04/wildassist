@@ -150,7 +150,19 @@ export async function POST(req: Request) {
       .select("id")
       .eq("centre_id", c.centreId)
       .in("id", targets);
-    if ((valid?.length ?? 0) !== targets.length) {
+    let ok = new Set((valid ?? []).map((v) => v.id));
+    // A DM target may also be a volunteer driving one of this centre's cases,
+    // even though volunteers aren't centre members. Staff need to reach them.
+    if (body.dmWith && !ok.has(body.dmWith)) {
+      const { data: asDriver } = await admin
+        .from("cases")
+        .select("id")
+        .eq("centre_id", c.centreId)
+        .eq("driver_id", body.dmWith)
+        .limit(1);
+      if (asDriver?.length) ok = ok.add(body.dmWith);
+    }
+    if (targets.some((t) => !ok.has(t))) {
       return Response.json({ error: "Members must be in your centre" }, {
         status: 400,
       });
