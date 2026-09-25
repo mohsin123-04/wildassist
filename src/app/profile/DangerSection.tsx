@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { flash } from "@/lib/flash";
 import Spinner from "@/components/Spinner";
 
 export default function DangerSection() {
@@ -15,6 +16,7 @@ export default function DangerSection() {
   async function signOutEverywhere() {
     setBusy("out");
     await createClient().auth.signOut({ scope: "global" });
+    flash("Signed out on all devices");
     router.push("/");
     router.refresh();
   }

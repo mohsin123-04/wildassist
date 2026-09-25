@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
+import Toast from "@/components/Toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </header>
 
         <div className="flex flex-1 flex-col">{children}</div>
+        <Toast />
 
         <footer className="border-t border-zinc-200 px-5 py-6 text-center text-xs leading-5 text-zinc-400">
           WildAssist offers general guidance only. In an emergency, contact a

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { flash } from "@/lib/flash";
 import Spinner from "@/components/Spinner";
 
 type Mode = "signin" | "signup";
@@ -67,6 +68,7 @@ export default function LoginPage() {
           });
         }
         if (data.session) {
+          flash("Welcome to WildAssist");
           await routeByRole();
         } else {
           setNotice(
@@ -80,6 +82,7 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
+        flash("Signed in");
         await routeByRole();
       }
     } catch (err) {

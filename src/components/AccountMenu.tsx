@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { flash } from "@/lib/flash";
 import Avatar from "@/components/Avatar";
 
 export default function AccountMenu() {
@@ -122,6 +123,7 @@ export default function AccountMenu() {
   async function signOut() {
     await createClient().auth.signOut();
     setOpen(false);
+    flash("You've been signed out");
     router.push("/");
     router.refresh();
   }
