@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
+import { FACILITY_TYPES, type FacilityType } from "@/lib/centres";
 
 type CentreRow = {
   id: string;
@@ -25,11 +26,14 @@ export default function AdminCentres() {
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
   const [managerEmail, setManagerEmail] = useState("");
+  const [type, setType] = useState<FacilityType>("rehab_centre");
+  const [directoryOnly, setDirectoryOnly] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<{ name: string; code: string } | null>(
-    null
-  );
+  const [created, setCreated] = useState<{
+    name: string;
+    code: string | null;
+  } | null>(null);
 
   async function load() {
     const r = await fetch("/api/admin/centres");
@@ -51,7 +55,16 @@ export default function AdminCentres() {
     const r = await fetch("/api/admin/create-centre", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, address, takes, phone, website, managerEmail }),
+      body: JSON.stringify({
+        name,
+        address,
+        takes,
+        phone,
+        website,
+        managerEmail,
+        type,
+        directoryOnly,
+      }),
     });
     const d = await r.json();
     setBusy(false);
@@ -103,6 +116,34 @@ export default function AdminCentres() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <select
+                  className={inputClass + " px-3"}
+                  value={type}
+                  onChange={(e) => setType(e.target.value as FacilityType)}
+                >
+                  {Object.entries(FACILITY_TYPES).map(([v, label]) => (
+                    <option key={v} value={v}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 text-sm text-zinc-700">
+                  <input
+                    type="checkbox"
+                    checked={directoryOnly}
+                    onChange={(e) => setDirectoryOnly(e.target.checked)}
+                    className="h-4 w-4 accent-emerald-600"
+                  />
+                  Directory listing only
+                </label>
+              </div>
+              {directoryOnly && (
+                <p className="text-xs text-zinc-500">
+                  A directory listing has no staff accounts or dashboard. It is
+                  shown to finders as a nearby contact and does not receive cases.
+                </p>
+              )}
               <div className="flex flex-wrap gap-2">
                 {SPECIES.map((s) => (
                   <button
@@ -145,8 +186,17 @@ export default function AdminCentres() {
               {created && (
                 <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
                   Created <span className="font-semibold">{created.name}</span>.
-                  Join code:{" "}
-                  <span className="font-mono font-semibold">{created.code}</span>
+                  {created.code ? (
+                    <>
+                      {" "}
+                      Join code:{" "}
+                      <span className="font-mono font-semibold">
+                        {created.code}
+                      </span>
+                    </>
+                  ) : (
+                    " Added as a directory listing."
+                  )}
                 </p>
               )}
 

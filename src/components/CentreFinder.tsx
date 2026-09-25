@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ONTARIO_CENTRES,
   rankCentres,
+  FACILITY_TYPES,
   type Centre,
   type RankedCentre,
 } from "@/lib/centres";
@@ -125,9 +126,14 @@ export default function CentreFinder({
               className="rounded-2xl border border-black/5 bg-[var(--background)] p-3.5"
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-medium text-zinc-900">{c.name}</p>
                   <p className="text-sm text-zinc-500">{c.town}</p>
+                  {c.type && c.type !== "rehab_centre" && (
+                    <span className="mt-1 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
+                      {FACILITY_TYPES[c.type]}
+                    </span>
+                  )}
                 </div>
                 {"distanceKm" in c && (
                   <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">

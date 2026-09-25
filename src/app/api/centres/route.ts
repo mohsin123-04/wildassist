@@ -15,7 +15,9 @@ export async function GET() {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("centres")
-      .select("id, name, town, lat, lng, takes, phone, website, notes");
+      .select(
+        "id, name, town, lat, lng, takes, phone, website, notes, type, directory_only"
+      );
 
     if (error || !data || data.length === 0) {
       return Response.json({ centres: ONTARIO_CENTRES, source: "static" });

@@ -63,9 +63,12 @@ export async function POST(req: NextRequest) {
     "id" | "name" | "town" | "phone" | "website"
   > | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
+    // Only full participants receive cases; directory listings (vets, hotlines)
+    // are reference contacts, not case managers.
     const { data: centres } = await supabase
       .from("centres")
-      .select("id, name, town, lat, lng, takes, phone, website");
+      .select("id, name, town, lat, lng, takes, phone, website")
+      .neq("directory_only", true);
     if (centres && centres.length) {
       const ranked = rankCentres(lat, lng, category, centres as Centre[]);
       const top = ranked[0];

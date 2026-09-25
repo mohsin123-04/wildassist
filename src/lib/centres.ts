@@ -9,6 +9,24 @@
 
 import type { AnimalType } from "./triage";
 
+export type FacilityType =
+  | "rehab_centre"
+  | "vet"
+  | "animal_hospital"
+  | "humane_society"
+  | "hotline"
+  | "sanctuary";
+
+/** Human labels for each facility type. */
+export const FACILITY_TYPES: Record<FacilityType, string> = {
+  rehab_centre: "Rehabilitation centre",
+  vet: "Veterinary clinic",
+  animal_hospital: "Animal hospital",
+  humane_society: "Humane society / SPCA",
+  hotline: "Wildlife hotline",
+  sanctuary: "Sanctuary",
+};
+
 export interface Centre {
   id: string;
   name: string;
@@ -20,6 +38,9 @@ export interface Centre {
   phone?: string;
   website?: string;
   notes?: string;
+  type?: FacilityType;
+  /** Directory listing only: shown for reference, but not assigned cases. */
+  directory_only?: boolean;
 }
 
 export const ONTARIO_CENTRES: Centre[] = [

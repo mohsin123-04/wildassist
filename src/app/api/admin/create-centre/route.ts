@@ -49,6 +49,8 @@ export async function POST(req: Request) {
     phone?: string;
     website?: string;
     managerEmail?: string;
+    type?: string;
+    directoryOnly?: boolean;
   };
   try {
     body = await req.json();
@@ -105,6 +107,19 @@ export async function POST(req: Request) {
     .maybeSingle();
   if (existing) id = `${id}-${genCode().replace("-", "").slice(0, 4).toLowerCase()}`;
 
+  const VALID_TYPES = [
+    "rehab_centre",
+    "vet",
+    "animal_hospital",
+    "humane_society",
+    "hotline",
+    "sanctuary",
+  ];
+  const type = VALID_TYPES.includes(body.type ?? "")
+    ? body.type
+    : "rehab_centre";
+  const directoryOnly = body.directoryOnly === true;
+
   const { error: insErr } = await admin.from("centres").insert({
     id,
     name,
@@ -114,12 +129,21 @@ export async function POST(req: Request) {
     takes,
     phone: body.phone?.trim() || null,
     website: body.website?.trim() || null,
-    manager_email: body.managerEmail?.trim().toLowerCase() || null,
+    // Directory listings have no accounts, so no manager.
+    manager_email: directoryOnly
+      ? null
+      : body.managerEmail?.trim().toLowerCase() || null,
+    type,
+    directory_only: directoryOnly,
   });
   if (insErr) return Response.json({ error: insErr.message }, { status: 500 });
 
-  const code = genCode();
-  await admin.from("centre_codes").upsert({ centre_id: id, code });
+  // Directory listings do not get a join code (no staff accounts).
+  let code: string | null = null;
+  if (!directoryOnly) {
+    code = genCode();
+    await admin.from("centre_codes").upsert({ centre_id: id, code });
+  }
 
-  return Response.json({ id, name, town, lat, lng, code });
+  return Response.json({ id, name, town, lat, lng, code, directoryOnly });
 }
