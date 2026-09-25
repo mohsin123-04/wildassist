@@ -47,5 +47,6 @@ export const config = {
     "/profile/:path*",
     "/transport/:path*",
     "/messages/:path*",
+    "/analytics/:path*",
   ],
 };

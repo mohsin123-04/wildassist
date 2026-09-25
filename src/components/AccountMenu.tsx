@@ -230,6 +230,15 @@ export default function AccountMenu() {
               )}
             </Link>
           )}
+          {(centreName || role === "admin") && (
+            <Link
+              href="/analytics"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+            >
+              Analytics
+            </Link>
+          )}
           <Link
             href="/profile"
             onClick={() => setOpen(false)}
