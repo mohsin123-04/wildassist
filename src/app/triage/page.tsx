@@ -6,6 +6,7 @@ import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import ReporterContact from "@/components/ReporterContact";
 import ReportStatus from "@/components/ReportStatus";
+import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
@@ -470,6 +471,7 @@ export default function TriagePage() {
           result={result}
           caseId={caseId}
           assignedCentre={assignedCentre}
+          coords={coords}
           danger={danger}
           onRestart={reset}
         />
@@ -541,6 +543,7 @@ function ResultView({
   result,
   caseId,
   assignedCentre,
+  coords,
   danger,
   onRestart,
 }: {
@@ -548,6 +551,7 @@ function ResultView({
   result: Result;
   caseId: string | null;
   assignedCentre: AssignedCentre | null;
+  coords: { lat: number; lng: number } | null;
   danger: DangerInfo | null;
   onRestart: () => void;
 }) {
@@ -602,7 +606,17 @@ function ResultView({
       {result.showContactCentre && (
         <>
           {assignedCentre ? (
-            <ReportStatus centre={assignedCentre} />
+            <>
+              <ReportStatus centre={assignedCentre} />
+              {coords && (
+                <NearbyHelp
+                  lat={coords.lat}
+                  lng={coords.lng}
+                  animal={animal}
+                  assignedId={assignedCentre.id}
+                />
+              )}
+            </>
           ) : (
             <CentreFinder animal={animal} caseId={caseId} />
           )}
