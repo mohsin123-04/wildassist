@@ -6,12 +6,28 @@ import { SITUATIONS } from "@/lib/triage";
 export const dynamic = "force-dynamic";
 
 type Row = {
+  id: string;
   created_at: string;
   animal: string;
   situation: string;
   verdict: string;
   status: string;
 };
+
+type EventRow = { case_id: string; to_status: string; created_at: string };
+
+/** Human-friendly duration from milliseconds. */
+function formatDuration(ms: number): string {
+  if (ms < 60 * 60 * 1000) return `${Math.max(1, Math.round(ms / 60000))} min`;
+  if (ms < 48 * 60 * 60 * 1000) return `${(ms / 3_600_000).toFixed(1)} h`;
+  return `${(ms / 86_400_000).toFixed(1)} d`;
+}
+
+function median(nums: number[]): number {
+  const s = [...nums].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
 
 const SITUATION_LABEL: Record<string, string> = Object.fromEntries(
   SITUATIONS.map((s) => [s.value, s.label])
@@ -35,10 +51,16 @@ export default async function AnalyticsPage() {
     redirect("/dashboard");
   }
 
-  const { data: rows } = await supabase
-    .from("cases")
-    .select("created_at, animal, situation, verdict, status");
+  const [{ data: rows }, { data: eventRows }] = await Promise.all([
+    supabase
+      .from("cases")
+      .select("id, created_at, animal, situation, verdict, status"),
+    supabase
+      .from("case_events")
+      .select("case_id, to_status, created_at"),
+  ]);
   const cases = (rows ?? []) as Row[];
+  const events = (eventRows ?? []) as EventRow[];
 
   // --- aggregates ---
   const now = Date.now();
@@ -80,6 +102,27 @@ export default async function AnalyticsPage() {
 
   const wowChange =
     lastWeek === 0 ? null : Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+
+  // Response time: from a case being reported to its first pickup (the earliest
+  // "in_transit" or "at_centre" event). Uses the audit trail.
+  const reportedAt: Record<string, number> = {};
+  for (const c of cases) reportedAt[c.id] = new Date(c.created_at).getTime();
+  const firstResponse: Record<string, number> = {};
+  for (const e of events) {
+    if (e.to_status !== "in_transit" && e.to_status !== "at_centre") continue;
+    const t = new Date(e.created_at).getTime();
+    if (firstResponse[e.case_id] === undefined || t < firstResponse[e.case_id]) {
+      firstResponse[e.case_id] = t;
+    }
+  }
+  const responseMs = Object.entries(firstResponse)
+    .filter(([id]) => reportedAt[id] !== undefined)
+    .map(([id, t]) => t - reportedAt[id])
+    .filter((ms) => ms >= 0);
+  const medianResponse = responseMs.length ? median(responseMs) : null;
+  const respondedPct = cases.length
+    ? Math.round((responseMs.length / cases.length) * 100)
+    : 0;
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 py-8">
@@ -127,6 +170,38 @@ export default async function AnalyticsPage() {
               accent="text-emerald-700"
             />
           </div>
+
+          {/* Response time */}
+          <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+            <h2 className="font-display text-base font-semibold text-zinc-900">
+              Response time
+            </h2>
+            {medianResponse === null ? (
+              <p className="mt-2 text-sm text-zinc-400">
+                Not enough data yet. This shows the typical time from a report to
+                its first pickup once cases start moving.
+              </p>
+            ) : (
+              <div className="mt-3 flex items-baseline gap-6">
+                <div>
+                  <p className="font-display text-3xl font-semibold text-zinc-900">
+                    {formatDuration(medianResponse)}
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    Median, report to first pickup
+                  </p>
+                </div>
+                <div>
+                  <p className="font-display text-3xl font-semibold text-emerald-700">
+                    {respondedPct}%
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    Picked up ({responseMs.length} of {cases.length})
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
 
           {/* Daily intake */}
           <section className="rounded-2xl border border-zinc-200 bg-white p-5">
