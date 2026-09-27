@@ -383,6 +383,12 @@ export default function TriagePage() {
                   className="h-16 w-16 rounded-xl object-cover"
                 />
                 <button
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="text-sm font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                >
+                  Retake
+                </button>
+                <button
                   onClick={() => {
                     setPhotoFile(null);
                     setPhotoPreview(null);
@@ -500,6 +506,14 @@ function Section({
   return (
     <div className="animate-in flex flex-col gap-5">
       <div>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+          >
+            <span aria-hidden>←</span> Back
+          </button>
+        )}
         <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
           {eyebrow}
         </p>
@@ -509,14 +523,6 @@ function Section({
         <p className="mt-1.5 text-zinc-500">{subtitle}</p>
       </div>
       {children}
-      {onBack && (
-        <button
-          onClick={onBack}
-          className="mt-1 self-start text-sm text-zinc-500 transition-colors hover:text-zinc-900"
-        >
-          ← Back
-        </button>
-      )}
     </div>
   );
 }
@@ -526,19 +532,28 @@ const VERDICT_STYLES = {
     card: "border-rose-200 bg-rose-50",
     badge: "bg-white text-rose-700 ring-1 ring-rose-200",
     dot: "bg-rose-500",
+    bar: "bg-rose-500",
     label: "Needs help",
+    urgency: "High urgency",
+    level: 3,
   },
   leave: {
     card: "border-emerald-200 bg-emerald-50",
     badge: "bg-white text-emerald-700 ring-1 ring-emerald-200",
     dot: "bg-emerald-500",
+    bar: "bg-emerald-500",
     label: "Leave it be",
+    urgency: "Low urgency",
+    level: 1,
   },
   uncertain: {
     card: "border-amber-200 bg-amber-50",
     badge: "bg-white text-amber-700 ring-1 ring-amber-200",
     dot: "bg-amber-500",
+    bar: "bg-amber-500",
     label: "Check first",
+    urgency: "Medium urgency",
+    level: 2,
   },
 } as const;
 
@@ -565,12 +580,27 @@ function ResultView({
     <div className="animate-in flex flex-col gap-5">
       {danger && <SafetyBanner danger={danger} />}
       <div className={`rounded-2xl border p-6 ${style.card}`}>
-        <span
-          className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${style.badge}`}
-        >
-          <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-          {style.label}
-        </span>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span
+            className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${style.badge}`}
+          >
+            <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+            {style.label}
+          </span>
+          <span className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600">
+            <span className="flex items-center gap-1" aria-hidden>
+              {[1, 2, 3].map((n) => (
+                <span
+                  key={n}
+                  className={`h-3.5 w-1.5 rounded-full ${
+                    n <= style.level ? style.bar : "bg-zinc-200"
+                  }`}
+                />
+              ))}
+            </span>
+            {style.urgency}
+          </span>
+        </div>
         <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-zinc-900">
           {result.title}
         </h1>
