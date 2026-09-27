@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flash } from "@/lib/flash";
 
 type Conversation = { id: string; kind: string; label: string };
 
@@ -11,6 +12,14 @@ export default function ShareCase({ caseId }: { caseId: string }) {
   const [loaded, setLoaded] = useState(false);
   const [sharedTo, setSharedTo] = useState<Set<string>>(new Set());
   const [busyId, setBusyId] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    },
+    []
+  );
 
   async function toggle() {
     const next = !open;
@@ -23,7 +32,7 @@ export default function ShareCase({ caseId }: { caseId: string }) {
     }
   }
 
-  async function share(conversationId: string) {
+  async function share(conversationId: string, label: string) {
     setBusyId(conversationId);
     const r = await fetch("/api/share-case", {
       method: "POST",
@@ -31,7 +40,12 @@ export default function ShareCase({ caseId }: { caseId: string }) {
       body: JSON.stringify({ caseId, conversationId }),
     });
     setBusyId(null);
-    if (r.ok) setSharedTo((s) => new Set(s).add(conversationId));
+    if (r.ok) {
+      setSharedTo((s) => new Set(s).add(conversationId));
+      flash(`Shared to ${label}`);
+      // Briefly show the "Shared" state, then close the menu on its own.
+      closeTimer.current = setTimeout(() => setOpen(false), 850);
+    }
   }
 
   return (
@@ -58,7 +72,7 @@ export default function ShareCase({ caseId }: { caseId: string }) {
                 return (
                   <button
                     key={c.id}
-                    onClick={() => !done && share(c.id)}
+                    onClick={() => !done && share(c.id, c.label)}
                     disabled={busyId === c.id || done}
                     className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
                   >
