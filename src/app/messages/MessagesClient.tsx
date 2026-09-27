@@ -19,6 +19,8 @@ type Message = {
   body: string;
   created_at: string;
   case_ref?: CaseRef | null;
+  edited_at?: string | null;
+  deleted_at?: string | null;
 };
 
 export default function MessagesClient({
@@ -38,10 +40,17 @@ export default function MessagesClient({
   const [unread, setUnread] = useState<Record<string, number>>({});
   const [newMenu, setNewMenu] = useState<null | "menu" | "group">(null);
   const [mobileThread, setMobileThread] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [typingNames, setTypingNames] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
   const convIdsRef = useRef<string[]>([]);
+  // Broadcast channel for "is typing" pings on the open conversation.
+  const typingChanRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const typingTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const lastTypingSent = useRef(0);
 
   async function markRead(convId: string) {
     setUnread((u) => ({ ...u, [convId]: 0 }));
@@ -82,11 +91,41 @@ export default function MessagesClient({
     if (!selected) return;
     supabase
       .from("messages")
-      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at")
       .eq("conversation_id", selected)
       .order("created_at", { ascending: true })
       .then(({ data }) => setMessages((data ?? []) as Message[]));
     markRead(selected);
+    setEditingId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
+
+  // Typing indicator: a lightweight realtime broadcast channel per conversation
+  // (no database writes). Names auto-expire a few seconds after the last ping.
+  useEffect(() => {
+    if (!selected) return;
+    setTypingNames([]);
+    const chan = supabase.channel(`typing:${selected}`, {
+      config: { broadcast: { self: false } },
+    });
+    chan
+      .on("broadcast", { event: "typing" }, ({ payload }) => {
+        const name = (payload?.name as string) || "";
+        if (!name) return;
+        setTypingNames((prev) => (prev.includes(name) ? prev : [...prev, name]));
+        clearTimeout(typingTimers.current[name]);
+        typingTimers.current[name] = setTimeout(() => {
+          setTypingNames((prev) => prev.filter((n) => n !== name));
+        }, 3500);
+      })
+      .subscribe();
+    typingChanRef.current = chan;
+    return () => {
+      supabase.removeChannel(chan);
+      typingChanRef.current = null;
+      Object.values(typingTimers.current).forEach(clearTimeout);
+      typingTimers.current = {};
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
@@ -112,6 +151,19 @@ export default function MessagesClient({
                 [m.conversation_id]: (u[m.conversation_id] ?? 0) + 1,
               }));
             }
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages" },
+        (payload) => {
+          // Edits and soft-deletes arrive as UPDATEs; reflect them live.
+          const m = payload.new as Message;
+          if (m.conversation_id === selectedRef.current) {
+            setMessages((prev) =>
+              prev.map((x) => (x.id === m.id ? { ...x, ...m } : x))
+            );
           }
         }
       )
@@ -149,7 +201,7 @@ export default function MessagesClient({
         sender_name: myName,
         body: text,
       })
-      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at")
       .single();
     if (data) {
       setMessages((prev) =>
@@ -158,6 +210,49 @@ export default function MessagesClient({
           : prev.map((x) => (x.id === tempId ? (data as Message) : x))
       );
     }
+  }
+
+  function notifyTyping() {
+    const now = Date.now();
+    if (now - lastTypingSent.current < 2000) return; // throttle
+    lastTypingSent.current = now;
+    typingChanRef.current?.send({
+      type: "broadcast",
+      event: "typing",
+      payload: { name: myName },
+    });
+  }
+
+  function startEdit(m: Message) {
+    setEditingId(m.id);
+    setEditText(m.body);
+  }
+
+  async function saveEdit(id: string) {
+    const text = editText.trim();
+    if (!text) return;
+    const edited_at = new Date().toISOString();
+    setMessages((prev) =>
+      prev.map((x) => (x.id === id ? { ...x, body: text, edited_at } : x))
+    );
+    setEditingId(null);
+    await supabase
+      .from("messages")
+      .update({ body: text, edited_at })
+      .eq("id", id)
+      .eq("sender_id", myId);
+  }
+
+  async function deleteMessage(id: string) {
+    const deleted_at = new Date().toISOString();
+    setMessages((prev) =>
+      prev.map((x) => (x.id === id ? { ...x, deleted_at } : x))
+    );
+    await supabase
+      .from("messages")
+      .update({ deleted_at })
+      .eq("id", id)
+      .eq("sender_id", myId);
   }
 
   function openConversation(id: string) {
@@ -315,14 +410,49 @@ export default function MessagesClient({
                   return (
                     <div
                       key={m.id}
-                      className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
+                      className={`group flex flex-col ${mine ? "items-end" : "items-start"}`}
                     >
                       {!mine && active?.kind !== "dm" && (
                         <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
                           {m.sender_name || "Someone"}
                         </span>
                       )}
-                      {m.case_ref ? (
+                      {m.deleted_at ? (
+                        <div className="max-w-[80%] rounded-2xl bg-zinc-50 px-3.5 py-2 text-sm italic leading-6 text-zinc-400">
+                          This message was deleted
+                        </div>
+                      ) : editingId === m.id ? (
+                        <div className="flex w-full max-w-[85%] flex-col gap-2">
+                          <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                saveEdit(m.id);
+                              }
+                              if (e.key === "Escape") setEditingId(null);
+                            }}
+                            rows={2}
+                            autoFocus
+                            className="w-full resize-none rounded-xl border border-zinc-300 bg-white p-2.5 text-sm text-zinc-800 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => saveEdit(m.id)}
+                              className="inline-flex h-8 items-center rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              className="inline-flex h-8 items-center rounded-lg border border-zinc-200 px-3 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : m.case_ref ? (
                         <a
                           href="/dashboard"
                           className="block max-w-[85%] rounded-2xl border border-zinc-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-zinc-50"
@@ -348,12 +478,31 @@ export default function MessagesClient({
                           {m.body}
                         </div>
                       )}
-                      <span className="mt-0.5 px-1 text-[10px] text-zinc-400">
-                        {new Date(m.created_at).toLocaleTimeString([], {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                      <div className="mt-0.5 flex items-center gap-2 px-1">
+                        <span className="text-[10px] text-zinc-400">
+                          {new Date(m.created_at).toLocaleTimeString([], {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                          {m.edited_at && !m.deleted_at ? " · edited" : ""}
+                        </span>
+                        {mine && !m.deleted_at && !m.case_ref && editingId !== m.id && (
+                          <span className="flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button
+                              onClick={() => startEdit(m)}
+                              className="text-[10px] font-medium text-zinc-400 hover:text-zinc-700"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => deleteMessage(m.id)}
+                              className="text-[10px] font-medium text-zinc-400 hover:text-rose-600"
+                            >
+                              Delete
+                            </button>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })
@@ -361,10 +510,20 @@ export default function MessagesClient({
               <div ref={bottomRef} />
             </div>
 
+            <div className="h-4 px-4 text-xs italic text-zinc-400">
+              {typingNames.length > 0 &&
+                (typingNames.length === 1
+                  ? `${typingNames[0]} is typing…`
+                  : `${typingNames.length} people are typing…`)}
+            </div>
+
             <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
               <input
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={(e) => {
+                  setBody(e.target.value);
+                  notifyTyping();
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
