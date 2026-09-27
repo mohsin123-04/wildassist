@@ -1,10 +1,10 @@
 /**
  * Canadian wildlife rehabilitation centres (SEED DATA).
  *
- * ⚠️ Coordinates are approximate (town-level) and contact details must be
- * verified against each centre's official site before this ships to real users.
- * Intake capacity, accepted species, and hours change seasonally, so always
- * confirm by phone. This list is a starting point, not authoritative.
+ * Contact details (website + phone) were verified against each centre's
+ * official site in Sept 2026. Coordinates are approximate (town-level). Intake
+ * capacity, accepted species, and hours change seasonally, so always confirm by
+ * phone. This list is a starting point, not authoritative.
  */
 
 import type { AnimalType } from "./triage";
@@ -98,16 +98,18 @@ export const ONTARIO_CENTRES: Centre[] = [
     lat: 44.925,
     lng: -78.72,
     takes: ["mammal"],
-    website: "https://www.woodlandswildlife.ca",
+    phone: "705-286-1133",
+    website: "https://www.woodlandswildlifesanctuary.ca",
   },
   {
     id: "rideau-valley",
     name: "Rideau Valley Wildlife Sanctuary",
-    town: "Oxford Mills (near Ottawa)",
-    lat: 44.98,
-    lng: -75.68,
+    town: "North Gower (near Ottawa)",
+    lat: 45.128,
+    lng: -75.717,
     takes: ["bird", "mammal", "reptile"],
-    website: "https://www.rideauvalleywildlife.ca",
+    phone: "613-258-9480",
+    website: "https://www.rideauwildlife.org",
   },
   {
     id: "salthaven",
@@ -179,13 +181,15 @@ export const ONTARIO_CENTRES: Centre[] = [
     website: "https://livingskywildliferehabilitation.org",
   },
   {
-    id: "prairie-wildlife",
-    name: "Prairie Wildlife Rehabilitation Centre",
-    town: "Winnipeg, MB",
-    lat: 49.9,
-    lng: -97.14,
+    // Prairie Wildlife Rehabilitation Centre closed in 2026; Manitoba intake
+    // now goes to Wildlife Haven Rehabilitation Centre.
+    id: "wildlife-haven",
+    name: "Wildlife Haven Rehabilitation Centre",
+    town: "Île-des-Chênes, MB",
+    lat: 49.71,
+    lng: -96.99,
     takes: ["bird", "mammal"],
-    website: "https://www.pwrconline.ca",
+    phone: "204-202-3806",
   },
 
   // --- Quebec ---
@@ -216,7 +220,8 @@ export const ONTARIO_CENTRES: Centre[] = [
     lat: 45.26,
     lng: -63.29,
     takes: ["bird", "mammal"],
-    website: "https://cobequidwildlife.ca",
+    phone: "902-893-0253",
+    website: "https://www.cwrc.net",
   },
 ];
 
