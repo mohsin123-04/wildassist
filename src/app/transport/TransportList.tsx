@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+const TransportMap = dynamic(() => import("./TransportMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[340px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">
+      Loading map…
+    </div>
+  ),
+});
 
 export type Job = {
   id: string;
@@ -45,6 +55,18 @@ export default function TransportList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Keep the map/list live: refresh periodically and when the tab regains focus.
+  useEffect(() => {
+    const id = setInterval(() => load(coords), 45000);
+    const onFocus = () => load(coords);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("focus", onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coords]);
+
   async function load(c: { lat: number; lng: number } | null) {
     setLoading(true);
     const q = c ? `?lat=${c.lat}&lng=${c.lng}` : "";
@@ -79,8 +101,23 @@ export default function TransportList({
     );
   }
 
+  const hasMappable =
+    coords != null ||
+    [...mine, ...available].some((j) => j.lat != null && j.lng != null);
+
   return (
     <div className="flex flex-col gap-6">
+      {hasMappable && (
+        <div>
+          <TransportMap coords={coords} available={available} mine={mine} />
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+            <Legend color="#2563eb" label="You" />
+            <Legend color="#059669" label="Your pickups" />
+            <Legend color="#e11d48" label="Available nearby" />
+          </div>
+        </div>
+      )}
+
       <Section title={`Your pickups (${mine.length})`}>
         {mine.length === 0 ? (
           <Empty text="You haven't claimed any pickups yet." />
@@ -137,6 +174,18 @@ export default function TransportList({
         )}
       </Section>
     </div>
+  );
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className="h-2.5 w-2.5 rounded-full"
+        style={{ backgroundColor: color }}
+      />
+      {label}
+    </span>
   );
 }
 
