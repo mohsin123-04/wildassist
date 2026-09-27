@@ -44,9 +44,30 @@ export default function MessagesClient({
   const [editText, setEditText] = useState("");
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const newMenuRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
   const convIdsRef = useRef<string[]>([]);
+
+  // Close the "+" new-conversation dropdown on outside click / Escape. Scoped
+  // to the small menu only, not the full group-creation form.
+  useEffect(() => {
+    if (newMenu !== "menu") return;
+    function onDown(e: MouseEvent) {
+      if (newMenuRef.current && !newMenuRef.current.contains(e.target as Node)) {
+        setNewMenu(null);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setNewMenu(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [newMenu]);
   // Broadcast channel for "is typing" pings on the open conversation.
   const typingChanRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const typingTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -310,7 +331,10 @@ export default function MessagesClient({
           mobileThread ? "hidden" : "flex"
         }`}
       >
-        <div className="relative flex items-center justify-between border-b border-zinc-200 px-3 py-2.5">
+        <div
+          ref={newMenuRef}
+          className="relative flex items-center justify-between border-b border-zinc-200 px-3 py-2.5"
+        >
           <span className="text-sm font-semibold text-zinc-900">Conversations</span>
           <button
             onClick={() => setNewMenu(newMenu ? null : "menu")}

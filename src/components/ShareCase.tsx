@@ -10,16 +10,26 @@ export default function ShareCase({ caseId }: { caseId: string }) {
   const [open, setOpen] = useState(false);
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [sharedTo, setSharedTo] = useState<Set<string>>(new Set());
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(
-    () => () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    },
-    []
-  );
+  // Close on click outside or Escape.
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   async function toggle() {
     const next = !open;
@@ -32,24 +42,22 @@ export default function ShareCase({ caseId }: { caseId: string }) {
     }
   }
 
-  async function share(conversationId: string, label: string) {
-    setBusyId(conversationId);
-    const r = await fetch("/api/share-case", {
+  function share(conversationId: string, label: string) {
+    // Close instantly for a snappy feel; the toast confirms the result.
+    setOpen(false);
+    fetch("/api/share-case", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ caseId, conversationId }),
-    });
-    setBusyId(null);
-    if (r.ok) {
-      setSharedTo((s) => new Set(s).add(conversationId));
-      flash(`Shared to ${label}`);
-      // Briefly show the "Shared" state, then close the menu on its own.
-      closeTimer.current = setTimeout(() => setOpen(false), 850);
-    }
+    })
+      .then((r) =>
+        flash(r.ok ? `Shared to ${label}` : "Couldn't share. Please try again.")
+      )
+      .catch(() => flash("Couldn't share. Please try again."));
   }
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" ref={menuRef}>
       <button
         onClick={toggle}
         className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
@@ -67,29 +75,18 @@ export default function ShareCase({ caseId }: { caseId: string }) {
                 {loaded ? "No conversations." : "Loading…"}
               </p>
             ) : (
-              convs.map((c) => {
-                const done = sharedTo.has(c.id);
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => !done && share(c.id, c.label)}
-                    disabled={busyId === c.id || done}
-                    className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
-                  >
-                    <span className="truncate">
-                      {c.kind === "channel" ? "# " : ""}
-                      {c.label}
-                    </span>
-                    {done ? (
-                      <span className="text-xs font-medium text-emerald-600">
-                        Shared
-                      </span>
-                    ) : busyId === c.id ? (
-                      <span className="text-xs text-zinc-400">…</span>
-                    ) : null}
-                  </button>
-                );
-              })
+              convs.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => share(c.id, c.label)}
+                  className="flex w-full items-center px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+                >
+                  <span className="truncate">
+                    {c.kind === "channel" ? "# " : ""}
+                    {c.label}
+                  </span>
+                </button>
+              ))
             )}
           </div>
         </div>
