@@ -3,6 +3,51 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { SITUATIONS, type AnimalType } from "@/lib/triage";
 import { rankCentres, haversineKm, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
+import { sendEmail, newCaseEmail } from "@/lib/email";
+
+type Admin = ReturnType<typeof createAdminClient>;
+
+/**
+ * Email the staff at the centre a new case was routed to. Best-effort: any
+ * failure (including no RESEND_API_KEY) is swallowed so it never affects the
+ * report being saved. "leave" cases need no action, so they are skipped.
+ */
+async function notifyCentreStaff(
+  admin: Admin,
+  centre: { id: string; name: string },
+  info: { animal: string; title: string | null; verdict: string },
+  origin: string
+) {
+  try {
+    if (info.verdict === "leave") return;
+    const { data: staff } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("centre_id", centre.id);
+    if (!staff || staff.length === 0) return;
+
+    const emails = (
+      await Promise.all(
+        staff.map(async (s) => {
+          const { data } = await admin.auth.admin.getUserById(s.id);
+          return data.user?.email ?? null;
+        })
+      )
+    ).filter((e): e is string => !!e);
+    if (emails.length === 0) return;
+
+    const { subject, html, text } = newCaseEmail({
+      centreName: centre.name,
+      animal: info.animal,
+      title: info.title,
+      verdict: info.verdict,
+      dashboardUrl: `${origin}/dashboard`,
+    });
+    await sendEmail({ to: emails, subject, html, text });
+  } catch {
+    // Never let notification problems affect the response.
+  }
+}
 
 /**
  * POST /api/cases
@@ -128,5 +173,16 @@ export async function POST(req: NextRequest) {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
+
+  // Let the receiving centre's staff know (dormant without RESEND_API_KEY).
+  if (assignedCentre) {
+    await notifyCentreStaff(
+      supabase,
+      { id: assignedCentre.id, name: assignedCentre.name },
+      { animal: animal!.trim(), title: title ?? null, verdict: verdict! },
+      req.nextUrl.origin
+    );
+  }
+
   return Response.json({ id: data.id, centre: assignedCentre });
 }
