@@ -419,7 +419,11 @@ export default function TriagePage() {
               Sharing your location routes this report to the nearest centre.
             </p>
             {locStatus === "done" ? (
-              <div className="flex items-center gap-2 text-sm text-zinc-700">
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex items-center gap-2 text-sm text-zinc-700"
+              >
                 <span aria-hidden>📍</span>
                 <span className="font-medium">Location captured.</span>
                 <button
@@ -448,7 +452,7 @@ export default function TriagePage() {
               </button>
             )}
             {locStatus === "denied" && (
-              <p className="mt-2 text-xs text-amber-700">
+              <p role="status" aria-live="polite" className="mt-2 text-xs text-amber-700">
                 {locError ||
                   "Couldn't get your location. You can still continue without it."}
               </p>

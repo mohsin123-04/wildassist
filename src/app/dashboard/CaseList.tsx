@@ -237,12 +237,14 @@ export default function CaseList({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search cases"
           placeholder="Search animal, title, description, reporter…"
           className="h-10 min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+          aria-label="Sort cases"
           className="h-10 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
         >
           <option value="newest">Newest first</option>
@@ -294,7 +296,7 @@ export default function CaseList({
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-10 text-center">
-          <p className="text-3xl">🕊️</p>
+          <p className="text-3xl" aria-hidden>🕊️</p>
           <p className="mt-2 font-medium text-zinc-900">Nothing here</p>
           <p className="mt-1 text-sm text-zinc-500">
             {tab === "unassigned"
@@ -366,7 +368,10 @@ export default function CaseList({
                 {expanded && (
                   <div className="border-t border-black/5 px-4 py-3">
                     {c.duplicate_of && (
-                      <div className="mb-3 rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm">
+                      <div
+                        role="alert"
+                        className="mb-3 rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm"
+                      >
                         <p className="font-medium text-orange-900">
                           Possible duplicate
                         </p>

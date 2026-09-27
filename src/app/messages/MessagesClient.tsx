@@ -425,6 +425,7 @@ export default function MessagesClient({
                         <div className="flex w-full max-w-[85%] flex-col gap-2">
                           <textarea
                             value={editText}
+                            aria-label="Edit message"
                             onChange={(e) => setEditText(e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" && !e.shiftKey) {
@@ -510,7 +511,11 @@ export default function MessagesClient({
               <div ref={bottomRef} />
             </div>
 
-            <div className="h-4 px-4 text-xs italic text-zinc-400">
+            <div
+              role="status"
+              aria-live="polite"
+              className="h-4 px-4 text-xs italic text-zinc-400"
+            >
               {typingNames.length > 0 &&
                 (typingNames.length === 1
                   ? `${typingNames[0]} is typing…`
@@ -520,6 +525,7 @@ export default function MessagesClient({
             <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
               <input
                 value={body}
+                aria-label="Type a message"
                 onChange={(e) => {
                   setBody(e.target.value);
                   notifyTyping();

@@ -170,6 +170,7 @@ export default function LoginPage() {
               </div>
               <input
                 className={inputClass}
+                aria-label="Your name"
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -182,12 +183,14 @@ export default function LoginPage() {
                   <input
                     className={inputClass}
                     type="tel"
+                    aria-label="Phone number"
                     placeholder="Phone number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
                   <input
                     className={inputClass}
+                    aria-label="City or town"
                     placeholder="City / town"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -195,12 +198,14 @@ export default function LoginPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       className={inputClass}
+                      aria-label="Province or state"
                       placeholder="Province / state"
                       value={province}
                       onChange={(e) => setProvince(e.target.value)}
                     />
                     <input
                       className={inputClass}
+                      aria-label="Country"
                       placeholder="Country"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
@@ -215,6 +220,7 @@ export default function LoginPage() {
             className={inputClass}
             type="email"
             required
+            aria-label="Email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -224,12 +230,17 @@ export default function LoginPage() {
             type="password"
             required
             minLength={6}
+            aria-label="Password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-rose-600">
+              {error}
+            </p>
+          )}
           {notice && <p className="text-sm text-emerald-600">{notice}</p>}
 
           <button

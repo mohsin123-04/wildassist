@@ -37,7 +37,11 @@ export default function Toast() {
   if (!message) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
+    <div
+      role="status"
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
+    >
       <div className="animate-in flex items-center gap-2.5 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
         <span
           aria-hidden
