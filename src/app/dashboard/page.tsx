@@ -52,7 +52,7 @@ export default async function DashboardPage() {
     supabase
       .from("cases")
       .select(
-        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of"
+        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of, assigned_to"
       )
       .order("created_at", { ascending: false }),
   ]);
@@ -117,6 +117,8 @@ export default async function DashboardPage() {
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}
+        myId={user.id}
+        myName={profile.full_name ?? "A teammate"}
         centreNames={centreNames}
         isAdmin={isAdmin}
         centre={

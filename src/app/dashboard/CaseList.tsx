@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { haversineKm } from "@/lib/centres";
 import ShareCase from "@/components/ShareCase";
 import CaseTimeline from "@/components/CaseTimeline";
+import CaseNotes from "@/components/CaseNotes";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -51,7 +52,10 @@ export type CaseRow = {
   driver_name: string | null;
   driver_phone?: string | null;
   duplicate_of: string | null;
+  assigned_to: string | null;
 };
+
+type Teammate = { id: string; full_name: string | null; role: string };
 
 const STATUSES: { value: CaseRow["status"]; label: string }[] = [
   { value: "reported", label: "Reported" },
@@ -71,18 +75,31 @@ type Tab = "area" | "unassigned";
 export default function CaseList({
   initialCases,
   myCentreId,
+  myId,
+  myName,
   centreNames,
   centre,
   isAdmin = false,
 }: {
   initialCases: CaseRow[];
   myCentreId: string;
+  myId: string;
+  myName: string;
   centreNames: Record<string, string>;
   centre: [number, number];
   isAdmin?: boolean;
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
   const [tab, setTab] = useState<Tab>("area");
+  const [teammates, setTeammates] = useState<Teammate[]>([]);
+
+  // Roster for assigning cases to a specific person.
+  useEffect(() => {
+    fetch("/api/team")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.members && setTeammates(d.members))
+      .catch(() => {});
+  }, []);
 
   // Viewing the dashboard marks all current cases as seen (clears the bell).
   useEffect(() => {
@@ -102,12 +119,28 @@ export default function CaseList({
   );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
-  const [savingNoteId, setSavingNoteId] = useState<string | null>(null);
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "map">("list");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [mineOnly, setMineOnly] = useState(false);
+
+  const teammateName = useMemo(
+    () => Object.fromEntries(teammates.map((t) => [t.id, t.full_name || "A teammate"])),
+    [teammates]
+  );
+
+  async function assignCase(id: string, assigned_to: string | null) {
+    const previous = cases;
+    setCases((cs) => cs.map((c) => (c.id === id ? { ...c, assigned_to } : c)));
+    const { error } = await createClient()
+      .from("cases")
+      .update({ assigned_to })
+      .eq("id", id);
+    if (error) setCases(previous);
+  }
 
   const areaCases = cases.filter((c) => c.centre_id !== null);
   const unassignedCases = cases.filter((c) => c.centre_id === null);
@@ -126,8 +159,18 @@ export default function CaseList({
   }, [cases, unassignedCases.length]);
 
   const q = query.trim().toLowerCase();
+  const fromMs = dateFrom ? new Date(dateFrom).getTime() : null;
+  // Include the whole "to" day (up to 23:59).
+  const toMs = dateTo ? new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 : null;
   const filtered = tabCases
     .filter((c) => statusFilter === "all" || c.status === statusFilter)
+    .filter((c) => !mineOnly || c.assigned_to === myId)
+    .filter((c) => {
+      const t = new Date(c.created_at).getTime();
+      if (fromMs != null && t < fromMs) return false;
+      if (toMs != null && t >= toMs) return false;
+      return true;
+    })
     .filter((c) => {
       if (!q) return true;
       return [c.animal, c.title, c.description, c.reporter_name]
@@ -194,23 +237,6 @@ export default function CaseList({
       cs.map((c) => (c.id === id ? { ...c, duplicate_of: null } : c))
     );
     await createClient().from("cases").update({ duplicate_of: null }).eq("id", id);
-  }
-
-  async function saveNotes(id: string) {
-    const notes = noteDrafts[id] ?? "";
-    setSavingNoteId(id);
-    const { error } = await createClient()
-      .from("cases")
-      .update({ staff_notes: notes.trim() || null })
-      .eq("id", id);
-    setSavingNoteId(null);
-    if (!error) {
-      setCases((cs) =>
-        cs.map((c) =>
-          c.id === id ? { ...c, staff_notes: notes.trim() || null } : c
-        )
-      );
-    }
   }
 
   async function claim(id: string) {
@@ -291,6 +317,44 @@ export default function CaseList({
         </div>
       </div>
 
+      {/* Date range + assignment filter */}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <label className="flex items-center gap-1.5 text-zinc-500">
+          From
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            aria-label="Reported from date"
+            className="h-9 rounded-lg border border-zinc-200 bg-white px-2 text-zinc-700 outline-none focus:border-emerald-400"
+          />
+        </label>
+        <label className="flex items-center gap-1.5 text-zinc-500">
+          to
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            aria-label="Reported to date"
+            className="h-9 rounded-lg border border-zinc-200 bg-white px-2 text-zinc-700 outline-none focus:border-emerald-400"
+          />
+        </label>
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => {
+              setDateFrom("");
+              setDateTo("");
+            }}
+            className="text-xs font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+          >
+            Clear dates
+          </button>
+        )}
+        <Chip active={mineOnly} onClick={() => setMineOnly((v) => !v)}>
+          Assigned to me
+        </Chip>
+      </div>
+
       {/* Status filters */}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
         <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
@@ -363,6 +427,13 @@ export default function CaseList({
                       {c.duplicate_of && (
                         <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
                           possible duplicate
+                        </span>
+                      )}
+                      {c.assigned_to && (
+                        <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
+                          {c.assigned_to === myId
+                            ? "you"
+                            : teammateName[c.assigned_to] ?? "assigned"}
                         </span>
                       )}
                     </div>
@@ -579,32 +650,41 @@ export default function CaseList({
                       )}
                     </div>
 
-                    {/* Staff notes */}
-                    <div className="mt-4 border-t border-black/5 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                        Staff notes
-                      </p>
-                      <textarea
-                        rows={2}
-                        value={noteDrafts[c.id] ?? c.staff_notes ?? ""}
-                        onChange={(e) =>
-                          setNoteDrafts((d) => ({ ...d, [c.id]: e.target.value }))
-                        }
-                        placeholder="Add an internal note (e.g. volunteer driver assigned, ETA 3pm)."
-                        className="mt-1 w-full resize-none rounded-xl border border-zinc-200 bg-white p-3 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
-                      />
-                      <button
-                        onClick={() => saveNotes(c.id)}
-                        disabled={
-                          savingNoteId === c.id ||
-                          (noteDrafts[c.id] ?? c.staff_notes ?? "") ===
-                            (c.staff_notes ?? "")
-                        }
-                        className="mt-2 inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
-                      >
-                        {savingNoteId === c.id ? "Saving…" : "Save note"}
-                      </button>
-                    </div>
+                    {/* Assignment */}
+                    {teammates.length > 0 && (
+                      <div className="mt-4 border-t border-black/5 pt-3">
+                        <label
+                          htmlFor={`assign-${c.id}`}
+                          className="text-xs font-semibold uppercase tracking-wide text-zinc-400"
+                        >
+                          Assigned to
+                        </label>
+                        <select
+                          id={`assign-${c.id}`}
+                          value={c.assigned_to ?? ""}
+                          onChange={(e) =>
+                            assignCase(c.id, e.target.value || null)
+                          }
+                          className="mt-1 block h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
+                        >
+                          <option value="">Unassigned</option>
+                          {teammates.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.full_name || "A teammate"}
+                              {t.id === myId ? " (me)" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Notes log */}
+                    <CaseNotes
+                      caseId={c.id}
+                      myId={myId}
+                      myName={myName}
+                      legacyNote={c.staff_notes}
+                    />
 
                     {/* Share to team */}
                     <div className="mt-4 border-t border-black/5 pt-3">
