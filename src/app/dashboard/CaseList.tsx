@@ -3,8 +3,24 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
+import { haversineKm } from "@/lib/centres";
 import ShareCase from "@/components/ShareCase";
 import CaseTimeline from "@/components/CaseTimeline";
+
+/** "3h ago", "2d ago", etc. */
+function timeAgo(iso: string): string {
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.round(hrs / 24)}d ago`;
+}
+
+/** Short distance label, e.g. "150 m away" or "1.3 km away". */
+function fmtDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;
+}
 
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
@@ -375,28 +391,60 @@ export default function CaseList({
                         <p className="font-medium text-orange-900">
                           Possible duplicate
                         </p>
-                        <p className="mt-0.5 leading-6 text-orange-800">
-                          {(() => {
-                            const orig = cases.find((x) => x.id === c.duplicate_of);
-                            return orig
-                              ? `Looks like the same ${orig.animal.toLowerCase()} reported nearby around ${new Date(orig.created_at).toLocaleString()}.`
-                              : "An earlier report of the same animal was made nearby.";
-                          })()}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <button
-                            onClick={() => updateStatus(c.id, "closed")}
-                            className="inline-flex h-8 items-center justify-center rounded-lg bg-orange-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
-                          >
-                            Close as duplicate
-                          </button>
-                          <button
-                            onClick={() => dismissDuplicate(c.id)}
-                            className="inline-flex h-8 items-center justify-center rounded-lg border border-orange-200 px-3 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-100"
-                          >
-                            Not a duplicate
-                          </button>
-                        </div>
+                        {(() => {
+                          const orig = cases.find(
+                            (x) => x.id === c.duplicate_of
+                          );
+                          if (!orig)
+                            return (
+                              <p className="mt-0.5 leading-6 text-orange-800">
+                                An earlier open report of the same animal was
+                                made nearby.
+                              </p>
+                            );
+                          const dist =
+                            c.lat != null &&
+                            c.lng != null &&
+                            orig.lat != null &&
+                            orig.lng != null
+                              ? haversineKm(c.lat, c.lng, orig.lat, orig.lng)
+                              : null;
+                          return (
+                            <>
+                              <p className="mt-0.5 leading-6 text-orange-800">
+                                Looks like the same{" "}
+                                <span className="capitalize">
+                                  {orig.animal.toLowerCase()}
+                                </span>{" "}
+                                already reported {timeAgo(orig.created_at)}
+                                {dist != null
+                                  ? `, ${fmtDistance(dist)}`
+                                  : ""}
+                                {orig.title ? ` — "${orig.title}"` : ""}.
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                <button
+                                  onClick={() => updateStatus(c.id, "closed")}
+                                  className="inline-flex h-8 items-center justify-center rounded-lg bg-orange-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
+                                >
+                                  Close as duplicate
+                                </button>
+                                <button
+                                  onClick={() => dismissDuplicate(c.id)}
+                                  className="inline-flex h-8 items-center justify-center rounded-lg border border-orange-200 px-3 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-100"
+                                >
+                                  Not a duplicate
+                                </button>
+                                <button
+                                  onClick={() => setExpandedId(orig.id)}
+                                  className="inline-flex h-8 items-center justify-center rounded-lg border border-orange-200 px-3 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-100"
+                                >
+                                  View original
+                                </button>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
                     )}
                     {c.photo_url && (

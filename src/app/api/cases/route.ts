@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SITUATIONS, type AnimalType } from "@/lib/triage";
-import { rankCentres, haversineKm, type Centre } from "@/lib/centres";
+import { rankCentres, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 import { sendEmail, newCaseEmail } from "@/lib/email";
+import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -129,28 +130,25 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Possible duplicate: an open report of the same animal, within ~1.5 km, in
-  // the last 24 hours. Flag it so staff can merge or dismiss rather than
-  // getting two cases for one animal.
+  // Possible duplicate: an open report of the same kind of animal, nearby, in
+  // the recent window. Fuzzy animal matching (so "baby raccoon" matches
+  // "raccoon") and the radius/window live in lib/dedup. Flag it so staff can
+  // merge or dismiss rather than dispatching twice for one animal.
   let duplicateOf: string | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
-    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const since = new Date(
+      Date.now() - DUP_WINDOW_HOURS * 60 * 60 * 1000
+    ).toISOString();
     const { data: recent } = await supabase
       .from("cases")
-      .select("id, lat, lng")
-      .eq("animal", animal!.trim())
+      .select("id, animal, lat, lng")
       .neq("status", "closed")
-      .gte("created_at", dayAgo)
+      .gte("created_at", since)
       .not("lat", "is", null);
-    let best = Infinity;
-    for (const r of recent ?? []) {
-      if (r.lat == null || r.lng == null) continue;
-      const km = haversineKm(lat, lng, r.lat, r.lng);
-      if (km <= 1.5 && km < best) {
-        best = km;
-        duplicateOf = r.id;
-      }
-    }
+    duplicateOf = findDuplicate(
+      { lat, lng, animal: animal!.trim() },
+      recent ?? []
+    );
   }
 
   const { data, error } = await supabase
