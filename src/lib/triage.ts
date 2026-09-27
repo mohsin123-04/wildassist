@@ -206,7 +206,7 @@ export function recommend(
         "A displaced nest can often be restored, and parents will usually keep caring for their young. It's best to try to renest before assuming the babies are orphaned.",
       steps: [
         "If the babies look unhurt, place them and any nesting material into a small container and secure it as close as possible to the original spot.",
-        "Watch from a distance for a couple of hours to see if a parent returns.",
+        "Watch from a distance for about an hour to see if a parent returns.",
         "Keep pets and people well away from the area.",
         "If a parent doesn't return, or a baby is injured or cold, contact a rehabilitator.",
       ],
