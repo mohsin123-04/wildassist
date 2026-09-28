@@ -216,8 +216,8 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "snake",
     animals: ["reptile"],
     situations: [],
-    text: "Almost all snakes in Canada are harmless and simply want to get away; give the snake space to leave and do not try to touch or catch it. Only a few species (such as the Massasauga rattlesnake in parts of Ontario, or rattlesnakes in western Canada) are venomous, and bites are very rare. If a snake is clearly injured, keep people and pets back and contact a wildlife rehabilitator for advice.",
-    source: "Ontario Nature / Wildlife Preservation Canada (verified 2026-09).",
+    text: "Almost all snakes in North America are harmless and simply want to get away; give the snake space to leave and do not try to touch or catch it. Some species are venomous, including rattlesnakes (across much of the US and parts of western Canada), copperheads and cottonmouths (eastern and southern US), coral snakes (southern US), and the Massasauga rattlesnake (parts of the Great Lakes region). They can be hard to identify, so never handle a snake you are unsure about, and keep children and pets away. If a snake is clearly injured, keep people and pets back and contact a wildlife rehabilitator for advice.",
+    source: "Ontario Nature / Wildlife Preservation Canada / US state wildlife agencies (verified 2026-09).",
   },
   {
     id: "frog-toad",

@@ -5,6 +5,7 @@ import {
   ONTARIO_CENTRES,
   rankCentres,
   FACILITY_TYPES,
+  formatDistance,
   type Centre,
   type RankedCentre,
 } from "@/lib/centres";
@@ -139,7 +140,7 @@ export default function CentreFinder({
                 </div>
                 {"distanceKm" in c && (
                   <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                    {Math.round(c.distanceKm)} km
+                    {formatDistance(c.distanceKm, c.country)}
                   </span>
                 )}
               </div>

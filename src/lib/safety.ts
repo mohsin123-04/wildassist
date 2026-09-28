@@ -23,7 +23,7 @@ export const DANGERS: Record<string, DangerInfo> = {
     key: "snake",
     label: "Do not handle this snake",
     reason:
-      "Treat any snake as if it could bite. Most snakes in Canada are harmless, but a few are venomous and they are hard to tell apart. Give it space and let it move away on its own.",
+      "Treat any snake as if it could bite. Most snakes in North America are harmless, but some are venomous (rattlesnakes, copperheads, cottonmouths, and coral snakes), and they can be hard to tell apart. Give it space and let it move away on its own.",
   },
   bat: {
     key: "bat",

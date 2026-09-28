@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Wildlife emergency basics | WildAssist",
   description:
-    "Quick do's and don'ts for when you find an injured or orphaned wild animal in Canada, plus how to reach a wildlife hotline.",
+    "Quick do's and don'ts for when you find an injured or orphaned wild animal in the US or Canada, plus how to reach a wildlife hotline.",
 };
 
 const DOS = [
@@ -17,7 +17,7 @@ const DOS = [
 const DONTS = [
   "Don't give food or water. The wrong food can seriously harm or kill wildlife.",
   "Don't handle raptors, herons, raccoons, foxes, skunks, or bats. Bats and other mammals can carry rabies, so never touch a bat with bare hands.",
-  "Don't try to treat injuries yourself or keep the animal as a pet (it's also illegal across Canada).",
+  "Don't try to treat injuries yourself or keep the animal as a pet (it's also illegal without a license across the US and Canada).",
   "Don't assume a lone baby animal is orphaned. A parent is often nearby.",
 ];
 

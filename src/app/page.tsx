@@ -30,7 +30,7 @@ export default function Home() {
         <div className="animate-in relative mx-auto flex w-full max-w-3xl flex-col items-center px-5 py-20 text-center sm:py-28">
           <span className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            Canada-wide wildlife help
+            Wildlife help across the US &amp; Canada
           </span>
 
           <h1 className="mt-6 max-w-2xl font-display text-4xl font-semibold leading-[1.05] tracking-tight text-zinc-900 sm:text-6xl">
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
 
           <p className="mt-6 text-sm text-zinc-500">
-            No account needed. Free, and available across Canada.
+            No account needed. Free, and available across the US and Canada.
           </p>
         </div>
       </section>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   rankCentres,
   FACILITY_TYPES,
+  formatDistance,
   type Centre,
   type RankedCentre,
 } from "@/lib/centres";
@@ -78,7 +79,7 @@ export default function NearbyHelp({
                   </div>
                 </div>
                 <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  {Math.round(c.distanceKm)} km
+                  {formatDistance(c.distanceKm, c.country)}
                 </span>
               </div>
               {(c.phone || c.website) && (

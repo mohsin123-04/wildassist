@@ -41,6 +41,28 @@ export interface Centre {
   type?: FacilityType;
   /** Directory listing only: shown for reference, but not assigned cases. */
   directory_only?: boolean;
+  /** "Canada" or "United States". Drives distance units (km vs mi). */
+  country?: string | null;
+  /** Province or state. */
+  state?: string | null;
+}
+
+/** True for US facilities (distances shown in miles rather than km). */
+function isUS(country?: string | null): boolean {
+  const c = (country ?? "").toLowerCase();
+  return c === "united states" || c === "usa" || c === "us";
+}
+
+/**
+ * Distance label in the units of the facility's country: miles for the US,
+ * kilometres elsewhere. e.g. "12 km" or "8 mi".
+ */
+export function formatDistance(km: number, country?: string | null): string {
+  if (isUS(country)) {
+    const mi = km * 0.621371;
+    return `${mi < 10 ? mi.toFixed(1) : Math.round(mi)} mi`;
+  }
+  return `${km < 10 ? km.toFixed(1) : Math.round(km)} km`;
 }
 
 export const ONTARIO_CENTRES: Centre[] = [

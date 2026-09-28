@@ -16,7 +16,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from("centres")
       .select(
-        "id, name, town, lat, lng, takes, phone, website, notes, type, directory_only"
+        "id, name, town, lat, lng, takes, phone, website, notes, type, directory_only, country, state"
       );
 
     if (error || !data || data.length === 0) {

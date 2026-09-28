@@ -2,9 +2,27 @@ import { describe, it, expect } from "vitest";
 import {
   haversineKm,
   rankCentres,
+  formatDistance,
   ONTARIO_CENTRES,
   type Centre,
 } from "../centres";
+
+describe("formatDistance()", () => {
+  it("uses km for Canada / unknown country", () => {
+    expect(formatDistance(12, "Canada")).toBe("12 km");
+    expect(formatDistance(12, null)).toBe("12 km");
+    expect(formatDistance(12, undefined)).toBe("12 km");
+    expect(formatDistance(3.4, "Canada")).toBe("3.4 km");
+  });
+
+  it("uses miles for the US", () => {
+    expect(formatDistance(0, "United States")).toBe("0.0 mi");
+    // 100 km ≈ 62 mi
+    expect(formatDistance(100, "United States")).toBe("62 mi");
+    // small distances keep one decimal
+    expect(formatDistance(8, "USA")).toBe("5.0 mi");
+  });
+});
 
 describe("haversineKm()", () => {
   it("is zero for the same point", () => {
