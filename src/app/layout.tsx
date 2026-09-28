@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Bird } from "lucide-react";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
 import Toast from "@/components/Toast";
@@ -37,9 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               <span
                 aria-hidden
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-sm text-white shadow-sm"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm"
               >
-                🦉
+                <Bird className="h-4 w-4" />
               </span>
               <span>WildAssist</span>
             </Link>

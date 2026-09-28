@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { Bird, MapPin, Car, Phone, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { haversineKm } from "@/lib/centres";
 import ShareCase from "@/components/ShareCase";
@@ -380,7 +381,7 @@ export default function CaseList({
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-10 text-center">
-          <p className="text-3xl" aria-hidden>🕊️</p>
+          <Bird className="mx-auto h-8 w-8 text-zinc-300" aria-hidden />
           <p className="mt-2 font-medium text-zinc-900">Nothing here</p>
           <p className="mt-1 text-sm text-zinc-500">
             {tab === "unassigned"
@@ -554,9 +555,9 @@ export default function CaseList({
                           href={`https://www.openstreetmap.org/?mlat=${c.lat}&mlon=${c.lng}#map=14/${c.lat}/${c.lng}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-medium text-emerald-700 underline underline-offset-2"
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 underline underline-offset-2"
                         >
-                          📍 View reported location
+                          <MapPin className="h-4 w-4" aria-hidden /> View reported location
                         </a>
                       ) : (
                         <span className="text-sm text-zinc-400">
@@ -600,7 +601,7 @@ export default function CaseList({
                     {c.driver_name && (
                       <div className="mt-3 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
                         <div className="flex items-center gap-2">
-                          <span aria-hidden>🚗</span>
+                          <Car className="h-4 w-4 shrink-0" aria-hidden />
                           <span>
                             Being transported by{" "}
                             <span className="font-medium">
@@ -615,14 +616,14 @@ export default function CaseList({
                                 href={`tel:${c.driver_phone.replace(/[^0-9+]/g, "")}`}
                                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
                               >
-                                <span aria-hidden>📞</span> Call driver
+                                <Phone className="h-3.5 w-3.5" aria-hidden /> Call driver
                               </a>
                             )}
                             <a
                               href={`/messages?dm=${c.driver_id}`}
                               className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
                             >
-                              <span aria-hidden>💬</span> Message driver
+                              <MessageSquare className="h-3.5 w-3.5" aria-hidden /> Message driver
                             </a>
                           </div>
                         )}

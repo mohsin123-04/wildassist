@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { MapPin } from "lucide-react";
 import { flash } from "@/lib/flash";
 
 const TransportMap = dynamic(() => import("./TransportMap"), {
@@ -255,9 +256,9 @@ function JobCard({
             href={`https://www.openstreetmap.org/?mlat=${job.lat}&mlon=${job.lng}#map=15/${job.lat}/${job.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-emerald-600 underline underline-offset-2"
+            className="inline-flex items-center gap-1 font-medium text-emerald-600 underline underline-offset-2"
           >
-            📍 Pickup location
+            <MapPin className="h-3.5 w-3.5" aria-hidden /> Pickup location
           </a>
         )}
         {centreName && <span className="text-zinc-500">→ {centreName}</span>}

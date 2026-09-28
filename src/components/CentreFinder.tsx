@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
 import {
   ONTARIO_CENTRES,
   rankCentres,
@@ -103,9 +104,9 @@ export default function CentreFinder({
           </p>
           <button
             onClick={findNearest}
-            className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
+            className="mt-4 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
           >
-            📍 Find nearest help
+            <MapPin className="h-4 w-4" aria-hidden /> Find nearest help
           </button>
         </>
       )}

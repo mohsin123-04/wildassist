@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 
 /** Global toast host. Shows messages sent via flash() from anywhere. */
 export default function Toast() {
@@ -44,9 +45,9 @@ export default function Toast() {
       <div className="animate-in flex items-center gap-2.5 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
         <span
           aria-hidden
-          className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs text-white"
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white"
         >
-          ✓
+          <Check className="h-3 w-3" />
         </span>
         {message}
       </div>

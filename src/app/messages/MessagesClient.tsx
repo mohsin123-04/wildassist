@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Users, Camera } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 
@@ -371,9 +372,9 @@ export default function MessagesClient({
             <div className="absolute right-2 top-11 z-20 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
               <button
                 onClick={() => setNewMenu("group")}
-                className="block w-full border-b border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
+                className="flex w-full items-center gap-2 border-b border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
               >
-                👥 New group chat
+                <Users className="h-4 w-4" aria-hidden /> New group chat
               </button>
               <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-400">
                 Direct message
@@ -614,7 +615,7 @@ export default function MessagesClient({
                 {uploading ? (
                   <span className="text-sm text-zinc-400">…</span>
                 ) : (
-                  <span aria-hidden>📷</span>
+                  <Camera className="h-5 w-5" aria-hidden />
                 )}
               </button>
               <input
@@ -668,7 +669,7 @@ function ConvIcon({
   if (kind === "group")
     return (
       <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-zinc-200 text-zinc-600"}`}>
-        👥
+        <Users className="h-3.5 w-3.5" aria-hidden />
       </span>
     );
   return (

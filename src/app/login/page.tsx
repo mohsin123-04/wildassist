@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import Spinner from "@/components/Spinner";
+import { Bird, Building2, Car, type LucideIcon } from "lucide-react";
 
 type Mode = "signin" | "signup";
 type Role = "staff" | "volunteer";
@@ -13,16 +14,16 @@ type Role = "staff" | "volunteer";
 const inputClass =
   "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
 
-const ROLES: { value: Role; icon: string; title: string; desc: string }[] = [
+const ROLES: { value: Role; Icon: LucideIcon; title: string; desc: string }[] = [
   {
     value: "staff",
-    icon: "🏥",
+    Icon: Building2,
     title: "Wildlife centre staff",
     desc: "See and manage cases for your centre. You'll need your centre's join code.",
   },
   {
     value: "volunteer",
-    icon: "🚗",
+    Icon: Car,
     title: "Rescue volunteer",
     desc: "Help transport injured animals from where they're found to a centre.",
   },
@@ -117,9 +118,9 @@ export default function LoginPage() {
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-base text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white"
           >
-            🦉
+            <Bird className="h-5 w-5" />
           </span>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
             {mode === "signin" ? "Sign in" : "Create your account"}
@@ -154,8 +155,11 @@ export default function LoginPage() {
                         : "border-zinc-200 bg-white hover:border-zinc-300"
                     }`}
                   >
-                    <span aria-hidden className="text-xl">
-                      {r.icon}
+                    <span
+                      aria-hidden
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+                    >
+                      <r.Icon className="h-5 w-5" />
                     </span>
                     <span>
                       <span className="block text-sm font-semibold text-zinc-900">

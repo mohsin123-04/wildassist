@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Check, X } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Wildlife emergency basics | WildAssist",
@@ -64,8 +65,8 @@ export default function EmergencyPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
           <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-emerald-700">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white">
-              ✓
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-white">
+              <Check className="h-3 w-3" />
             </span>
             Do
           </h2>
@@ -82,8 +83,8 @@ export default function EmergencyPage() {
         </div>
         <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6">
           <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-rose-700">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-xs text-white">
-              ✕
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
+              <X className="h-3 w-3" />
             </span>
             Don&apos;t
           </h2>
