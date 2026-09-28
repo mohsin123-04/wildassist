@@ -15,6 +15,7 @@ type Row = {
   verdict: string;
   status: string;
   centre_id: string | null;
+  duplicate_of: string | null;
 };
 
 type EventRow = { case_id: string; to_status: string; created_at: string };
@@ -106,7 +107,7 @@ export default async function AnalyticsPage({
   const [{ data: rows }, { data: eventRows }] = await Promise.all([
     supabase
       .from("cases")
-      .select("id, created_at, animal, situation, verdict, status, centre_id"),
+      .select("id, created_at, animal, situation, verdict, status, centre_id, duplicate_of"),
     supabase.from("case_events").select("case_id, to_status, created_at"),
   ]);
   const all = (rows ?? []) as Row[];
@@ -148,6 +149,8 @@ export default async function AnalyticsPage({
   }
 
   const closed = cases.filter((c) => c.status === "closed").length;
+  const dupCount = cases.filter((c) => c.duplicate_of).length;
+  const dupPct = cases.length ? Math.round((dupCount / cases.length) * 100) : 0;
 
   // Live queue: current open cases (ignores the range; respects the animal filter).
   const openQueue = all.filter(
@@ -281,6 +284,7 @@ export default async function AnalyticsPage({
     ["Resolved %", cases.length ? Math.round((closed / cases.length) * 100) : 0],
     ["Open, needs help (now)", needsHelpOpen],
     ["Pickup rate %", respondedPct],
+    ["Possible duplicates", `${dupCount} (${dupPct}%)`],
     ["Median response", medianResponse !== null ? formatDuration(medianResponse) : "n/a"],
     ["Oldest open case", oldestOpen !== null ? formatDuration(oldestOpen) : "n/a"],
     ["Median open age", medianOpenAge !== null ? formatDuration(medianOpenAge) : "n/a"],
@@ -392,6 +396,14 @@ export default async function AnalyticsPage({
             <Stat label="Open, needs help (now)" value={needsHelpOpen} accent="text-rose-600" />
             <Stat label="Pickup rate" value={`${respondedPct}%`} />
           </div>
+
+          {dupCount > 0 && (
+            <p className="-mt-1 text-xs text-zinc-500">
+              <span className="font-medium text-orange-600">{dupCount}</span>{" "}
+              possible duplicate{dupCount === 1 ? "" : "s"} flagged ({dupPct}% of
+              cases) — merge or dismiss them on the dashboard.
+            </p>
+          )}
 
           {/* Backlog aging */}
           <section className="rounded-2xl border border-zinc-200 bg-white p-5">
