@@ -8,6 +8,10 @@ import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
+// Don't auto-route a report to a participant further away than this. Matches the
+// area a staff member can see (staff_can_see_case, 150 km).
+const ROUTE_RADIUS_KM = 150;
+
 /**
  * Email the staff at the centre a new case was routed to. Best-effort: any
  * failure (including no RESEND_API_KEY) is swallowed so it never affects the
@@ -103,29 +107,47 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Auto-route to the nearest suitable centre when we have coordinates.
+  // Auto-route to the nearest onboarded organization when we have coordinates.
+  // Routing is participation-based, not type-based: an org receives cases only
+  // if it has actually onboarded (has at least one staff member) and hasn't
+  // opted out. An unclaimed rehab centre is treated the same as any other
+  // directory listing (a vet, a hotline): shown to the finder for reference,
+  // but not auto-assigned a case. And we only route if one is within range,
+  // so a report far from any participant stays unassigned rather than being
+  // sent hundreds of km away.
   let assignedCentre: Pick<
     Centre,
     "id" | "name" | "town" | "phone" | "website"
   > | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
-    // Only full participants receive cases; directory listings (vets, hotlines)
-    // are reference contacts, not case managers.
-    const { data: centres } = await supabase
-      .from("centres")
-      .select("id, name, town, lat, lng, takes, phone, website")
-      .neq("directory_only", true);
-    if (centres && centres.length) {
-      const ranked = rankCentres(lat, lng, category, centres as Centre[]);
-      const top = ranked[0];
-      if (top) {
-        assignedCentre = {
-          id: top.id,
-          name: top.name,
-          town: top.town,
-          phone: top.phone,
-          website: top.website,
-        };
+    const { data: staffRows } = await supabase
+      .from("profiles")
+      .select("centre_id")
+      .not("centre_id", "is", null);
+    const claimedIds = [
+      ...new Set((staffRows ?? []).map((p) => p.centre_id)),
+    ];
+    if (claimedIds.length) {
+      const { data: centres } = await supabase
+        .from("centres")
+        .select("id, name, town, lat, lng, takes, phone, website")
+        .in("id", claimedIds)
+        .neq("directory_only", true);
+      const participants = (centres ?? []).filter(
+        (c) => c.lat != null && c.lng != null
+      );
+      if (participants.length) {
+        const ranked = rankCentres(lat, lng, category, participants as Centre[]);
+        const top = ranked[0];
+        if (top && top.distanceKm <= ROUTE_RADIUS_KM) {
+          assignedCentre = {
+            id: top.id,
+            name: top.name,
+            town: top.town,
+            phone: top.phone,
+            website: top.website,
+          };
+        }
       }
     }
   }
