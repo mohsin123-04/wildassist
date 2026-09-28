@@ -55,6 +55,7 @@ export default function TriagePage() {
   const [caseId, setCaseId] = useState<string | null>(null);
   const [trackToken, setTrackToken] = useState<string | null>(null);
   const [saveError, setSaveError] = useState(false);
+  const [routingNote, setRoutingNote] = useState<string | null>(null);
   const [assignedCentre, setAssignedCentre] = useState<AssignedCentre | null>(
     null
   );
@@ -79,6 +80,7 @@ export default function TriagePage() {
     setCaseId(null);
     setTrackToken(null);
     setSaveError(false);
+    setRoutingNote(null);
     setAssignedCentre(null);
     setDomestic(false);
     setStep("animal");
@@ -203,6 +205,7 @@ export default function TriagePage() {
         setCaseId(d.id);
         if (d.trackToken) setTrackToken(d.trackToken);
         if (d.centre) setAssignedCentre(d.centre);
+        if (d.routingNote) setRoutingNote(d.routingNote);
       } else {
         setSaveError(true);
       }
@@ -516,6 +519,7 @@ export default function TriagePage() {
           caseId={caseId}
           trackToken={trackToken}
           saveError={saveError}
+          routingNote={routingNote}
           assignedCentre={assignedCentre}
           coords={coords}
           danger={danger}
@@ -599,6 +603,7 @@ function ResultView({
   caseId,
   trackToken,
   saveError,
+  routingNote,
   assignedCentre,
   coords,
   danger,
@@ -609,6 +614,7 @@ function ResultView({
   caseId: string | null;
   trackToken: string | null;
   saveError: boolean;
+  routingNote: string | null;
   assignedCentre: AssignedCentre | null;
   coords: { lat: number; lng: number } | null;
   danger: DangerInfo | null;
@@ -727,6 +733,12 @@ function ResultView({
           {assignedCentre ? (
             <>
               <ReportStatus centre={assignedCentre} />
+              {routingNote && (
+                <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600">
+                  <span className="font-medium text-zinc-800">Why here:</span>{" "}
+                  {routingNote}
+                </div>
+              )}
               {coords && (
                 <NearbyHelp
                   lat={coords.lat}

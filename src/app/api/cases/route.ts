@@ -5,8 +5,18 @@ import { rankCentres, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 import { sendEmail, newCaseEmail } from "@/lib/email";
 import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
+import { detectDanger } from "@/lib/safety";
 
 type Admin = ReturnType<typeof createAdminClient>;
+
+// Human, plural category names for the "why this facility" explanation.
+const CATEGORY_PLURAL: Record<string, string> = {
+  bird: "birds",
+  mammal: "mammals",
+  reptile: "reptiles",
+  amphibian: "amphibians",
+  fish: "fish",
+};
 
 // Routing model switch. While this is a demo/portfolio project (access isn't
 // sold yet), route to every seeded org so the map stays populated. Flip to true
@@ -126,6 +136,8 @@ export async function POST(req: NextRequest) {
     Centre,
     "id" | "name" | "town" | "phone" | "website"
   > | null = null;
+  // A short, honest explanation of the routing choice, shown to the finder.
+  let routingNote: string | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
     let claimedIds: string[] | null = null;
     if (ROUTE_ONLY_ONBOARDED) {
@@ -162,6 +174,28 @@ export async function POST(req: NextRequest) {
             phone: top.phone,
             website: top.website,
           };
+
+          // Explain the choice. rankCentres prefers facilities that accept the
+          // animal's category, so if the closest one overall was skipped, it's
+          // because it doesn't take this kind of animal.
+          const catP = CATEGORY_PLURAL[category ?? ""] ?? "this animal";
+          const nearestByDistance = [...ranked].sort(
+            (a, b) => a.distanceKm - b.distanceKm
+          )[0];
+          const skippedCloser =
+            category && category !== "unsure"
+              ? nearestByDistance && nearestByDistance.id !== top.id
+              : false;
+          routingNote = skippedCloser
+            ? `The closest wildlife facility doesn't take ${catP}, so this went to ${top.name}, the nearest one that does.`
+            : `${top.name} is the nearest wildlife facility that can take ${catP}.`;
+
+          // Rabies-vector species (raccoon, bat, skunk, fox) need special
+          // permits, so not every facility can accept them.
+          if (detectDanger(animal!.trim())?.rabiesVector) {
+            routingNote +=
+              " Because this animal can carry rabies, not every facility is permitted to take it, so please call ahead to confirm before bringing it in.";
+          }
         }
       }
     }
@@ -226,6 +260,7 @@ export async function POST(req: NextRequest) {
   return Response.json({
     id: data.id,
     centre: assignedCentre,
+    routingNote,
     trackToken,
   });
 }
