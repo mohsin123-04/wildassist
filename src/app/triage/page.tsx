@@ -6,6 +6,7 @@ import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import ReporterContact from "@/components/ReporterContact";
 import ReportStatus from "@/components/ReportStatus";
+import DomesticRedirect from "@/components/DomesticRedirect";
 import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
@@ -37,6 +38,7 @@ const STEP_ORDER: Step[] = ["animal", "situation", "details", "result"];
 
 export default function TriagePage() {
   const [step, setStep] = useState<Step>("animal");
+  const [domestic, setDomestic] = useState(false);
   const [animalOption, setAnimalOption] = useState<AnimalOption | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
   const [description, setDescription] = useState("");
@@ -78,6 +80,7 @@ export default function TriagePage() {
     setTrackToken(null);
     setSaveError(false);
     setAssignedCentre(null);
+    setDomestic(false);
     setStep("animal");
   }
 
@@ -212,6 +215,14 @@ export default function TriagePage() {
     setStep("result");
   }
 
+  if (domestic) {
+    return (
+      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-8">
+        <DomesticRedirect onBack={() => setDomestic(false)} />
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-8">
       {/* Progress */}
@@ -307,6 +318,16 @@ export default function TriagePage() {
               />
             )}
           </div>
+
+          <p className="mt-4 border-t border-zinc-100 pt-4 text-sm text-zinc-500">
+            Not a wild animal?{" "}
+            <button
+              onClick={() => setDomestic(true)}
+              className="font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+            >
+              It&apos;s a pet, or a dog or cat
+            </button>
+          </p>
         </Section>
       )}
 
