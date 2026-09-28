@@ -2,6 +2,7 @@
 
 Guided help for people who find injured or orphaned wildlife in Canada, and the operations tooling for the centres and volunteers who rescue them.
 
+[![CI](https://github.com/mohsin123-04/wildassist/actions/workflows/ci.yml/badge.svg)](https://github.com/mohsin123-04/wildassist/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20Realtime-3FCF8E?logo=supabase&logoColor=white)
@@ -109,6 +110,15 @@ SUPABASE_SERVICE_ROLE_KEY= # keep server-side only
 
 The app runs without the AI key (it falls back to a built-in rule engine) and without the database (the public flow still works), which makes local development forgiving.
 
+## Tests and CI
+
+```bash
+npm test          # run the unit suite once
+npm run test:watch
+```
+
+Vitest covers the core logic: triage verdicts, danger detection, centre ranking and distance, vision label mapping, duplicate detection, email, and API-route validation (auth, rate limits, the signup privilege guard). GitHub Actions runs the tests and a production build on every push and pull request (see the CI badge above).
+
 ## Project structure
 
 ```
@@ -163,14 +173,16 @@ supabase/               SQL schema, seed data, and migrations
 
 ## Roadmap
 
-- Automated tests over the core logic (triage rules, safety detection, centre ranking, access control).
-- Verification of the seed centre and guidance data against authoritative sources before real-world use.
-- Case history and audit trail, duplicate-report detection, and per-centre analytics.
-- Email notifications alongside the existing in-app ones.
+- Public report tracking so a finder can follow their case status without an account.
+- An installable, offline-capable PWA for finders in the field with poor signal.
+- Localization (English and French) for a Canada-wide audience.
+- Photo sharing within team messaging.
+
+Recently shipped: a unit and API test suite with CI, a case audit trail with a response-time metric, fuzzy duplicate-report detection, per-centre analytics, email notifications, an accessibility pass, and fact-checked guidance and centre data.
 
 ## Status
 
-This is a working, deployed project built to explore the space and to learn. The guidance and centre contact details are drawn from reputable sources but are still marked as needing verification, so it should not yet be relied on for a real emergency. If you have found an animal in distress, contact a licensed wildlife rehabilitator directly.
+This is a working, deployed project built to explore the space and to learn. The guidance and centre contact details were fact-checked in 2026 against authoritative sources (Toronto Wildlife Centre, Ontario SPCA, Audubon, Tufts Wildlife Clinic, the Ontario Turtle Conservation Centre, and others), but seasonal details change, so always confirm by phone. If you have found an animal in distress, contact a licensed wildlife rehabilitator directly.
 
 ## License
 
