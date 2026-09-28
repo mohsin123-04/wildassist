@@ -11,6 +11,7 @@ import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
+import { Camera, Images, MapPin } from "lucide-react";
 import { flash } from "@/lib/flash";
 import { detectDanger, type DangerInfo } from "@/lib/safety";
 import {
@@ -302,7 +303,8 @@ export default function TriagePage() {
                 onClick={() => setShowPhoto(true)}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700"
               >
-                📷 Not sure? Identify it with a photo
+                <Camera className="h-4 w-4" aria-hidden />
+                Not sure? Identify it with a photo
               </button>
             ) : (
               <PhotoIdentify
@@ -438,15 +440,17 @@ export default function TriagePage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 >
-                  📷 Take photo
+                  <Camera className="h-4 w-4" aria-hidden />
+                  Take photo
                 </button>
                 <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 >
-                  🖼️ Choose from library
+                  <Images className="h-4 w-4" aria-hidden />
+                  Choose from library
                 </button>
               </div>
             )}
@@ -467,7 +471,7 @@ export default function TriagePage() {
                 aria-live="polite"
                 className="flex items-center gap-2 text-sm text-zinc-700"
               >
-                <span aria-hidden>📍</span>
+                <MapPin className="h-4 w-4 text-emerald-600" aria-hidden />
                 <span className="font-medium">Location captured.</span>
                 <button
                   onClick={() => {
@@ -483,14 +487,15 @@ export default function TriagePage() {
               <button
                 onClick={useMyLocation}
                 disabled={locStatus === "locating"}
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
               >
                 {locStatus === "locating" ? (
                   <Spinner label="Locating…" />
-                ) : locStatus === "denied" ? (
-                  "📍 Try again"
                 ) : (
-                  "📍 Use my location"
+                  <>
+                    <MapPin className="h-4 w-4" aria-hidden />
+                    {locStatus === "denied" ? "Try again" : "Use my location"}
+                  </>
                 )}
               </button>
             )}

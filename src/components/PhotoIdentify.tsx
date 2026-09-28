@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Camera, Images } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import SafetyBanner from "@/components/SafetyBanner";
 import { classifyPredictions, type Prediction } from "@/lib/vision";
@@ -162,15 +163,17 @@ export default function PhotoIdentify({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => cameraRef.current?.click()}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-700 px-5 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-5 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
           >
-            📷 Take photo
+            <Camera className="h-4 w-4" aria-hidden />
+            Take photo
           </button>
           <button
             onClick={() => inputRef.current?.click()}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 bg-white px-5 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-5 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
           >
-            🖼️ Choose from library
+            <Images className="h-4 w-4" aria-hidden />
+            Choose from library
           </button>
         </div>
       )}
