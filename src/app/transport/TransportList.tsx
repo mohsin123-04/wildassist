@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { flash } from "@/lib/flash";
 
 const TransportMap = dynamic(() => import("./TransportMap"), {
   ssr: false,
@@ -82,13 +83,23 @@ export default function TransportList({
 
   async function act(id: string, action: "claim" | "deliver" | "release") {
     setBusyId(id);
-    const res = await fetch("/api/transport", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ caseId: id, action }),
-    });
-    setBusyId(null);
-    if (res.ok) await load(coords);
+    try {
+      const res = await fetch("/api/transport", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseId: id, action }),
+      });
+      if (res.ok) {
+        await load(coords);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        flash(d.error ?? "That didn't work. Please try again.");
+      }
+    } catch {
+      flash("Network problem. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
   }
 
   if (loading) {

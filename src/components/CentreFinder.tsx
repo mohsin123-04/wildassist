@@ -15,9 +15,11 @@ type Status = "idle" | "locating" | "ranked" | "denied";
 export default function CentreFinder({
   animal,
   caseId,
+  trackToken,
 }: {
   animal: AnimalType;
   caseId?: string | null;
+  trackToken?: string | null;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [centres, setCentres] = useState<(Centre | RankedCentre)[]>([]);
@@ -35,11 +37,11 @@ export default function CentreFinder({
 
   // Attach the nearest centre + reporter coordinates to the logged case.
   function attachCentreToCase(centreId: string, lat: number, lng: number) {
-    if (!caseId) return;
+    if (!caseId || !trackToken) return;
     fetch(`/api/cases/${caseId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ centreId, lat, lng }),
+      body: JSON.stringify({ token: trackToken, centreId, lat, lng }),
     }).catch(() => {});
   }
 

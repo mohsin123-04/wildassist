@@ -52,6 +52,7 @@ export default function TriagePage() {
   const [result, setResult] = useState<Result | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
   const [trackToken, setTrackToken] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState(false);
   const [assignedCentre, setAssignedCentre] = useState<AssignedCentre | null>(
     null
   );
@@ -75,6 +76,7 @@ export default function TriagePage() {
     setResult(null);
     setCaseId(null);
     setTrackToken(null);
+    setSaveError(false);
     setAssignedCentre(null);
     setStep("animal");
   }
@@ -132,6 +134,7 @@ export default function TriagePage() {
   async function submit() {
     if (!animalOption || !situation) return;
     setLoading(true);
+    setSaveError(false);
     const category = animalOption.category;
     const parts = [`The animal is a ${animalOption.label}.`];
     if (photoHint) parts.push(`Photo analysis suggests it may be a ${photoHint}.`);
@@ -192,12 +195,17 @@ export default function TriagePage() {
           photoUrl,
         }),
       });
-      const d = await r.json();
-      if (d.id) setCaseId(d.id);
-      if (d.trackToken) setTrackToken(d.trackToken);
-      if (d.centre) setAssignedCentre(d.centre);
+      const d = r.ok ? await r.json() : null;
+      if (d?.id) {
+        setCaseId(d.id);
+        if (d.trackToken) setTrackToken(d.trackToken);
+        if (d.centre) setAssignedCentre(d.centre);
+      } else {
+        setSaveError(true);
+      }
     } catch {
-      // best-effort
+      // The guidance still shows; we just couldn't save/route the report.
+      setSaveError(true);
     }
 
     setLoading(false);
@@ -486,6 +494,7 @@ export default function TriagePage() {
           result={result}
           caseId={caseId}
           trackToken={trackToken}
+          saveError={saveError}
           assignedCentre={assignedCentre}
           coords={coords}
           danger={danger}
@@ -568,6 +577,7 @@ function ResultView({
   result,
   caseId,
   trackToken,
+  saveError,
   assignedCentre,
   coords,
   danger,
@@ -577,6 +587,7 @@ function ResultView({
   result: Result;
   caseId: string | null;
   trackToken: string | null;
+  saveError: boolean;
   assignedCentre: AssignedCentre | null;
   coords: { lat: number; lng: number } | null;
   danger: DangerInfo | null;
@@ -596,6 +607,16 @@ function ResultView({
   return (
     <div className="animate-in flex flex-col gap-5">
       {danger && <SafetyBanner danger={danger} />}
+      {saveError && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+        >
+          <span className="font-semibold">Your report didn&apos;t save.</span>{" "}
+          The guidance below still applies. Please follow it, and contact a
+          wildlife rehabilitator or vet directly using the options below.
+        </div>
+      )}
       <div className={`rounded-2xl border p-6 ${style.card}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span
@@ -695,9 +716,9 @@ function ResultView({
               )}
             </>
           ) : (
-            <CentreFinder animal={animal} caseId={caseId} />
+            <CentreFinder animal={animal} caseId={caseId} trackToken={trackToken} />
           )}
-          <ReporterContact caseId={caseId} />
+          <ReporterContact caseId={caseId} trackToken={trackToken} />
         </>
       )}
 

@@ -183,6 +183,7 @@ export default function LoginPage() {
                   <input
                     className={inputClass}
                     type="tel"
+                    required
                     aria-label="Phone number"
                     placeholder="Phone number"
                     value={phone}
@@ -190,6 +191,7 @@ export default function LoginPage() {
                   />
                   <input
                     className={inputClass}
+                    required
                     aria-label="City or town"
                     placeholder="City / town"
                     value={city}

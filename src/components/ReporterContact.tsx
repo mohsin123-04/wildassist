@@ -7,7 +7,13 @@ import Spinner from "@/components/Spinner";
  * Optional: lets the person who found the animal share their contact so the
  * centre can follow up. Saves onto the already-logged case.
  */
-export default function ReporterContact({ caseId }: { caseId: string | null }) {
+export default function ReporterContact({
+  caseId,
+  trackToken,
+}: {
+  caseId: string | null;
+  trackToken: string | null;
+}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
@@ -22,7 +28,11 @@ export default function ReporterContact({ caseId }: { caseId: string | null }) {
       await fetch(`/api/cases/${caseId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reporterName: name, reporterPhone: phone }),
+        body: JSON.stringify({
+          token: trackToken,
+          reporterName: name,
+          reporterPhone: phone,
+        }),
       });
       setSaved(true);
     } catch {

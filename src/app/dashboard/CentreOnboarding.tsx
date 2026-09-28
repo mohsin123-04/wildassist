@@ -32,6 +32,7 @@ export default function CentreOnboarding({
       setLoading(false);
       return;
     }
+    setLoading(false);
     router.refresh();
   }
 

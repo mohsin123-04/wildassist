@@ -232,10 +232,15 @@ export default function CaseList({
   }
 
   async function dismissDuplicate(id: string) {
+    const previous = cases;
     setCases((cs) =>
       cs.map((c) => (c.id === id ? { ...c, duplicate_of: null } : c))
     );
-    await createClient().from("cases").update({ duplicate_of: null }).eq("id", id);
+    const { error } = await createClient()
+      .from("cases")
+      .update({ duplicate_of: null })
+      .eq("id", id);
+    if (error) setCases(previous);
   }
 
   async function claim(id: string) {
