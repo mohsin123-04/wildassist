@@ -227,7 +227,7 @@ export default function AdminCentres() {
                     )}
                   </span>
                   {c.code && (
-                    <span className="rounded-md bg-emerald-100 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-800">
+                    <span className="rounded-lg bg-emerald-100 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-800">
                       {c.code}
                     </span>
                   )}

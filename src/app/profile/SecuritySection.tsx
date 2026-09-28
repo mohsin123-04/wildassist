@@ -98,7 +98,7 @@ export default function SecuritySection({ email }: { email: string }) {
         </button>
       </div>
 
-      <hr className="my-6 border-black/5" />
+      <hr className="my-6 border-zinc-100" />
 
       {/* Change email */}
       <div className="flex flex-col gap-3">

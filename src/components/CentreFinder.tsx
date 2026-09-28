@@ -127,7 +127,7 @@ export default function CentreFinder({
           {centres.map((c) => (
             <li
               key={c.id}
-              className="rounded-2xl border border-black/5 bg-[var(--background)] p-3.5"
+              className="rounded-2xl border border-zinc-200 bg-[var(--background)] p-3.5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

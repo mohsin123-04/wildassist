@@ -65,14 +65,14 @@ export default function ReporterContact({
           onChange={(e) => setName(e.target.value)}
           aria-label="Your name"
           placeholder="Your name"
-          className="h-11 flex-1 rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+          className="h-11 flex-1 rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
         />
         <input
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-label="Your phone or email"
           placeholder="Phone or email"
-          className="h-11 flex-1 rounded-xl border border-black/10 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+          className="h-11 flex-1 rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
         />
       </div>
       <button

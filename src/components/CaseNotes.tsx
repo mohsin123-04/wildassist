@@ -71,7 +71,7 @@ export default function CaseNotes({
   }
 
   return (
-    <div className="mt-4 border-t border-black/5 pt-3">
+    <div className="mt-4 border-t border-zinc-100 pt-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
         Notes
       </p>

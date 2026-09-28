@@ -106,7 +106,7 @@ export default function TeamPanel() {
                         {name}
                       </span>
                       {isMe && (
-                        <span className="shrink-0 rounded-md bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                        <span className="shrink-0 rounded-lg bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                           You
                         </span>
                       )}

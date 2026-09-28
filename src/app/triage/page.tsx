@@ -698,7 +698,7 @@ function ResultView({
               key={i}
               className="flex gap-3 rounded-xl border border-zinc-200 bg-white p-3.5"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-xs font-semibold text-white">
                 {i + 1}
               </span>
               <span className="leading-6 text-zinc-700">{s}</span>

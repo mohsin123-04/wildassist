@@ -20,7 +20,7 @@ export default function CasesMap({
   const located = cases.filter((c) => c.lat != null && c.lng != null);
 
   return (
-    <div className="h-[440px] w-full overflow-hidden rounded-2xl border border-black/5">
+    <div className="h-[440px] w-full overflow-hidden rounded-2xl border border-zinc-200">
       <MapContainer
         center={center}
         zoom={9}

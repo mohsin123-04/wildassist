@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { MapPin } from "lucide-react";
+import { MapPin, Inbox } from "lucide-react";
 import { flash } from "@/lib/flash";
 
 const TransportMap = dynamic(() => import("./TransportMap"), {
@@ -217,8 +217,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-6 text-center text-sm text-zinc-500">
-      {text}
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-10 text-center">
+      <Inbox className="mx-auto h-8 w-8 text-zinc-300" aria-hidden />
+      <p className="mt-2 text-sm text-zinc-500">{text}</p>
     </div>
   );
 }

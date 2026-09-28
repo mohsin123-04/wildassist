@@ -32,7 +32,7 @@ export default function TransportMap({
   const mineIds = new Set(mine.map((j) => j.id));
 
   return (
-    <div className="h-[340px] w-full overflow-hidden rounded-2xl border border-black/5">
+    <div className="h-[340px] w-full overflow-hidden rounded-2xl border border-zinc-200">
       <MapContainer
         center={center}
         zoom={zoom}

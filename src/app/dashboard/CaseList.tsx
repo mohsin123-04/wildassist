@@ -401,8 +401,8 @@ export default function CaseList({
                 key={c.id}
                 className={`rounded-2xl border bg-white shadow-sm ${
                   c.verdict === "help" && c.status !== "closed"
-                    ? "border-black/5 border-l-4 border-l-rose-400"
-                    : "border-black/5"
+                    ? "border-zinc-200 border-l-4 border-l-rose-400"
+                    : "border-zinc-200"
                 }`}
               >
                 <button
@@ -458,7 +458,7 @@ export default function CaseList({
                 </button>
 
                 {expanded && (
-                  <div className="border-t border-black/5 px-4 py-3">
+                  <div className="border-t border-zinc-100 px-4 py-3">
                     {c.duplicate_of && (
                       <div
                         role="alert"
@@ -631,7 +631,7 @@ export default function CaseList({
                     )}
 
                     {/* Reporter contact */}
-                    <div className="mt-4 border-t border-black/5 pt-3">
+                    <div className="mt-4 border-t border-zinc-100 pt-3">
                       <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
                         Reported by
                       </p>
@@ -657,7 +657,7 @@ export default function CaseList({
 
                     {/* Assignment */}
                     {teammates.length > 0 && (
-                      <div className="mt-4 border-t border-black/5 pt-3">
+                      <div className="mt-4 border-t border-zinc-100 pt-3">
                         <label
                           htmlFor={`assign-${c.id}`}
                           className="text-xs font-semibold uppercase tracking-wide text-zinc-400"
@@ -692,7 +692,7 @@ export default function CaseList({
                     />
 
                     {/* Share to team */}
-                    <div className="mt-4 border-t border-black/5 pt-3">
+                    <div className="mt-4 border-t border-zinc-100 pt-3">
                       <ShareCase caseId={c.id} />
                     </div>
 
