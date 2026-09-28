@@ -155,13 +155,29 @@ export async function POST(req: NextRequest) {
     if (!ROUTE_ONLY_ONBOARDED || (claimedIds && claimedIds.length)) {
       let q = supabase
         .from("centres")
-        .select("id, name, town, lat, lng, takes, phone, website")
+        .select("id, name, town, lat, lng, takes, phone, website, rabies_vector")
         .neq("directory_only", true);
       if (ROUTE_ONLY_ONBOARDED && claimedIds) q = q.in("id", claimedIds);
       const { data: centres } = await q;
-      const participants = (centres ?? []).filter(
+      let participants = (centres ?? []).filter(
         (c) => c.lat != null && c.lng != null
       );
+
+      // Rabies-vector species (raccoon, bat, skunk, fox) need special permits.
+      // Exclude facilities that have said they can't take them; keep unknowns
+      // (they get a "call ahead" caveat below).
+      const isRabiesVector = !!detectDanger(animal!.trim())?.rabiesVector;
+      let excludedForRabies = false;
+      if (isRabiesVector) {
+        const eligible = participants.filter(
+          (c) => (c as { rabies_vector?: boolean | null }).rabies_vector !== false
+        );
+        if (eligible.length) {
+          excludedForRabies = eligible.length < participants.length;
+          participants = eligible;
+        }
+      }
+
       if (participants.length) {
         const ranked = rankCentres(lat, lng, category, participants as Centre[]);
         const top = ranked[0];
@@ -176,9 +192,11 @@ export async function POST(req: NextRequest) {
           };
 
           // Explain the choice. rankCentres prefers facilities that accept the
-          // animal's category, so if the closest one overall was skipped, it's
-          // because it doesn't take this kind of animal.
+          // animal's category; a closer one may have been skipped because it
+          // doesn't take this kind of animal, or (for rabies vectors) can't.
           const catP = CATEGORY_PLURAL[category ?? ""] ?? "this animal";
+          const topRV = (top as { rabies_vector?: boolean | null })
+            .rabies_vector;
           const nearestByDistance = [...ranked].sort(
             (a, b) => a.distanceKm - b.distanceKm
           )[0];
@@ -186,15 +204,20 @@ export async function POST(req: NextRequest) {
             category && category !== "unsure"
               ? nearestByDistance && nearestByDistance.id !== top.id
               : false;
-          routingNote = skippedCloser
-            ? `The closest wildlife facility doesn't take ${catP}, so this went to ${top.name}, the nearest one that does.`
-            : `${top.name} is the nearest wildlife facility that can take ${catP}.`;
 
-          // Rabies-vector species (raccoon, bat, skunk, fox) need special
-          // permits, so not every facility can accept them.
-          if (detectDanger(animal!.trim())?.rabiesVector) {
+          if (excludedForRabies) {
+            routingNote = `A closer facility can't take rabies-vector animals like this one, so this went to ${top.name}, the nearest one that can.`;
+          } else if (skippedCloser) {
+            routingNote = `The closest wildlife facility doesn't take ${catP}, so this went to ${top.name}, the nearest one that does.`;
+          } else {
+            routingNote = `${top.name} is the nearest wildlife facility that can take ${catP}.`;
+          }
+
+          // If we're not certain the chosen facility can take this rabies-vector
+          // animal, tell the finder to call ahead.
+          if (isRabiesVector && topRV !== true) {
             routingNote +=
-              " Because this animal can carry rabies, not every facility is permitted to take it, so please call ahead to confirm before bringing it in.";
+              " Because this animal can carry rabies, please call ahead to confirm they can take it before bringing it in.";
           }
         }
       }
