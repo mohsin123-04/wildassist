@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Bird, MapPin, Car, Phone, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
 import ShareCase from "@/components/ShareCase";
 import CaseTimeline from "@/components/CaseTimeline";
@@ -265,6 +266,35 @@ export default function CaseList({
     }, 60);
   }
 
+  // Merge a duplicate into its original: copy the second reporter's contact and
+  // details onto the original as a note (so nothing is lost), then close the dup.
+  async function mergeAndClose(c: CaseRow, orig: CaseRow) {
+    if (savingId === c.id) return;
+    const parts = [
+      `Merged from a duplicate report made ${timeAgo(c.created_at)} (${new Date(
+        c.created_at
+      ).toLocaleString()}).`,
+    ];
+    const contact = [c.reporter_name, c.reporter_phone].filter(Boolean).join(" · ");
+    if (contact) parts.push(`Reporter: ${contact}`);
+    if (c.description) parts.push(`They reported: ${c.description}`);
+    if (c.lat != null && c.lng != null) {
+      parts.push(
+        `Location: https://www.openstreetmap.org/?mlat=${c.lat}&mlon=${c.lng}#map=16/${c.lat}/${c.lng}`
+      );
+    }
+    const body = parts.join("\n");
+    const { error } = await createClient()
+      .from("case_notes")
+      .insert({ case_id: orig.id, author_id: myId, author_name: myName, body });
+    if (error) {
+      flash("Couldn't save the merge note — case not closed.");
+      return;
+    }
+    await updateStatus(c.id, "closed");
+    flash("Merged into the original and closed.");
+  }
+
   async function claim(id: string) {
     setClaimingId(id);
     const { error } = await createClient()
@@ -522,10 +552,12 @@ export default function CaseList({
                               </p>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 <button
-                                  onClick={() => updateStatus(c.id, "closed")}
-                                  className="inline-flex h-8 items-center justify-center rounded-lg bg-orange-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-orange-700"
+                                  onClick={() => mergeAndClose(c, orig)}
+                                  disabled={savingId === c.id}
+                                  title="Copy this reporter's contact and details onto the original, then close this one"
+                                  className="inline-flex h-8 items-center justify-center rounded-lg bg-orange-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
                                 >
-                                  Close as duplicate
+                                  {savingId === c.id ? "Merging…" : "Merge & close"}
                                 </button>
                                 <button
                                   onClick={() => dismissDuplicate(c.id)}
