@@ -244,6 +244,27 @@ export default function CaseList({
     if (error) setCases(previous);
   }
 
+  // Reveal a specific case (e.g. the original a duplicate points to). It may live
+  // in the other tab or be hidden by filters, so switch to its tab and clear
+  // anything that would hide it, then expand and scroll to it.
+  function goToCase(id: string) {
+    const target = cases.find((c) => c.id === id);
+    if (!target) return;
+    setTab(target.centre_id !== null ? "area" : "unassigned");
+    setStatusFilter("all");
+    setQuery("");
+    setDateFrom("");
+    setDateTo("");
+    setMineOnly(false);
+    setView("list");
+    setExpandedId(id);
+    setTimeout(() => {
+      document
+        .getElementById(`case-${id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  }
+
   async function claim(id: string) {
     setClaimingId(id);
     const { error } = await createClient()
@@ -399,7 +420,8 @@ export default function CaseList({
             return (
               <li
                 key={c.id}
-                className={`rounded-2xl border bg-white shadow-sm ${
+                id={`case-${c.id}`}
+                className={`rounded-2xl border bg-white shadow-sm scroll-mt-24 ${
                   c.verdict === "help" && c.status !== "closed"
                     ? "border-zinc-200 border-l-4 border-l-rose-400"
                     : "border-zinc-200"
@@ -512,7 +534,7 @@ export default function CaseList({
                                   Not a duplicate
                                 </button>
                                 <button
-                                  onClick={() => setExpandedId(orig.id)}
+                                  onClick={() => goToCase(orig.id)}
                                   className="inline-flex h-8 items-center justify-center rounded-lg border border-orange-200 px-3 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-100"
                                 >
                                   View original
