@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { SITUATIONS, type AnimalType } from "@/lib/triage";
-import { rankCentres, type Centre } from "@/lib/centres";
+import { rankCentres, haversineKm, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 import { sendEmail, newCaseEmail } from "@/lib/email";
 import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
         .neq("directory_only", true);
       if (ROUTE_ONLY_ONBOARDED && claimedIds) q = q.in("id", claimedIds);
       const { data: centres } = await q;
-      let participants = (centres ?? []).filter(
+      const allParticipants = (centres ?? []).filter(
         (c) => c.lat != null && c.lng != null
       );
 
@@ -167,15 +167,12 @@ export async function POST(req: NextRequest) {
       // Exclude facilities that have said they can't take them; keep unknowns
       // (they get a "call ahead" caveat below).
       const isRabiesVector = !!detectDanger(animal!.trim())?.rabiesVector;
-      let excludedForRabies = false;
+      let participants = allParticipants;
       if (isRabiesVector) {
-        const eligible = participants.filter(
+        const eligible = allParticipants.filter(
           (c) => (c as { rabies_vector?: boolean | null }).rabies_vector !== false
         );
-        if (eligible.length) {
-          excludedForRabies = eligible.length < participants.length;
-          participants = eligible;
-        }
+        if (eligible.length) participants = eligible;
       }
 
       if (participants.length) {
@@ -191,23 +188,25 @@ export async function POST(req: NextRequest) {
             website: top.website,
           };
 
-          // Explain the choice. rankCentres prefers facilities that accept the
-          // animal's category; a closer one may have been skipped because it
-          // doesn't take this kind of animal, or (for rabies vectors) can't.
+          // Truthful explanation: look at the ACTUAL closest facility overall.
+          // If the chosen one isn't the closest, say why the closest was passed
+          // over (can't take this species, or can't take rabies vectors).
           const catP = CATEGORY_PLURAL[category ?? ""] ?? "this animal";
-          const topRV = (top as { rabies_vector?: boolean | null })
+          const topRV = (top as { rabies_vector?: boolean | null }).rabies_vector;
+          const nearestOverall = allParticipants
+            .map((c) => ({ c, d: haversineKm(lat, lng, c.lat!, c.lng!) }))
+            .reduce((a, b) => (b.d < a.d ? b : a)).c;
+          const closerExists = nearestOverall.id !== top.id;
+          const nearestTakesCat =
+            !category ||
+            category === "unsure" ||
+            (nearestOverall.takes as string[]).includes(category);
+          const nearestRV = (nearestOverall as { rabies_vector?: boolean | null })
             .rabies_vector;
-          const nearestByDistance = [...ranked].sort(
-            (a, b) => a.distanceKm - b.distanceKm
-          )[0];
-          const skippedCloser =
-            category && category !== "unsure"
-              ? nearestByDistance && nearestByDistance.id !== top.id
-              : false;
 
-          if (excludedForRabies) {
+          if (closerExists && isRabiesVector && nearestRV === false) {
             routingNote = `A closer facility can't take rabies-vector animals like this one, so this went to ${top.name}, the nearest one that can.`;
-          } else if (skippedCloser) {
+          } else if (closerExists && !nearestTakesCat) {
             routingNote = `The closest wildlife facility doesn't take ${catP}, so this went to ${top.name}, the nearest one that does.`;
           } else {
             routingNote = `${top.name} is the nearest wildlife facility that can take ${catP}.`;
