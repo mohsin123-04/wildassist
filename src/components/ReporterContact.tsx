@@ -35,7 +35,8 @@ export default function ReporterContact({ caseId }: { caseId: string | null }) {
   if (saved) {
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
-        Thanks. We've shared your contact with the centre so they can follow up.
+        Thanks. We&apos;ve shared your contact with the centre so they can follow
+        up.
       </div>
     );
   }

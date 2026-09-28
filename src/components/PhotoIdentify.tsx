@@ -81,7 +81,7 @@ export default function PhotoIdentify({
     setMessage("");
 
     try {
-      setStatus((s) => (classifierPromise ? "classifying" : "loading-model"));
+      setStatus(classifierPromise ? "classifying" : "loading-model");
       const classifier = await withTimeout(getClassifier(), 45000);
       setStatus("classifying");
 

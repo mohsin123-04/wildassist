@@ -31,7 +31,6 @@ export default function Toast() {
     }
     window.addEventListener("wa-flash", onFlash);
     return () => window.removeEventListener("wa-flash", onFlash);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!message) return null;

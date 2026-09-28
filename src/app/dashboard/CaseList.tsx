@@ -147,7 +147,6 @@ export default function CaseList({
   const tabCases = tab === "area" ? areaCases : unassignedCases;
 
   const stats = useMemo(() => {
-    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     return {
       total: cases.length,
       open: cases.filter((c) => c.status !== "closed").length,

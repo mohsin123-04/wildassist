@@ -52,7 +52,6 @@ export default function TransportList({
       () => load(null),
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Keep the map/list live: refresh periodically and when the tab regains focus.
@@ -64,7 +63,6 @@ export default function TransportList({
       clearInterval(id);
       window.removeEventListener("focus", onFocus);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coords]);
 
   async function load(c: { lat: number; lng: number } | null) {

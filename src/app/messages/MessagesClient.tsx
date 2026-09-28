@@ -95,7 +95,6 @@ export default function MessagesClient({
 
   useEffect(() => {
     loadConversations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Deep link from the dashboard: /messages?dm=<userId> opens (or creates) that DM.
