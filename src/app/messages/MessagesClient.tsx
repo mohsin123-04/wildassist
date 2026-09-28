@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Users, Camera } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
@@ -26,6 +26,35 @@ type Message = {
   image_url?: string | null;
 };
 
+/** Whether two timestamps fall on the same calendar day. */
+function sameDay(a: string, b: string): boolean {
+  const x = new Date(a);
+  const y = new Date(b);
+  return (
+    x.getFullYear() === y.getFullYear() &&
+    x.getMonth() === y.getMonth() &&
+    x.getDate() === y.getDate()
+  );
+}
+
+/** "Today", "Yesterday", or a dated label for day separators. */
+function dayLabel(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayMs = 24 * 60 * 60 * 1000;
+  const diffDays = Math.floor((startOfToday.getTime() - d.getTime()) / dayMs);
+  if (sameDay(iso, now.toISOString())) return "Today";
+  if (diffDays >= 0 && diffDays < 1) return "Yesterday";
+  const y = new Date(now.getTime() - dayMs);
+  if (sameDay(iso, y.toISOString())) return "Yesterday";
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: d.getFullYear() === now.getFullYear() ? undefined : "numeric",
+  });
+}
+
 export default function MessagesClient({
   myId,
   myName,
@@ -48,6 +77,8 @@ export default function MessagesClient({
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const atBottomRef = useRef(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const newMenuRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
@@ -199,9 +230,19 @@ export default function MessagesClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Switching conversations should always land at the newest message.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    atBottomRef.current = true;
+  }, [selected]);
+
+  // Auto-scroll only when the reader is already at the bottom or just sent a
+  // message — don't yank someone who has scrolled up to read older messages.
+  useEffect(() => {
+    const last = messages[messages.length - 1];
+    if (last?.sender_id === myId || atBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, myId]);
 
   async function send(imageUrl?: string) {
     const text = body.trim();
@@ -446,7 +487,15 @@ export default function MessagesClient({
               </p>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div
+              ref={listRef}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                atBottomRef.current =
+                  el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+              }}
+              className="flex-1 space-y-3 overflow-y-auto p-4"
+            >
               {messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center text-center text-sm text-zinc-400">
                   {active?.kind === "channel"
@@ -454,13 +503,22 @@ export default function MessagesClient({
                     : "Start the conversation."}
                 </div>
               ) : (
-                messages.map((m) => {
+                messages.map((m, i) => {
                   const mine = m.sender_id === myId;
+                  const prev = messages[i - 1];
+                  const showDay = !prev || !sameDay(prev.created_at, m.created_at);
                   return (
-                    <div
-                      key={m.id}
-                      className={`group flex flex-col ${mine ? "items-end" : "items-start"}`}
-                    >
+                    <Fragment key={m.id}>
+                      {showDay && (
+                        <div className="flex justify-center py-1">
+                          <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-500">
+                            {dayLabel(m.created_at)}
+                          </span>
+                        </div>
+                      )}
+                      <div
+                        className={`group flex flex-col ${mine ? "items-end" : "items-start"}`}
+                      >
                       {!mine && active?.kind !== "dm" && (
                         <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
                           {m.sender_name || "Someone"}
@@ -579,7 +637,8 @@ export default function MessagesClient({
                           </span>
                         )}
                       </div>
-                    </div>
+                      </div>
+                    </Fragment>
                   );
                 })
               )}
