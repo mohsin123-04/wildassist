@@ -8,8 +8,14 @@ import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
-// Don't auto-route a report to a participant further away than this. Matches the
-// area a staff member can see (staff_can_see_case, 150 km).
+// Routing model switch. While this is a demo/portfolio project (access isn't
+// sold yet), route to every seeded org so the map stays populated. Flip to true
+// to gate routing on real onboarding (org has staff) once access is a paid
+// product — see the routing block below.
+const ROUTE_ONLY_ONBOARDED = false;
+
+// When ROUTE_ONLY_ONBOARDED is true, don't route to a participant further than
+// this. Matches the area a staff member can see (staff_can_see_case, 150 km).
 const ROUTE_RADIUS_KM = 150;
 
 /**
@@ -107,39 +113,48 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Auto-route to the nearest onboarded organization when we have coordinates.
-  // Routing is participation-based, not type-based: an org receives cases only
-  // if it has actually onboarded (has at least one staff member) and hasn't
-  // opted out. An unclaimed rehab centre is treated the same as any other
-  // directory listing (a vet, a hotline): shown to the finder for reference,
-  // but not auto-assigned a case. And we only route if one is within range,
-  // so a report far from any participant stays unassigned rather than being
-  // sent hundreds of km away.
+  // Auto-route a report to the nearest organization when we have coordinates.
+  //
+  // Two models, switched by ROUTE_ONLY_ONBOARDED:
+  //  - false (current, demo/pre-sales): any org that isn't a directory-only
+  //    listing can receive cases, so the seeded centres keep routing populated.
+  //  - true (once access is a paid product): only orgs that have actually
+  //    onboarded (have staff) receive cases, and only within ROUTE_RADIUS_KM.
+  //    Then an unclaimed centre is treated the same as a vet or hotline: shown
+  //    to the finder for reference, not auto-assigned. Flip the one flag.
   let assignedCentre: Pick<
     Centre,
     "id" | "name" | "town" | "phone" | "website"
   > | null = null;
   if (typeof lat === "number" && typeof lng === "number") {
-    const { data: staffRows } = await supabase
-      .from("profiles")
-      .select("centre_id")
-      .not("centre_id", "is", null);
-    const claimedIds = [
-      ...new Set((staffRows ?? []).map((p) => p.centre_id)),
-    ];
-    if (claimedIds.length) {
-      const { data: centres } = await supabase
+    let claimedIds: string[] | null = null;
+    if (ROUTE_ONLY_ONBOARDED) {
+      const { data: staffRows } = await supabase
+        .from("profiles")
+        .select("centre_id")
+        .not("centre_id", "is", null);
+      claimedIds = [
+        ...new Set(
+          (staffRows ?? []).map((p) => p.centre_id).filter((id): id is string => !!id)
+        ),
+      ];
+    }
+
+    if (!ROUTE_ONLY_ONBOARDED || (claimedIds && claimedIds.length)) {
+      let q = supabase
         .from("centres")
         .select("id, name, town, lat, lng, takes, phone, website")
-        .in("id", claimedIds)
         .neq("directory_only", true);
+      if (ROUTE_ONLY_ONBOARDED && claimedIds) q = q.in("id", claimedIds);
+      const { data: centres } = await q;
       const participants = (centres ?? []).filter(
         (c) => c.lat != null && c.lng != null
       );
       if (participants.length) {
         const ranked = rankCentres(lat, lng, category, participants as Centre[]);
         const top = ranked[0];
-        if (top && top.distanceKm <= ROUTE_RADIUS_KM) {
+        const inRange = !ROUTE_ONLY_ONBOARDED || top.distanceKm <= ROUTE_RADIUS_KM;
+        if (top && inRange) {
           assignedCentre = {
             id: top.id,
             name: top.name,
