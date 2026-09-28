@@ -124,23 +124,55 @@ export default async function AnalyticsPage({
     (c) => c.verdict === "help" && c.status !== "closed"
   ).length;
 
-  // Intake buckets: daily for short spans, weekly when the span is long.
+  // Response time per case: report → first pickup ("in_transit"/"at_centre").
+  const inRange = new Set(cases.map((c) => c.id));
+  const reportedAt: Record<string, number> = {};
+  for (const c of cases) reportedAt[c.id] = at(c.created_at);
+  const firstResponse: Record<string, number> = {};
+  for (const e of events) {
+    if (!inRange.has(e.case_id)) continue;
+    if (e.to_status !== "in_transit" && e.to_status !== "at_centre") continue;
+    const t = at(e.created_at);
+    if (firstResponse[e.case_id] === undefined || t < firstResponse[e.case_id]) {
+      firstResponse[e.case_id] = t;
+    }
+  }
+  const caseResponse: Record<string, number> = {};
+  for (const [id, t] of Object.entries(firstResponse)) {
+    const d = t - reportedAt[id];
+    if (reportedAt[id] !== undefined && d >= 0) caseResponse[id] = d;
+  }
+  const responseMs = Object.values(caseResponse);
+  const medianResponse = responseMs.length ? median(responseMs) : null;
+  const respondedPct = cases.length
+    ? Math.round((responseMs.length / cases.length) * 100)
+    : 0;
+
+  // Intake + response-time buckets: daily for short spans, weekly when long.
   const spanDays = Math.max(1, Math.ceil((now - startMs) / DAY));
   const weekly = spanDays > 45;
   const step = weekly ? 7 * DAY : DAY;
-  const buckets: { label: string; count: number }[] = [];
+  const buckets: { label: string; count: number; medianResp: number | null }[] = [];
   for (let t = weekly ? startMs : now - (spanDays - 1) * DAY; t <= now; t += step) {
     const bEnd = t + step;
-    const count = cases.filter((c) => at(c.created_at) >= t && at(c.created_at) < bEnd).length;
+    const inBucket = cases.filter(
+      (c) => at(c.created_at) >= t && at(c.created_at) < bEnd
+    );
+    const resp = inBucket
+      .map((c) => caseResponse[c.id])
+      .filter((v): v is number => v !== undefined);
     buckets.push({
       label: new Date(t).toLocaleDateString(
         [],
         weekly ? { month: "short", day: "numeric" } : { day: "numeric" }
       ),
-      count,
+      count: inBucket.length,
+      medianResp: resp.length ? median(resp) : null,
     });
   }
   const maxBucket = Math.max(1, ...buckets.map((d) => d.count));
+  const maxResp = Math.max(1, ...buckets.map((d) => d.medianResp ?? 0));
+  const hasRespTrend = buckets.some((d) => d.medianResp !== null);
   const labelEvery = Math.ceil(buckets.length / 12);
 
   const countBy = (
@@ -172,28 +204,6 @@ export default async function AnalyticsPage({
     ...v,
     value: cases.filter((c) => c.verdict === v.key).length,
   }));
-
-  // Response time: report → first pickup ("in_transit"/"at_centre"), for cases in range.
-  const inRange = new Set(cases.map((c) => c.id));
-  const reportedAt: Record<string, number> = {};
-  for (const c of cases) reportedAt[c.id] = at(c.created_at);
-  const firstResponse: Record<string, number> = {};
-  for (const e of events) {
-    if (!inRange.has(e.case_id)) continue;
-    if (e.to_status !== "in_transit" && e.to_status !== "at_centre") continue;
-    const t = at(e.created_at);
-    if (firstResponse[e.case_id] === undefined || t < firstResponse[e.case_id]) {
-      firstResponse[e.case_id] = t;
-    }
-  }
-  const responseMs = Object.entries(firstResponse)
-    .filter(([id]) => reportedAt[id] !== undefined)
-    .map(([id, t]) => t - reportedAt[id])
-    .filter((ms) => ms >= 0);
-  const medianResponse = responseMs.length ? median(responseMs) : null;
-  const respondedPct = cases.length
-    ? Math.round((responseMs.length / cases.length) * 100)
-    : 0;
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
@@ -318,6 +328,45 @@ export default async function AnalyticsPage({
               </div>
             )}
           </section>
+
+          {/* Response time trend */}
+          {hasRespTrend && (
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="font-display text-base font-semibold text-zinc-900">
+                Response time trend
+              </h2>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Median report to first pickup, per {weekly ? "week" : "day"} ·
+                shorter is better
+              </p>
+              <div className="mt-4 flex h-32 items-end gap-1">
+                {buckets.map((d, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <div
+                      className="w-full rounded-t bg-sky-400/80"
+                      style={{
+                        height:
+                          d.medianResp !== null
+                            ? `${(d.medianResp / maxResp) * 100}%`
+                            : "0%",
+                      }}
+                      title={
+                        d.medianResp !== null
+                          ? formatDuration(d.medianResp)
+                          : "no pickups"
+                      }
+                    />
+                    <span className="text-[10px] text-zinc-400">
+                      {i % labelEvery === 0 ? d.label : ""}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-zinc-400">
+                Peak {formatDuration(maxResp)}
+              </p>
+            </section>
+          )}
 
           {/* Daily intake */}
           <section className="rounded-2xl border border-zinc-200 bg-white p-5">
