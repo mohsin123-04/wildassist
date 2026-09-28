@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { flash } from "@/lib/flash";
 
 type Member = { id: string; full_name: string | null; role: string };
 type Conversation = { id: string; kind: string; label: string; unread?: number };
@@ -21,6 +22,7 @@ type Message = {
   case_ref?: CaseRef | null;
   edited_at?: string | null;
   deleted_at?: string | null;
+  image_url?: string | null;
 };
 
 export default function MessagesClient({
@@ -43,7 +45,9 @@ export default function MessagesClient({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [typingNames, setTypingNames] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const newMenuRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
@@ -111,7 +115,7 @@ export default function MessagesClient({
     if (!selected) return;
     supabase
       .from("messages")
-      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at, image_url")
       .eq("conversation_id", selected)
       .order("created_at", { ascending: true })
       .then(({ data }) => setMessages((data ?? []) as Message[]));
@@ -198,9 +202,9 @@ export default function MessagesClient({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send() {
+  async function send(imageUrl?: string) {
     const text = body.trim();
-    if (!text || !selected) return;
+    if ((!text && !imageUrl) || !selected) return;
     setBody("");
     // Optimistic: show it instantly, then reconcile with the saved row.
     const tempId = `temp-${Date.now()}`;
@@ -211,6 +215,7 @@ export default function MessagesClient({
       sender_name: myName,
       body: text,
       created_at: new Date().toISOString(),
+      image_url: imageUrl ?? null,
     };
     setMessages((prev) => [...prev, optimistic]);
     const { data } = await supabase
@@ -220,8 +225,9 @@ export default function MessagesClient({
         sender_id: myId,
         sender_name: myName,
         body: text,
+        image_url: imageUrl ?? null,
       })
-      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at")
+      .select("id, conversation_id, sender_id, sender_name, body, created_at, case_ref, edited_at, deleted_at, image_url")
       .single();
     if (data) {
       setMessages((prev) =>
@@ -229,6 +235,25 @@ export default function MessagesClient({
           ? prev.filter((x) => x.id !== tempId)
           : prev.map((x) => (x.id === tempId ? (data as Message) : x))
       );
+    }
+  }
+
+  async function onPickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file
+    if (!file || !selected) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch("/api/message-photo", { method: "POST", body: fd });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.url) await send(d.url);
+      else flash(d.error ?? "Couldn't upload the image.");
+    } catch {
+      flash("Couldn't upload the image.");
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -491,6 +516,32 @@ export default function MessagesClient({
                             View in dashboard →
                           </span>
                         </a>
+                      ) : m.image_url ? (
+                        <div className="flex max-w-[80%] flex-col gap-1">
+                          <a
+                            href={m.image_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={m.image_url}
+                              alt="Shared photo"
+                              className="max-h-64 w-full rounded-2xl object-cover"
+                            />
+                          </a>
+                          {m.body && (
+                            <div
+                              className={`rounded-2xl px-3.5 py-2 text-sm leading-6 ${
+                                mine
+                                  ? "rounded-br-md bg-emerald-600 text-white"
+                                  : "rounded-bl-md bg-zinc-100 text-zinc-800"
+                              }`}
+                            >
+                              {m.body}
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <div
                           className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
@@ -547,6 +598,26 @@ export default function MessagesClient({
 
             <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
               <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={onPickPhoto}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!selected || uploading}
+                aria-label="Attach a photo"
+                title="Attach a photo"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-lg text-zinc-500 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+              >
+                {uploading ? (
+                  <span className="text-sm text-zinc-400">…</span>
+                ) : (
+                  <span aria-hidden>📷</span>
+                )}
+              </button>
+              <input
                 value={body}
                 aria-label="Type a message"
                 onChange={(e) => {
@@ -564,7 +635,7 @@ export default function MessagesClient({
                 className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 disabled:opacity-50"
               />
               <button
-                onClick={send}
+                onClick={() => send()}
                 disabled={!body.trim() || !selected}
                 className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
               >
