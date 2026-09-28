@@ -12,9 +12,31 @@ type Row = {
   situation: string;
   verdict: string;
   status: string;
+  centre_id: string | null;
 };
 
 type EventRow = { case_id: string; to_status: string; created_at: string };
+
+const DAY = 24 * 60 * 60 * 1000;
+
+const RANGES = [
+  { key: "7d", label: "7 days", days: 7 },
+  { key: "30d", label: "30 days", days: 30 },
+  { key: "all", label: "All time", days: null as number | null },
+];
+
+const STATUS_META = [
+  { key: "reported", label: "Reported", color: "bg-zinc-400", dot: "bg-zinc-400" },
+  { key: "in_transit", label: "In transit", color: "bg-amber-400", dot: "bg-amber-400" },
+  { key: "at_centre", label: "At centre", color: "bg-sky-400", dot: "bg-sky-400" },
+  { key: "closed", label: "Closed", color: "bg-emerald-500", dot: "bg-emerald-500" },
+];
+
+const VERDICT_META = [
+  { key: "help", label: "Needs help", color: "bg-rose-400", dot: "bg-rose-400" },
+  { key: "uncertain", label: "Uncertain", color: "bg-amber-400", dot: "bg-amber-400" },
+  { key: "leave", label: "Leave it be", color: "bg-emerald-500", dot: "bg-emerald-500" },
+];
 
 /** Human-friendly duration from milliseconds. */
 function formatDuration(ms: number): string {
@@ -33,7 +55,14 @@ const SITUATION_LABEL: Record<string, string> = Object.fromEntries(
   SITUATIONS.map((s) => [s.value, s.label])
 );
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const { range: rangeParam } = await searchParams;
+  const range = RANGES.find((r) => r.key === rangeParam) ?? RANGES[1];
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -54,44 +83,76 @@ export default async function AnalyticsPage() {
   const [{ data: rows }, { data: eventRows }] = await Promise.all([
     supabase
       .from("cases")
-      .select("id, created_at, animal, situation, verdict, status"),
-    supabase
-      .from("case_events")
-      .select("case_id, to_status, created_at"),
+      .select("id, created_at, animal, situation, verdict, status, centre_id"),
+    supabase.from("case_events").select("case_id, to_status, created_at"),
   ]);
-  const cases = (rows ?? []) as Row[];
+  const all = (rows ?? []) as Row[];
   const events = (eventRows ?? []) as EventRow[];
 
-  // --- aggregates ---
+  // Centre names (admins get a per-centre breakdown).
+  let centreNames: Record<string, string> = {};
+  if (isAdmin && all.length) {
+    const { data: cn } = await supabase.from("centres").select("id, name");
+    centreNames = Object.fromEntries((cn ?? []).map((c) => [c.id, c.name]));
+  }
+
+  // --- windowing ---
   const now = Date.now();
-  const weekMs = 7 * 24 * 60 * 60 * 1000;
-  const thisWeek = cases.filter(
-    (c) => now - new Date(c.created_at).getTime() < weekMs
-  ).length;
-  const lastWeek = cases.filter((c) => {
-    const age = now - new Date(c.created_at).getTime();
-    return age >= weekMs && age < 2 * weekMs;
-  }).length;
+  const at = (iso: string) => new Date(iso).getTime();
+  const windowMs = range.days ? range.days * DAY : null;
+  const earliest = all.length
+    ? Math.min(...all.map((c) => at(c.created_at)))
+    : now - 30 * DAY;
+  const startMs = windowMs ? now - windowMs : earliest;
+
+  const cases = all.filter((c) => at(c.created_at) >= startMs);
+
+  // Change vs the previous equal window (only meaningful for fixed windows).
+  let changePct: number | null = null;
+  if (windowMs) {
+    const prevStart = startMs - windowMs;
+    const prevCount = all.filter(
+      (c) => at(c.created_at) >= prevStart && at(c.created_at) < startMs
+    ).length;
+    changePct =
+      prevCount === 0 ? null : Math.round(((cases.length - prevCount) / prevCount) * 100);
+  }
+
   const closed = cases.filter((c) => c.status === "closed").length;
-  const needsHelpOpen = cases.filter(
+  // Live queue count — current open needs-help, regardless of range.
+  const needsHelpOpen = all.filter(
     (c) => c.verdict === "help" && c.status !== "closed"
   ).length;
 
-  // Daily intake, last 14 days.
-  const days: { label: string; count: number }[] = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(now - i * 24 * 60 * 60 * 1000);
-    const key = d.toISOString().slice(0, 10);
-    const count = cases.filter(
-      (c) => c.created_at.slice(0, 10) === key
-    ).length;
-    days.push({ label: d.toLocaleDateString([], { day: "numeric" }), count });
+  // Intake buckets: daily for short spans, weekly when the span is long.
+  const spanDays = Math.max(1, Math.ceil((now - startMs) / DAY));
+  const weekly = spanDays > 45;
+  const step = weekly ? 7 * DAY : DAY;
+  const buckets: { label: string; count: number }[] = [];
+  for (let t = weekly ? startMs : now - (spanDays - 1) * DAY; t <= now; t += step) {
+    const bEnd = t + step;
+    const count = cases.filter((c) => at(c.created_at) >= t && at(c.created_at) < bEnd).length;
+    buckets.push({
+      label: new Date(t).toLocaleDateString(
+        [],
+        weekly ? { month: "short", day: "numeric" } : { day: "numeric" }
+      ),
+      count,
+    });
   }
-  const maxDay = Math.max(1, ...days.map((d) => d.count));
+  const maxBucket = Math.max(1, ...buckets.map((d) => d.count));
+  const labelEvery = Math.ceil(buckets.length / 12);
 
-  const countBy = (key: keyof Row, labelFn?: (v: string) => string) => {
+  const countBy = (
+    key: "animal" | "situation" | "centre_id",
+    labelFn?: (v: string) => string
+  ) => {
     const m: Record<string, number> = {};
-    for (const c of cases) m[c[key]] = (m[c[key]] ?? 0) + 1;
+    for (const c of cases) {
+      const raw = c[key];
+      if (raw == null) continue;
+      m[raw] = (m[raw] ?? 0) + 1;
+    }
     return Object.entries(m)
       .map(([k, v]) => ({ label: labelFn ? labelFn(k) : k, value: v }))
       .sort((a, b) => b.value - a.value);
@@ -99,18 +160,28 @@ export default async function AnalyticsPage() {
 
   const byAnimal = countBy("animal").slice(0, 6);
   const bySituation = countBy("situation", (v) => SITUATION_LABEL[v] ?? v).slice(0, 6);
+  const byCentre = isAdmin
+    ? countBy("centre_id", (id) => centreNames[id] ?? "Unknown centre").slice(0, 8)
+    : [];
 
-  const wowChange =
-    lastWeek === 0 ? null : Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+  const statusSegments = STATUS_META.map((s) => ({
+    ...s,
+    value: cases.filter((c) => c.status === s.key).length,
+  }));
+  const verdictSegments = VERDICT_META.map((v) => ({
+    ...v,
+    value: cases.filter((c) => c.verdict === v.key).length,
+  }));
 
-  // Response time: from a case being reported to its first pickup (the earliest
-  // "in_transit" or "at_centre" event). Uses the audit trail.
+  // Response time: report → first pickup ("in_transit"/"at_centre"), for cases in range.
+  const inRange = new Set(cases.map((c) => c.id));
   const reportedAt: Record<string, number> = {};
-  for (const c of cases) reportedAt[c.id] = new Date(c.created_at).getTime();
+  for (const c of cases) reportedAt[c.id] = at(c.created_at);
   const firstResponse: Record<string, number> = {};
   for (const e of events) {
+    if (!inRange.has(e.case_id)) continue;
     if (e.to_status !== "in_transit" && e.to_status !== "at_centre") continue;
-    const t = new Date(e.created_at).getTime();
+    const t = at(e.created_at);
     if (firstResponse[e.case_id] === undefined || t < firstResponse[e.case_id]) {
       firstResponse[e.case_id] = t;
     }
@@ -125,8 +196,8 @@ export default async function AnalyticsPage() {
     : 0;
 
   return (
-    <main className="animate-in mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 py-8">
-      <div className="mb-6 flex items-center justify-between">
+    <main className="animate-in mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
+      <div className="mb-5 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
             {isAdmin ? "Nationwide" : "Your area"}
@@ -137,38 +208,83 @@ export default async function AnalyticsPage() {
         </div>
         <Link
           href="/dashboard"
-          className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
         >
           Dashboard
         </Link>
       </div>
 
+      {/* Range selector */}
+      <div className="mb-6 inline-flex gap-1 self-start rounded-xl border border-zinc-200 bg-white p-1">
+        {RANGES.map((r) => (
+          <Link
+            key={r.key}
+            href={`/analytics?range=${r.key}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              r.key === range.key
+                ? "bg-zinc-900 text-white"
+                : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            {r.label}
+          </Link>
+        ))}
+      </div>
+
       {cases.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-10 text-center text-sm text-zinc-500">
-          No cases yet, so there is nothing to chart. Reports will show up here as
-          they come in.
+          No cases in this range yet, so there is nothing to chart. Try a wider
+          range, or reports will show up here as they come in.
         </div>
       ) : (
         <div className="flex flex-col gap-5">
           {/* Stat cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Total cases" value={cases.length} />
             <Stat
-              label="This week"
-              value={thisWeek}
+              label={range.days ? `Cases, last ${range.label.toLowerCase()}` : "Cases, all time"}
+              value={cases.length}
               sub={
-                wowChange === null
+                changePct === null
                   ? undefined
-                  : `${wowChange >= 0 ? "+" : ""}${wowChange}% vs last week`
+                  : `${changePct >= 0 ? "+" : ""}${changePct}% vs previous ${range.label.toLowerCase()}`
               }
-              subUp={wowChange !== null && wowChange >= 0}
+              subUp={changePct !== null && changePct >= 0}
             />
-            <Stat label="Open, needs help" value={needsHelpOpen} accent="text-rose-600" />
             <Stat
               label="Resolved"
               value={`${Math.round((closed / cases.length) * 100)}%`}
               accent="text-emerald-700"
             />
+            <Stat
+              label="Open, needs help (now)"
+              value={needsHelpOpen}
+              accent="text-rose-600"
+            />
+            <Stat
+              label="Pickup rate"
+              value={`${respondedPct}%`}
+              accent="text-zinc-900"
+            />
+          </div>
+
+          {/* Status + Verdict breakdowns */}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="font-display text-base font-semibold text-zinc-900">
+                Case status
+              </h2>
+              <p className="mt-0.5 text-xs text-zinc-500">Where cases stand now</p>
+              <SegBar segments={statusSegments} total={cases.length} />
+            </section>
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="font-display text-base font-semibold text-zinc-900">
+                Triage outcome
+              </h2>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                What WildAssist advised finders
+              </p>
+              <SegBar segments={verdictSegments} total={cases.length} />
+            </section>
           </div>
 
           {/* Response time */}
@@ -206,17 +322,24 @@ export default async function AnalyticsPage() {
           {/* Daily intake */}
           <section className="rounded-2xl border border-zinc-200 bg-white p-5">
             <h2 className="font-display text-base font-semibold text-zinc-900">
-              Intake, last 14 days
+              Intake, {range.label.toLowerCase()}
+              {weekly && (
+                <span className="ml-2 text-xs font-normal text-zinc-400">
+                  (weekly)
+                </span>
+              )}
             </h2>
-            <div className="mt-4 flex h-32 items-end gap-1.5">
-              {days.map((d, i) => (
+            <div className="mt-4 flex h-32 items-end gap-1">
+              {buckets.map((d, i) => (
                 <div key={i} className="flex flex-1 flex-col items-center gap-1">
                   <div
                     className="w-full rounded-t bg-emerald-500/80"
-                    style={{ height: `${(d.count / maxDay) * 100}%` }}
+                    style={{ height: `${(d.count / maxBucket) * 100}%` }}
                     title={`${d.count}`}
                   />
-                  <span className="text-[10px] text-zinc-400">{d.label}</span>
+                  <span className="text-[10px] text-zinc-400">
+                    {i % labelEvery === 0 ? d.label : ""}
+                  </span>
                 </div>
               ))}
             </div>
@@ -226,6 +349,10 @@ export default async function AnalyticsPage() {
             <BarPanel title="By animal" rows={byAnimal} />
             <BarPanel title="By situation" rows={bySituation} />
           </div>
+
+          {isAdmin && byCentre.length > 0 && (
+            <BarPanel title="By centre" rows={byCentre} />
+          )}
         </div>
       )}
     </main>
@@ -254,6 +381,44 @@ function Stat({
           {sub}
         </p>
       )}
+    </div>
+  );
+}
+
+function SegBar({
+  segments,
+  total,
+}: {
+  segments: { label: string; value: number; color: string; dot: string }[];
+  total: number;
+}) {
+  return (
+    <div className="mt-4">
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-zinc-100">
+        {segments.map(
+          (s) =>
+            s.value > 0 && (
+              <div
+                key={s.label}
+                className={s.color}
+                style={{ width: `${(s.value / total) * 100}%` }}
+                title={`${s.label}: ${s.value}`}
+              />
+            )
+        )}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+        {segments.map((s) => (
+          <div
+            key={s.label}
+            className="flex items-center gap-1.5 text-xs text-zinc-600"
+          >
+            <span className={`h-2 w-2 rounded-full ${s.dot}`} />
+            {s.label}{" "}
+            <span className="font-medium text-zinc-900">{s.value}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
