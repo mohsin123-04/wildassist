@@ -44,6 +44,22 @@ body {
   animation: fadeInUp 0.3s ease-out both;
 }
 
+/* Print: drop the app chrome and interactive controls so reports come out clean. */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  .animate-in {
+    animation: none !important;
+  }
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+}
+
 /* Respect users who prefer reduced motion: no entrance animation, and neutralize
    any transitions/animations rather than moving content around. */
 @media (prefers-reduced-motion: reduce) {
