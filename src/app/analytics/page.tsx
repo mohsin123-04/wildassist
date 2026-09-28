@@ -303,7 +303,7 @@ export default async function AnalyticsPage({
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
-      <div className="mb-5 flex items-start justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
             {isAdmin ? "Nationwide" : "Your area"}
@@ -312,7 +312,7 @@ export default async function AnalyticsPage({
             Analytics
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <AnalyticsActions rows={csvRows} filename={`wildassist-analytics-${range.key}.csv`} />
           <Link
             href="/dashboard"
@@ -486,7 +486,10 @@ export default async function AnalyticsPage({
               caption={`Peak ${formatDuration(maxResp)}`}
               barClass="bg-sky-400/80"
               bars={buckets.map((d, i) => ({
-                heightPct: d.medianResp !== null ? (d.medianResp / maxResp) * 100 : 0,
+                heightPct:
+                  d.medianResp !== null
+                    ? Math.max(6, (d.medianResp / maxResp) * 100)
+                    : 0,
                 title: d.medianResp !== null ? formatDuration(d.medianResp) : "no pickups",
                 label: i % labelEvery === 0 ? d.label : "",
               }))}
@@ -500,7 +503,7 @@ export default async function AnalyticsPage({
             caption={`Peak ${maxBucket} in a ${weekly ? "week" : "day"}`}
             barClass="bg-emerald-500/80"
             bars={buckets.map((d, i) => ({
-              heightPct: (d.count / maxBucket) * 100,
+              heightPct: d.count ? Math.max(6, (d.count / maxBucket) * 100) : 0,
               title: `${d.count}`,
               label: i % labelEvery === 0 ? d.label : "",
             }))}
@@ -654,14 +657,16 @@ function TimeChart({
     <section className="rounded-2xl border border-zinc-200 bg-white p-5">
       <h2 className="font-display text-base font-semibold text-zinc-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>}
-      <div className="mt-4 flex h-32 items-end gap-1 border-b border-zinc-100 pb-1">
+      <div className="mt-4 flex h-32 items-end gap-1 border-b border-zinc-200">
         {bars.map((b, i) => (
-          <div key={i} className="flex flex-1 flex-col items-center gap-1">
-            <div
-              className={`w-full rounded-t ${barClass}`}
-              style={{ height: `${b.heightPct}%` }}
-              title={b.title}
-            />
+          <div key={i} className="flex h-full flex-1 items-end">
+            <div className="flex h-full w-full items-end rounded-t bg-zinc-50">
+              <div
+                className={`w-full rounded-t ${barClass}`}
+                style={{ height: `${b.heightPct}%` }}
+                title={b.title}
+              />
+            </div>
           </div>
         ))}
       </div>
