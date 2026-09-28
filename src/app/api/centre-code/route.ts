@@ -1,11 +1,13 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 
-// Readable code, no ambiguous characters (0/O, 1/I).
+// Readable code, no ambiguous characters (0/O, 1/I). 8 chars over a 32-symbol
+// alphabet is ~40 bits; combined with the join rate limit that's ample. (The
+// alphabet has 32 symbols and a byte has 256 values, so b % 32 is unbiased.)
 function genCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
   const s = Array.from(bytes, (b) => chars[b % chars.length]).join("");
-  return `${s.slice(0, 3)}-${s.slice(3)}`;
+  return `${s.slice(0, 4)}-${s.slice(4)}`;
 }
 
 async function centreOfUser() {

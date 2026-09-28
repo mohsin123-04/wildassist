@@ -87,7 +87,12 @@ export default function TransportList({
       const res = await fetch("/api/transport", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caseId: id, action }),
+        body: JSON.stringify({
+          caseId: id,
+          action,
+          lat: coords?.lat,
+          lng: coords?.lng,
+        }),
       });
       if (res.ok) {
         await load(coords);

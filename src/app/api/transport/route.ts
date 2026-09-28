@@ -1,7 +1,11 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { haversineKm } from "@/lib/centres";
+
+// Matches the browse-feed radius in /api/transport/jobs.
+const CLAIM_RADIUS_KM = 100;
 
 /**
- * POST /api/transport  { caseId, action }
+ * POST /api/transport  { caseId, action, lat?, lng? }
  * Volunteer transport actions. Verified server-side (service role) so a
  * volunteer can only claim/deliver/release, not edit arbitrary case fields.
  *  - claim:   assign myself as driver, mark in transit
@@ -30,7 +34,12 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { caseId?: string; action?: "claim" | "deliver" | "release" };
+  let body: {
+    caseId?: string;
+    action?: "claim" | "deliver" | "release";
+    lat?: number;
+    lng?: number;
+  };
   try {
     body = await req.json();
   } catch {
@@ -45,6 +54,30 @@ export async function POST(req: Request) {
   let query;
 
   if (action === "claim") {
+    // A claim is only allowed from within the volunteer's area (same radius as
+    // the browse feed), so a volunteer can't grab a case anywhere in the country
+    // by id to harvest the finder's contact details.
+    if (typeof body.lat !== "number" || typeof body.lng !== "number") {
+      return Response.json(
+        { error: "Turn on location to claim a pickup." },
+        { status: 400 }
+      );
+    }
+    const { data: target } = await admin
+      .from("cases")
+      .select("lat, lng")
+      .eq("id", caseId)
+      .single();
+    if (
+      target?.lat != null &&
+      target?.lng != null &&
+      haversineKm(body.lat, body.lng, target.lat, target.lng) > CLAIM_RADIUS_KM
+    ) {
+      return Response.json(
+        { error: "That pickup is outside your area." },
+        { status: 403 }
+      );
+    }
     query = admin
       .from("cases")
       .update({

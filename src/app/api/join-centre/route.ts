@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 /**
  * POST /api/join-centre  { centreId, code }
@@ -7,6 +8,9 @@ import { createClient, createAdminClient } from "@/lib/supabase/server";
  * set their own centre_id directly (a DB trigger blocks that).
  */
 export async function POST(req: Request) {
+  // Cap attempts per IP so a join code can't be brute-forced.
+  if (!(await rateLimit(`join:${clientIp(req)}`, 10, 60))) return tooMany();
+
   const supabase = await createClient();
   const {
     data: { user },

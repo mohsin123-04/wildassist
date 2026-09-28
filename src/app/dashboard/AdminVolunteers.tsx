@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { flash } from "@/lib/flash";
 
 type Vol = {
   id: string;
@@ -29,13 +30,22 @@ export default function AdminVolunteers() {
 
   async function setApproved(userId: string, approved: boolean) {
     setBusyId(userId);
-    await fetch("/api/admin/volunteers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, approved }),
-    });
-    setBusyId(null);
-    load();
+    try {
+      const r = await fetch("/api/admin/volunteers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, approved }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        flash(d.error ?? "Couldn't update the volunteer.");
+      } else {
+        flash(approved ? "Volunteer approved" : "Volunteer access revoked");
+      }
+    } finally {
+      setBusyId(null);
+      load();
+    }
   }
 
   const pending = vols.filter((v) => !v.volunteer_approved).length;

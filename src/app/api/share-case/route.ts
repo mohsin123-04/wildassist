@@ -34,10 +34,21 @@ export async function POST(req: Request) {
   const admin = createAdminClient();
   const { data: c } = await admin
     .from("cases")
-    .select("id, animal, title, situation, status")
+    .select("id, animal, title, situation, status, centre_id, lat, lng")
     .eq("id", caseId)
     .single();
   if (!c) return Response.json({ error: "Case not found" }, { status: 404 });
+
+  // Defense in depth: only share a case the user can actually see (the case
+  // fetch above uses the service role, which bypasses RLS).
+  const { data: canSee } = await supabase.rpc("staff_can_see_case", {
+    c_centre: c.centre_id,
+    c_lat: c.lat,
+    c_lng: c.lng,
+  });
+  if (canSee !== true) {
+    return Response.json({ error: "Not your case" }, { status: 403 });
+  }
 
   const { data: prof } = await admin
     .from("profiles")
