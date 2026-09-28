@@ -10,6 +10,7 @@ import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
+import { flash } from "@/lib/flash";
 import { detectDanger, type DangerInfo } from "@/lib/safety";
 import {
   ANIMAL_OPTIONS,
@@ -50,6 +51,7 @@ export default function TriagePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
+  const [trackToken, setTrackToken] = useState<string | null>(null);
   const [assignedCentre, setAssignedCentre] = useState<AssignedCentre | null>(
     null
   );
@@ -72,6 +74,7 @@ export default function TriagePage() {
     setLocError("");
     setResult(null);
     setCaseId(null);
+    setTrackToken(null);
     setAssignedCentre(null);
     setStep("animal");
   }
@@ -191,6 +194,7 @@ export default function TriagePage() {
       });
       const d = await r.json();
       if (d.id) setCaseId(d.id);
+      if (d.trackToken) setTrackToken(d.trackToken);
       if (d.centre) setAssignedCentre(d.centre);
     } catch {
       // best-effort
@@ -481,6 +485,7 @@ export default function TriagePage() {
           animal={animalOption.category}
           result={result}
           caseId={caseId}
+          trackToken={trackToken}
           assignedCentre={assignedCentre}
           coords={coords}
           danger={danger}
@@ -562,6 +567,7 @@ function ResultView({
   animal,
   result,
   caseId,
+  trackToken,
   assignedCentre,
   coords,
   danger,
@@ -570,12 +576,22 @@ function ResultView({
   animal: AnimalType;
   result: Result;
   caseId: string | null;
+  trackToken: string | null;
   assignedCentre: AssignedCentre | null;
   coords: { lat: number; lng: number } | null;
   danger: DangerInfo | null;
   onRestart: () => void;
 }) {
   const style = VERDICT_STYLES[result.verdict];
+
+  function copyTrackLink() {
+    if (!trackToken) return;
+    const url = `${window.location.origin}/track/${trackToken}`;
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => flash("Tracking link copied"))
+      .catch(() => flash(url));
+  }
 
   return (
     <div className="animate-in flex flex-col gap-5">
@@ -637,6 +653,32 @@ function ResultView({
           ))}
         </ol>
       </div>
+
+      {trackToken && (
+        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+          <h2 className="font-display text-lg font-semibold text-zinc-900">
+            Follow your report
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-zinc-600">
+            Check its status any time, from reported to in care. No account
+            needed, just keep this link.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href={`/track/${trackToken}`}
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+            >
+              View status
+            </Link>
+            <button
+              onClick={copyTrackLink}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+            >
+              Copy link
+            </button>
+          </div>
+        </div>
+      )}
 
       {result.showContactCentre && (
         <>

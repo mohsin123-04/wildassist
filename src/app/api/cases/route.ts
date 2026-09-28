@@ -188,6 +188,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Unguessable token so the finder can follow their report without an account.
+  const trackToken = crypto.randomUUID();
+
   const { data, error } = await supabase
     .from("cases")
     .insert({
@@ -201,6 +204,7 @@ export async function POST(req: NextRequest) {
       centre_id: assignedCentre?.id ?? null,
       photo_url: typeof photoUrl === "string" ? photoUrl : null,
       duplicate_of: duplicateOf,
+      track_token: trackToken,
     })
     .select("id")
     .single();
@@ -219,5 +223,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return Response.json({ id: data.id, centre: assignedCentre });
+  return Response.json({
+    id: data.id,
+    centre: assignedCentre,
+    trackToken,
+  });
 }
