@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "WildAssist | Found an injured animal?",
   description:
-    "Found an injured or orphaned wild animal in Canada? WildAssist helps you figure out what to do and connects you to the nearest wildlife rehabilitation centre.",
+    "Found an injured or orphaned wild animal in Canada? WildAssist helps you figure out what to do and connects you to the nearest help, from wildlife rehabilitation centres to vets and hotlines.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

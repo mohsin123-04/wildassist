@@ -89,20 +89,20 @@ export default function CentreFinder({
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
       <h2 className="font-display text-lg font-semibold text-zinc-900">
-        Find a wildlife centre
+        Find help near you
       </h2>
 
       {status === "idle" && (
         <>
           <p className="mt-1 text-sm leading-6 text-zinc-600">
-            Share your location and we&apos;ll sort centres by how close they are
-            to you.
+            Share your location and we&apos;ll sort nearby wildlife centres,
+            vets, and hotlines by how close they are to you.
           </p>
           <button
             onClick={findNearest}
             className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
           >
-            📍 Find nearest centre
+            📍 Find nearest help
           </button>
         </>
       )}
@@ -113,7 +113,7 @@ export default function CentreFinder({
 
       {status === "denied" && (
         <p className="mt-1 text-sm text-amber-700">
-          We couldn&apos;t get your location, so here are all the centres we know
+          We couldn&apos;t get your location, so here are all the places we know
           of. Call ahead before bringing an animal in.
         </p>
       )}
@@ -168,7 +168,7 @@ export default function CentreFinder({
 
       <p className="mt-4 text-xs leading-5 text-zinc-400">
         Distances are approximate (straight-line) and this list may be
-        incomplete. Always call a centre before transporting an animal.
+        incomplete. Always call ahead before transporting an animal.
       </p>
     </div>
   );

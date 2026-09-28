@@ -38,8 +38,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-8 text-zinc-600">
             Take a breath. Answer a few quick questions and WildAssist tells you
-            exactly what to do, then connects the animal to the nearest
-            rehabilitation centre.
+            exactly what to do, then connects the animal to the nearest help,
+            from wildlife rehabilitation centres to vets and hotlines.
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">

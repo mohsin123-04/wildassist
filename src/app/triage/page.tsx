@@ -334,7 +334,7 @@ export default function TriagePage() {
           key="details"
           eyebrow="Step 3 of 3"
           title="Tell us a bit more"
-          subtitle="These help the centre respond. Everything here is optional."
+          subtitle="These help whoever responds. Everything here is optional."
           onBack={() => setStep("situation")}
         >
           {/* Description */}
@@ -357,7 +357,7 @@ export default function TriagePage() {
               Add a photo of the animal
             </p>
             <p className="mb-2 text-xs text-zinc-500">
-              A photo helps the centre understand its condition.
+              A photo helps responders understand its condition.
             </p>
             <input
               ref={photoInputRef}
@@ -422,7 +422,8 @@ export default function TriagePage() {
               Where is the animal?
             </p>
             <p className="mb-2 text-xs text-zinc-500">
-              Sharing your location routes this report to the nearest centre.
+              Sharing your location routes this report and shows the closest
+              help.
             </p>
             {locStatus === "done" ? (
               <div
@@ -611,9 +612,9 @@ function ResultView({
         <div className="rounded-2xl border-l-4 border-rose-400 bg-rose-50 p-4 text-sm leading-6 text-rose-900">
           <span className="font-semibold">Time-sensitive.</span>{" "}
           <span>
-            Follow these steps and get it to a centre as soon as you safely can.
-            If it&apos;s a life-threatening
-            emergency, call a centre right now.
+            Follow these steps and get it to a wildlife rehabilitator or vet as
+            soon as you safely can. If it&apos;s a life-threatening emergency,
+            call one right now.
           </span>
         </div>
       )}

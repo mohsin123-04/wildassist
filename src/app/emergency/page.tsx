@@ -49,14 +49,15 @@ export default function EmergencyPage() {
           Reach a wildlife rehabilitator
         </h2>
         <p className="mt-1 text-sm leading-6 text-zinc-600">
-          The fastest help comes from a licensed wildlife centre near you. Use the
-          guided tool to find and reach the nearest one for your situation.
+          The fastest help comes from a licensed wildlife rehabilitator or vet
+          near you. Use the guided tool to find and reach the nearest one for
+          your situation.
         </p>
         <Link
           href="/triage"
           className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98]"
         >
-          Find the nearest centre
+          Find the nearest help
         </Link>
       </div>
 
