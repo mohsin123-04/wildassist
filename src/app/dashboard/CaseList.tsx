@@ -80,7 +80,7 @@ const VERDICT_BADGE: Record<CaseRow["verdict"], string> = {
   uncertain: "bg-amber-100 text-amber-700",
 };
 
-type Tab = "area" | "unassigned";
+type Scope = "area" | "unassigned" | "open" | "needs-help";
 
 export default function CaseList({
   initialCases,
@@ -100,7 +100,7 @@ export default function CaseList({
   isAdmin?: boolean;
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
-  const [tab, setTab] = useState<Tab>("area");
+  const [scope, setScope] = useState<Scope>("area");
   const [teammates, setTeammates] = useState<Teammate[]>([]);
 
   // Roster for assigning cases to a specific person.
@@ -190,7 +190,21 @@ export default function CaseList({
 
   const areaCases = cases.filter((c) => c.centre_id !== null);
   const unassignedCases = cases.filter((c) => c.centre_id === null);
-  const tabCases = tab === "area" ? areaCases : unassignedCases;
+  // The clickable summary cards drive the scope; "open" and "needs-help" span
+  // both area and unassigned cases.
+  const baseCases =
+    scope === "area"
+      ? areaCases
+      : scope === "unassigned"
+        ? unassignedCases
+        : scope === "open"
+          ? cases.filter((c) => c.status !== "closed")
+          : cases.filter((c) => c.verdict === "help" && c.status !== "closed");
+
+  function selectScope(s: Scope) {
+    setScope(s);
+    setStatusFilter("all");
+  }
 
   const stats = useMemo(() => {
     return {
@@ -207,7 +221,7 @@ export default function CaseList({
   const fromMs = dateFrom ? new Date(dateFrom).getTime() : null;
   // Include the whole "to" day (up to 23:59).
   const toMs = dateTo ? new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 : null;
-  const filtered = tabCases
+  const filtered = baseCases
     .filter((c) => statusFilter === "all" || c.status === statusFilter)
     .filter((c) => !mineOnly || c.assigned_to === myId)
     .filter((c) => {
@@ -278,7 +292,7 @@ export default function CaseList({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `wildassist-cases-${tab}.csv`;
+    a.download = `wildassist-cases-${scope}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -313,7 +327,7 @@ export default function CaseList({
   function goToCase(id: string) {
     const target = cases.find((c) => c.id === id);
     if (!target) return;
-    setTab(target.centre_id !== null ? "area" : "unassigned");
+    setScope(target.centre_id !== null ? "area" : "unassigned");
     setStatusFilter("all");
     setQuery("");
     setDateFrom("");
@@ -376,22 +390,35 @@ export default function CaseList({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Stats */}
+      {/* Clickable summary — each card filters the list to those cases */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label={isAdmin ? "All cases" : "In your area"} value={areaCases.length} />
-        <Stat label="Open" value={stats.open} accent="text-emerald-700" />
-        <Stat label="Needs help" value={stats.needsHelp} accent="text-rose-700" />
-        <Stat label="Unassigned" value={stats.unassigned} accent="text-amber-600" />
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2">
-        <Tab active={tab === "area"} onClick={() => setTab("area")}>
-          {isAdmin ? "All assigned" : "In your area"} ({areaCases.length})
-        </Tab>
-        <Tab active={tab === "unassigned"} onClick={() => setTab("unassigned")}>
-          Unassigned ({unassignedCases.length})
-        </Tab>
+        <Stat
+          label={isAdmin ? "All cases" : "In your area"}
+          value={areaCases.length}
+          active={scope === "area"}
+          onClick={() => selectScope("area")}
+        />
+        <Stat
+          label="Open"
+          value={stats.open}
+          accent="text-emerald-700"
+          active={scope === "open"}
+          onClick={() => selectScope("open")}
+        />
+        <Stat
+          label="Needs help"
+          value={stats.needsHelp}
+          accent="text-rose-700"
+          active={scope === "needs-help"}
+          onClick={() => selectScope("needs-help")}
+        />
+        <Stat
+          label="Unassigned"
+          value={stats.unassigned}
+          accent="text-amber-600"
+          active={scope === "unassigned"}
+          onClick={() => selectScope("unassigned")}
+        />
       </div>
 
       {/* Search / sort / export */}
@@ -568,9 +595,13 @@ export default function CaseList({
           <Bird className="mx-auto h-8 w-8 text-zinc-300" aria-hidden />
           <p className="mt-2 font-medium text-zinc-900">Nothing here</p>
           <p className="mt-1 text-sm text-zinc-500">
-            {tab === "unassigned"
+            {scope === "unassigned"
               ? "No unassigned cases right now."
-              : "No cases in your area match this filter."}
+              : scope === "open"
+                ? "No open cases right now."
+                : scope === "needs-help"
+                  ? "No cases need help right now."
+                  : "No cases in your area match this filter."}
           </p>
         </div>
       ) : (
@@ -900,38 +931,36 @@ function Stat({
   label,
   value,
   accent = "text-zinc-900",
+  active = false,
+  onClick,
 }: {
   label: string;
   value: number;
   accent?: string;
+  active?: boolean;
+  onClick?: () => void;
 }) {
-  return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+  const content = (
+    <>
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
-    </div>
+    </>
   );
-}
-
-function Tab({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
+  const base = "rounded-2xl border p-4 text-left shadow-sm transition-all";
+  if (!onClick) {
+    return <div className={`${base} border-zinc-200 bg-white`}>{content}</div>;
+  }
   return (
     <button
       onClick={onClick}
-      className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+      aria-pressed={active}
+      className={`${base} ${
         active
-          ? "bg-zinc-900 text-white"
-          : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+          ? "border-zinc-900 bg-white ring-1 ring-zinc-900"
+          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
       }`}
     >
-      {children}
+      {content}
     </button>
   );
 }
