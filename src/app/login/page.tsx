@@ -242,6 +242,17 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          {mode === "signin" && (
+            <div className="-mt-1 flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-xs font-medium text-zinc-500 underline-offset-2 hover:text-zinc-800 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          )}
+
           {error && (
             <p role="alert" className="text-sm text-rose-600">
               {error}
