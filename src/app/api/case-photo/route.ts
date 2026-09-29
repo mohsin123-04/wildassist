@@ -6,8 +6,11 @@ const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 /**
  * POST /api/case-photo  (multipart form with `file`)
- * Uploads a photo of a found animal to Storage and returns its public URL.
- * Public (reporters aren't signed in); the upload uses the service role.
+ * Uploads a photo of a found animal to the PRIVATE case-images bucket and
+ * returns its storage path (not a URL). The path is stored on the case; the
+ * photo is then only viewable by staff through /api/case-image/[id], which
+ * checks case visibility and returns a short-lived signed URL. Public upload
+ * (reporters aren't signed in); uses the service role.
  */
 export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -37,10 +40,10 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
   const { error } = await admin.storage
-    .from("case-photos")
+    .from("case-images")
     .upload(path, bytes, { contentType: file.type, upsert: false });
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  const { data } = admin.storage.from("case-photos").getPublicUrl(path);
-  return Response.json({ url: data.publicUrl });
+  // Return the storage path — the photo is private, served via a signed URL.
+  return Response.json({ path });
 }

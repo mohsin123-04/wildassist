@@ -618,14 +618,14 @@ export default function CaseList({
                     )}
                     {c.photo_url && (
                       <a
-                        href={c.photo_url}
+                        href={`/api/case-image/${c.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mb-3 block"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={c.photo_url}
+                          src={`/api/case-image/${c.id}`}
                           alt="Reported animal"
                           className="max-h-52 w-full rounded-xl object-cover"
                         />

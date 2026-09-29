@@ -159,7 +159,7 @@ export default function TriagePage() {
         fd.append("file", photoFile);
         const r = await fetch("/api/case-photo", { method: "POST", body: fd });
         const d = await r.json();
-        if (d.url) photoUrl = d.url;
+        if (d.path) photoUrl = d.path;
       } catch {
         // keep going without the photo
       }

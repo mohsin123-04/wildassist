@@ -127,9 +127,13 @@ export async function POST(req: NextRequest) {
     typeof description === "string" ? description.slice(0, 2000) : "";
   const safeTitle =
     typeof title === "string" ? title.trim().slice(0, 200) || null : null;
+  // Accept either a legacy https URL or a private-bucket storage path
+  // (e.g. "<uuid>.jpg" from /api/case-photo). Reject anything else.
   const safePhotoUrl =
-    typeof photoUrl === "string" && /^https:\/\//.test(photoUrl)
-      ? photoUrl.slice(0, 1000)
+    typeof photoUrl === "string" &&
+    (/^https:\/\//.test(photoUrl) ||
+      /^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,200}\.(png|jpe?g|webp)$/i.test(photoUrl))
+      ? photoUrl.slice(0, 300)
       : null;
 
   const supabase = createAdminClient();
