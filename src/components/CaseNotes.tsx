@@ -72,27 +72,27 @@ export default function CaseNotes({
 
   return (
     <div className="mt-4 border-t border-zinc-100 pt-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
         Notes
       </p>
 
       <div className="mt-2 flex flex-col gap-2">
         {legacyNote && (
           <div className="rounded-xl bg-zinc-50 p-2.5 text-sm text-zinc-700">
-            <p className="text-[11px] font-medium text-zinc-400">Earlier note</p>
+            <p className="text-[11px] font-medium text-zinc-500">Earlier note</p>
             <p className="mt-0.5 whitespace-pre-wrap leading-6">{legacyNote}</p>
           </div>
         )}
         {notes === null ? (
-          <p className="text-sm text-zinc-400">Loading…</p>
+          <p className="text-sm text-zinc-500">Loading…</p>
         ) : notes.length === 0 && !legacyNote ? (
-          <p className="text-sm text-zinc-400">No notes yet.</p>
+          <p className="text-sm text-zinc-500">No notes yet.</p>
         ) : (
           notes.map((n) => (
             <div key={n.id} className="rounded-xl bg-zinc-50 p-2.5 text-sm text-zinc-700">
               <p className="text-[11px] font-medium text-zinc-500">
                 {n.author_name || "A teammate"}
-                <span className="text-zinc-400"> · {when(n.created_at)}</span>
+                <span className="text-zinc-500"> · {when(n.created_at)}</span>
               </p>
               <p className="mt-0.5 whitespace-pre-wrap leading-6">{n.body}</p>
             </div>

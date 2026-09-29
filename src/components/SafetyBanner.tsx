@@ -6,7 +6,7 @@ export default function SafetyBanner({ danger }: { danger: DangerInfo }) {
   return (
     <div className="rounded-2xl border-2 border-rose-300 bg-rose-50 p-5">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="h-6 w-6 shrink-0 text-rose-600" aria-hidden />
+        <AlertTriangle className="h-6 w-6 shrink-0 text-rose-700" aria-hidden />
         <div>
           <p className="font-display text-lg font-semibold text-rose-900">
             {danger.label}

@@ -121,7 +121,7 @@ export default function ProfileForm({
         </label>
       </div>
 
-      {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-rose-700">{error}</p>}
       {saved && !dirty && (
         <p className="mt-4 text-sm text-emerald-700">Saved.</p>
       )}

@@ -68,7 +68,7 @@ export default function Home() {
         <div className="grid gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 sm:grid-cols-3">
           {STEPS.map((step) => (
             <div key={step.n} className="bg-white p-6">
-              <span className="font-mono text-xs font-medium text-emerald-600">
+              <span className="font-mono text-xs font-medium text-emerald-700">
                 {step.n}
               </span>
               <p className="mt-3 font-display text-lg font-semibold tracking-tight text-zinc-900">
@@ -92,7 +92,7 @@ export default function Home() {
       <section className="border-t border-zinc-200 bg-zinc-50">
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-5 py-14 text-center sm:flex-row sm:justify-between sm:text-left">
           <div className="max-w-xl">
-            <p className="text-xs font-medium uppercase tracking-widest text-emerald-600">
+            <p className="text-xs font-medium uppercase tracking-widest text-emerald-700">
               Get involved
             </p>
             <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
@@ -106,7 +106,7 @@ export default function Home() {
           </div>
           <Link
             href="/login?signup=volunteer"
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-emerald-600 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
+            className="inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
           >
             Become a volunteer
           </Link>

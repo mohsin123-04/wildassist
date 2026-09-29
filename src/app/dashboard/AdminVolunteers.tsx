@@ -79,7 +79,7 @@ export default function AdminVolunteers() {
             protects finders&apos; contact details and animal locations.
           </p>
           {vols.length === 0 ? (
-            <p className="text-sm text-zinc-400">No volunteers yet.</p>
+            <p className="text-sm text-zinc-500">No volunteers yet.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {vols.map((v) => {

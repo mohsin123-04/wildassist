@@ -8,7 +8,7 @@ import { flash } from "@/lib/flash";
 const TransportMap = dynamic(() => import("./TransportMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[340px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">
+    <div className="flex h-[340px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-500">
       Loading map…
     </div>
   ),
@@ -110,7 +110,7 @@ export default function TransportList({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
         Finding transport requests near you…
       </div>
     );
@@ -257,7 +257,7 @@ function JobCard({
             href={`https://www.openstreetmap.org/?mlat=${job.lat}&mlon=${job.lng}#map=15/${job.lat}/${job.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-medium text-emerald-600 underline underline-offset-2"
+            className="inline-flex items-center gap-1 font-medium text-emerald-700 underline underline-offset-2"
           >
             <MapPin className="h-3.5 w-3.5" aria-hidden /> Pickup location
           </a>
@@ -266,7 +266,7 @@ function JobCard({
         {showContact && job.reporter_phone && (
           <a
             href={`tel:${job.reporter_phone.replace(/[^0-9+]/g, "")}`}
-            className="font-medium text-emerald-600 underline underline-offset-2"
+            className="font-medium text-emerald-700 underline underline-offset-2"
           >
             Call {job.reporter_name ?? "finder"}
           </a>

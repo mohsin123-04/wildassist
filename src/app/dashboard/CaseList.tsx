@@ -29,7 +29,7 @@ function fmtDistance(km: number): string {
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">
+    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-500">
       Loading map…
     </div>
   ),
@@ -331,7 +331,7 @@ export default function CaseList({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label={isAdmin ? "All cases" : "In your area"} value={areaCases.length} />
         <Stat label="Open" value={stats.open} accent="text-emerald-700" />
-        <Stat label="Needs help" value={stats.needsHelp} accent="text-rose-600" />
+        <Stat label="Needs help" value={stats.needsHelp} accent="text-rose-700" />
         <Stat label="Unassigned" value={stats.unassigned} accent="text-amber-600" />
       </div>
 
@@ -495,7 +495,7 @@ export default function CaseList({
                         {c.animal}
                       </span>
                       {otherCentre && (
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500">
+                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
                           {otherCentre}
                         </span>
                       )}
@@ -520,7 +520,7 @@ export default function CaseList({
                     <p className="mt-1.5 text-sm text-zinc-700">
                       {c.title ?? c.situation.replace(/-/g, " ")}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-400">
+                    <p className="mt-1 text-xs text-zinc-500">
                       <LocalTime iso={c.created_at} />
                     </p>
                   </div>
@@ -617,7 +617,7 @@ export default function CaseList({
                     )}
                     {c.description && (
                       <div className="mb-3">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                           Reporter&apos;s description
                         </p>
                         <p className="mt-1 text-sm leading-6 text-zinc-700">
@@ -637,7 +637,7 @@ export default function CaseList({
                           <MapPin className="h-4 w-4" aria-hidden /> View reported location
                         </a>
                       ) : (
-                        <span className="text-sm text-zinc-400">
+                        <span className="text-sm text-zinc-500">
                           No location shared
                         </span>
                       )}
@@ -651,7 +651,7 @@ export default function CaseList({
                           {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
                         </button>
                       ) : c.centre_id === null ? (
-                        <span className="ml-auto text-sm text-zinc-400">
+                        <span className="ml-auto text-sm text-zinc-500">
                           Unassigned
                         </span>
                       ) : (
@@ -709,7 +709,7 @@ export default function CaseList({
 
                     {/* Reporter contact */}
                     <div className="mt-4 border-t border-zinc-100 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                         Reported by
                       </p>
                       {c.reporter_name || c.reporter_phone ? (
@@ -726,7 +726,7 @@ export default function CaseList({
                           )}
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-zinc-400">
+                        <p className="mt-1 text-sm text-zinc-500">
                           The finder didn&apos;t leave contact details.
                         </p>
                       )}
@@ -737,7 +737,7 @@ export default function CaseList({
                       <div className="mt-4 border-t border-zinc-100 pt-3">
                         <label
                           htmlFor={`assign-${c.id}`}
-                          className="text-xs font-semibold uppercase tracking-wide text-zinc-400"
+                          className="text-xs font-semibold uppercase tracking-wide text-zinc-500"
                         >
                           Assigned to
                         </label>

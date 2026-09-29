@@ -66,12 +66,12 @@ export default function ShareCase({ caseId }: { caseId: string }) {
       </button>
       {open && (
         <div className="absolute left-0 z-20 mt-2 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-          <p className="border-b border-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
+          <p className="border-b border-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
             Share into
           </p>
           <div className="max-h-56 overflow-y-auto py-1">
             {convs.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-zinc-400">
+              <p className="px-3 py-2 text-sm text-zinc-500">
                 {loaded ? "No conversations." : "Loading…"}
               </p>
             ) : (

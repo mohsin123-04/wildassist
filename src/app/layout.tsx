@@ -72,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               <span
                 aria-hidden
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white shadow-sm"
               >
                 <Bird className="h-4 w-4" />
               </span>
@@ -81,7 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <div className="flex items-center gap-1">
               <Link
                 href="/emergency"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-100"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-700 transition-colors hover:border-rose-300 hover:bg-rose-100"
               >
                 <Siren className="h-4 w-4" aria-hidden />
                 Emergency
@@ -112,7 +112,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Staff login
               </Link>
             </nav>
-            <p className="max-w-xl text-xs leading-5 text-zinc-400">
+            <p className="max-w-xl text-xs leading-5 text-zinc-500">
               WildAssist offers general guidance only. In an emergency, contact a
               licensed wildlife rehabilitator directly.
             </p>

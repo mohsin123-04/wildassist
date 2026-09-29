@@ -87,7 +87,7 @@ export default function DangerSection() {
                 placeholder="DELETE"
                 className="h-10 rounded-xl border border-zinc-200 px-3 outline-none focus:border-rose-400"
               />
-              {error && <p className="text-sm text-rose-600">{error}</p>}
+              {error && <p className="text-sm text-rose-700">{error}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={deleteAccount}

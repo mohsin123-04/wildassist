@@ -247,7 +247,7 @@ export default function TriagePage() {
             <span className="flex items-center gap-2 text-sm text-zinc-700">
               <AnimalIcon
                 name={animalOption.value}
-                className="h-4 w-4 text-emerald-600"
+                className="h-4 w-4 text-emerald-700"
               />
               <span className="font-medium text-zinc-900">
                 {animalOption.label}
@@ -286,7 +286,7 @@ export default function TriagePage() {
                     : "border-zinc-200"
                 }`}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                   <AnimalIcon name={a.value} className="h-5 w-5" />
                 </span>
                 <span className="font-medium text-zinc-900">{a.label}</span>
@@ -301,7 +301,7 @@ export default function TriagePage() {
             {!showPhoto ? (
               <button
                 onClick={() => setShowPhoto(true)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-700"
               >
                 <Camera className="h-4 w-4" aria-hidden />
                 Not sure? Identify it with a photo
@@ -328,7 +328,7 @@ export default function TriagePage() {
             Not a wild animal?{" "}
             <button
               onClick={() => setDomestic(true)}
-              className="font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+              className="font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-700"
             >
               It&apos;s a pet, or a dog or cat
             </button>
@@ -385,7 +385,7 @@ export default function TriagePage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
               rows={4}
-              className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 text-zinc-800 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+              className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 text-zinc-800 outline-none transition-colors placeholder:text-zinc-500 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
             />
           </label>
 
@@ -422,7 +422,7 @@ export default function TriagePage() {
                 />
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  className="text-sm font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+                  className="text-sm font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-700"
                 >
                   Retake
                 </button>
@@ -471,7 +471,7 @@ export default function TriagePage() {
                 aria-live="polite"
                 className="flex items-center gap-2 text-sm text-zinc-700"
               >
-                <MapPin className="h-4 w-4 text-emerald-600" aria-hidden />
+                <MapPin className="h-4 w-4 text-emerald-700" aria-hidden />
                 <span className="font-medium">Location captured.</span>
                 <button
                   onClick={() => {
@@ -559,7 +559,7 @@ function Section({
             <span aria-hidden>←</span> Back
           </button>
         )}
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           {eyebrow}
         </p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
@@ -719,7 +719,7 @@ function ResultView({
           <div className="mt-3 flex flex-wrap gap-2">
             <Link
               href={`/track/${trackToken}`}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
             >
               View status
             </Link>
@@ -775,7 +775,7 @@ function ResultView({
         </Link>
       </div>
 
-      <p className="text-xs leading-5 text-zinc-400">
+      <p className="text-xs leading-5 text-zinc-500">
         General guidance from an early prototype, not veterinary advice. When in
         doubt, always contact a licensed wildlife rehabilitator.
         {result.source === "rules" && " (Offline guidance mode.)"}

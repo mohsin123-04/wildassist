@@ -29,7 +29,7 @@ export default async function TransportPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           {firstName ? `Hi ${firstName}` : "Rescue volunteer"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">
@@ -61,20 +61,20 @@ export default async function TransportPage() {
           </div>
 
           <div className="mx-auto mt-6 max-w-md">
-            <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+            <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
               What happens next
             </p>
             <ol className="mt-2 flex flex-col gap-2 text-sm text-zinc-700">
               <li className="flex gap-2.5">
-                <span className="font-mono text-xs text-emerald-600">01</span>
+                <span className="font-mono text-xs text-emerald-700">01</span>
                 A centre reviews and approves your account.
               </li>
               <li className="flex gap-2.5">
-                <span className="font-mono text-xs text-emerald-600">02</span>
+                <span className="font-mono text-xs text-emerald-700">02</span>
                 You&apos;ll see injured animals near you that need a lift.
               </li>
               <li className="flex gap-2.5">
-                <span className="font-mono text-xs text-emerald-600">03</span>
+                <span className="font-mono text-xs text-emerald-700">03</span>
                 Claim a pickup, drive it to the centre, mark it delivered.
               </li>
             </ol>

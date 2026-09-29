@@ -15,7 +15,7 @@ export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
       <div className="flex items-center gap-2">
         <span
           aria-hidden
-          className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-600 text-white"
+          className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-700 text-white"
         >
           <Check className="h-4 w-4" />
         </span>
@@ -33,7 +33,7 @@ export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
         {centre.phone && (
           <a
             href={`tel:${centre.phone.replace(/[^0-9+]/g, "")}`}
-            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-6 font-medium text-white shadow-sm transition-colors hover:bg-emerald-800"
           >
             <Phone className="h-4 w-4" aria-hidden /> Call {centre.phone}
           </a>

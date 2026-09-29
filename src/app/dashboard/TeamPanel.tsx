@@ -78,7 +78,7 @@ export default function TeamPanel() {
               ? "Everyone at your centre. Promote a colleague to co-manager, or remove someone who has left."
               : `Everyone at your centre. ${managers} manager${managers === 1 ? "" : "s"} can manage the team and join code.`}
           </p>
-          {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
+          {error && <p className="mt-2 text-sm text-rose-700">{error}</p>}
 
           <ul className="mt-3 flex flex-col gap-2">
             {members.map((m) => {
@@ -93,7 +93,7 @@ export default function TeamPanel() {
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                       isManager
-                        ? "bg-emerald-600 text-white"
+                        ? "bg-emerald-700 text-white"
                         : "bg-zinc-200 text-zinc-600"
                     }`}
                   >
@@ -177,7 +177,7 @@ function ActionBtn({
       disabled={disabled}
       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
         danger
-          ? "border-rose-200 text-rose-600 hover:bg-rose-50"
+          ? "border-rose-200 text-rose-700 hover:bg-rose-50"
           : "border-zinc-200 text-zinc-700 hover:bg-zinc-50"
       }`}
     >

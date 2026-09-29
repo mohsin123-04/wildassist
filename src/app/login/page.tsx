@@ -118,7 +118,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700 text-white"
           >
             <Bird className="h-5 w-5" />
           </span>
@@ -134,7 +134,7 @@ export default function LoginPage() {
           . Found an animal?{" "}
           <Link
             href="/triage"
-            className="font-medium text-emerald-600 underline underline-offset-2 hover:text-emerald-700"
+            className="font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-700"
           >
             You don&apos;t need an account, just report it.
           </Link>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   >
                     <span
                       aria-hidden
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700"
                     >
                       <r.Icon className="h-5 w-5" />
                     </span>
@@ -254,11 +254,11 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <p role="alert" className="text-sm text-rose-600">
+            <p role="alert" className="text-sm text-rose-700">
               {error}
             </p>
           )}
-          {notice && <p className="text-sm text-emerald-600">{notice}</p>}
+          {notice && <p className="text-sm text-emerald-700">{notice}</p>}
 
           <button
             type="submit"
@@ -281,7 +281,7 @@ export default function LoginPage() {
             setError(null);
             setNotice(null);
           }}
-          className="mt-4 text-sm text-emerald-600 underline underline-offset-4 hover:text-emerald-900"
+          className="mt-4 text-sm text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
         >
           {mode === "signin"
             ? "New here? Create an account"

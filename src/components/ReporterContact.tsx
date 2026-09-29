@@ -78,7 +78,7 @@ export default function ReporterContact({
       <button
         onClick={share}
         disabled={saving || (!name.trim() && !phone.trim())}
-        className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+        className="mt-3 inline-flex h-10 items-center justify-center rounded-xl bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-50"
       >
         {saving ? <Spinner label="Sharing…" /> : "Share my contact"}
       </button>

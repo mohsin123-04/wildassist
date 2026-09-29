@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700 text-white"
           >
             <Bird className="h-5 w-5" />
           </span>
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               href="/login"
-              className="mt-6 inline-flex text-sm font-medium text-emerald-600 underline underline-offset-4 hover:text-emerald-700"
+              className="mt-6 inline-flex text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-700"
             >
               Back to sign in
             </Link>
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
               {error && (
-                <p role="alert" className="text-sm text-rose-600">
+                <p role="alert" className="text-sm text-rose-700">
                   {error}
                 </p>
               )}
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
 
             <Link
               href="/login"
-              className="mt-4 inline-flex text-sm text-emerald-600 underline underline-offset-4 hover:text-emerald-900"
+              className="mt-4 inline-flex text-sm text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
             >
               Back to sign in
             </Link>

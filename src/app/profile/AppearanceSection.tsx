@@ -120,8 +120,8 @@ export default function AppearanceSection({
         </div>
       </div>
 
-      {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
-      <p className="mt-3 text-xs text-zinc-400">
+      {error && <p className="mt-4 text-sm text-rose-700">{error}</p>}
+      <p className="mt-3 text-xs text-zinc-500">
         PNG, JPG, or WebP, up to 2 MB.
       </p>
     </section>

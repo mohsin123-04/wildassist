@@ -182,7 +182,7 @@ export default function AdminCentres() {
                 onChange={(e) => setManagerEmail(e.target.value)}
               />
 
-              {error && <p className="text-sm text-rose-600">{error}</p>}
+              {error && <p className="text-sm text-rose-700">{error}</p>}
               {created && (
                 <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
                   Created <span className="font-semibold">{created.name}</span>.
@@ -223,7 +223,7 @@ export default function AdminCentres() {
                     <span className="font-medium text-zinc-900">{c.name}</span>
                     <span className="text-zinc-500"> · {c.town}</span>
                     {c.manager_email && (
-                      <span className="text-zinc-400"> · mgr {c.manager_email}</span>
+                      <span className="text-zinc-500"> · mgr {c.manager_email}</span>
                     )}
                   </span>
                   {c.code && (

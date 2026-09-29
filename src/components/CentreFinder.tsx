@@ -104,7 +104,7 @@ export default function CentreFinder({
           </p>
           <button
             onClick={findNearest}
-            className="mt-4 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
+            className="mt-4 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-6 font-medium text-white shadow-sm transition-all hover:bg-emerald-800 active:scale-[0.98]"
           >
             <MapPin className="h-4 w-4" aria-hidden /> Find nearest help
           </button>
@@ -170,7 +170,7 @@ export default function CentreFinder({
         </ul>
       )}
 
-      <p className="mt-4 text-xs leading-5 text-zinc-400">
+      <p className="mt-4 text-xs leading-5 text-zinc-500">
         Distances are approximate (straight-line) and this list may be
         incomplete. Always call ahead before transporting an animal.
       </p>

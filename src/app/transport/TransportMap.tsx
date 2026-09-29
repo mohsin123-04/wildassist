@@ -87,7 +87,7 @@ export default function TransportMap({
                     href={`https://www.openstreetmap.org/?mlat=${j.lat}&mlon=${j.lng}#map=15/${j.lat}/${j.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-emerald-600 underline underline-offset-2"
+                    className="text-emerald-700 underline underline-offset-2"
                   >
                     Open in maps
                   </a>

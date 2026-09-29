@@ -26,7 +26,7 @@ export default function EmergencyPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-5 py-10">
       <div>
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           Quick reference
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-zinc-900">
@@ -37,7 +37,7 @@ export default function EmergencyPage() {
           dealing with?{" "}
           <Link
             href="/triage"
-            className="font-medium text-emerald-600 underline underline-offset-4 hover:text-emerald-700"
+            className="font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-700"
           >
             Answer a few questions
           </Link>
@@ -65,7 +65,7 @@ export default function EmergencyPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
           <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-emerald-700">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-white">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-700 text-white">
               <Check className="h-3 w-3" />
             </span>
             Do
@@ -116,7 +116,7 @@ export default function EmergencyPage() {
         </Link>
       </div>
 
-      <p className="text-xs leading-5 text-zinc-400">
+      <p className="text-xs leading-5 text-zinc-500">
         General guidance only, not veterinary advice. Contact details and advice
         should be confirmed with a licensed wildlife rehabilitator.
       </p>

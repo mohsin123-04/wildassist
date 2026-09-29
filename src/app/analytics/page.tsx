@@ -341,7 +341,7 @@ export default async function AnalyticsPage({
       </Link>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
             {isAdmin ? "Nationwide" : "Your area"}
           </p>
           <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">
@@ -373,7 +373,7 @@ export default async function AnalyticsPage({
       {/* Active drill-down filters */}
       {(animalFilter || statusFilter) && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-zinc-400">Filtered by</span>
+          <span className="text-xs font-medium text-zinc-500">Filtered by</span>
           {animalFilter && (
             <Link
               href={hrefWith({ animal: null })}
@@ -419,7 +419,7 @@ export default async function AnalyticsPage({
               value={`${Math.round((closed / cases.length) * 100)}%`}
               accent="text-emerald-700"
             />
-            <Stat label="Open, needs help (now)" value={needsHelpOpen} accent="text-rose-600" />
+            <Stat label="Open, needs help (now)" value={needsHelpOpen} accent="text-rose-700" />
             <Stat label="Pickup rate" value={`${respondedPct}%`} />
           </div>
 
@@ -450,7 +450,7 @@ export default async function AnalyticsPage({
                   big
                   value={oldestOpen !== null ? formatDuration(oldestOpen) : "—"}
                   label="oldest waiting"
-                  accent={oldestOpen !== null && oldestOpen > 3 * DAY ? "text-rose-600" : "text-zinc-900"}
+                  accent={oldestOpen !== null && oldestOpen > 3 * DAY ? "text-rose-700" : "text-zinc-900"}
                 />
                 <Metric
                   big
@@ -495,7 +495,7 @@ export default async function AnalyticsPage({
               Response time
             </h2>
             {medianResponse === null ? (
-              <p className="mt-2 text-sm text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-500">
                 Not enough data yet. This shows the typical time from a report to
                 its first pickup once cases start moving.
               </p>
@@ -598,7 +598,7 @@ function Stat({
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
       {sub && (
-        <p className={`mt-1 text-xs ${subUp ? "text-emerald-600" : "text-rose-600"}`}>
+        <p className={`mt-1 text-xs ${subUp ? "text-emerald-700" : "text-rose-700"}`}>
           {sub}
         </p>
       )}
@@ -710,12 +710,12 @@ function TimeChart({
       </div>
       <div className="mt-1 flex gap-1">
         {bars.map((b, i) => (
-          <span key={i} className="flex-1 text-center text-[10px] text-zinc-400">
+          <span key={i} className="flex-1 text-center text-[10px] text-zinc-500">
             {b.label}
           </span>
         ))}
       </div>
-      {caption && <p className="mt-1 text-xs text-zinc-400">{caption}</p>}
+      {caption && <p className="mt-1 text-xs text-zinc-500">{caption}</p>}
     </section>
   );
 }

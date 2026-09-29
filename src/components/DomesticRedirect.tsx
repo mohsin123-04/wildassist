@@ -9,7 +9,7 @@ export default function DomesticRedirect({ onBack }: { onBack: () => void }) {
   return (
     <div className="animate-in flex flex-col gap-5">
       <div>
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           Not a wild animal
         </p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">

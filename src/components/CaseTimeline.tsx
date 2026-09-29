@@ -69,11 +69,11 @@ export default function CaseTimeline({
 
   return (
     <div className="mt-4 border-t border-zinc-100 pt-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
         History
       </p>
       {events === null ? (
-        <p className="mt-2 text-sm text-zinc-400">Loading…</p>
+        <p className="mt-2 text-sm text-zinc-500">Loading…</p>
       ) : (
         <ol className="mt-2 flex flex-col gap-3">
           {points.map((p, i) => (
@@ -90,7 +90,7 @@ export default function CaseTimeline({
               </div>
               <div className="pb-0.5 text-sm">
                 <span className="font-medium text-zinc-800">{p.label}</span>
-                <span className="text-zinc-400"> · {when(p.at)}</span>
+                <span className="text-zinc-500"> · {when(p.at)}</span>
                 {p.actor && (
                   <span className="block text-xs text-zinc-500">
                     by {p.actor}

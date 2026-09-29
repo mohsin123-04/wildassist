@@ -85,7 +85,7 @@ export default function SecuritySection({ email }: { email: string }) {
           onChange={(e) => setConfirm(e.target.value)}
         />
         {pwMsg && (
-          <p className={`text-sm ${pwMsg.ok ? "text-emerald-700" : "text-rose-600"}`}>
+          <p className={`text-sm ${pwMsg.ok ? "text-emerald-700" : "text-rose-700"}`}>
             {pwMsg.text}
           </p>
         )}
@@ -112,7 +112,7 @@ export default function SecuritySection({ email }: { email: string }) {
           onChange={(e) => setNewEmail(e.target.value)}
         />
         {emailMsg && (
-          <p className={`text-sm ${emailMsg.ok ? "text-emerald-700" : "text-rose-600"}`}>
+          <p className={`text-sm ${emailMsg.ok ? "text-emerald-700" : "text-rose-700"}`}>
             {emailMsg.text}
           </p>
         )}

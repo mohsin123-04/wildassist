@@ -124,7 +124,7 @@ export default async function TrackPage({
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-lg flex-1 flex-col px-5 py-8">
-      <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+      <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
         Report status
       </p>
       <h1 className="mt-2 font-display text-2xl font-semibold capitalize tracking-tight text-zinc-900">
@@ -165,14 +165,14 @@ export default async function TrackPage({
               </div>
               <div className="pb-0.5 text-sm">
                 <span className="font-medium text-zinc-800">{p.label}</span>
-                <span className="text-zinc-400"> · {when(p.at)}</span>
+                <span className="text-zinc-500"> · {when(p.at)}</span>
               </div>
             </li>
           ))}
         </ol>
       </div>
 
-      <p className="mt-6 text-xs leading-5 text-zinc-400">
+      <p className="mt-6 text-xs leading-5 text-zinc-500">
         This page updates as the animal is helped. Bookmark it to check back. For
         an urgent, life-threatening situation, call a wildlife rehabilitator or
         vet directly rather than waiting.

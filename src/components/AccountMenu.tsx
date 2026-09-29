@@ -250,7 +250,7 @@ export default function AccountMenu() {
           </Link>
           <button
             onClick={signOut}
-            className="block w-full px-4 py-2.5 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50"
+            className="block w-full px-4 py-2.5 text-left text-sm text-rose-700 transition-colors hover:bg-rose-50"
           >
             Sign out
           </button>

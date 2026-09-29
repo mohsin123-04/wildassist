@@ -54,7 +54,7 @@ export default async function MessagesPage() {
         <ArrowLeft className="h-4 w-4" aria-hidden /> Dashboard
       </Link>
       <div className="mb-5">
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
           {centre?.name ?? "Your centre"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">

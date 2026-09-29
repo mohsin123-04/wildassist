@@ -75,7 +75,7 @@ export default function CentreOnboarding({
         </label>
       </div>
 
-      {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+      {error && <p className="mt-3 text-sm text-rose-700">{error}</p>}
 
       <button
         onClick={join}
