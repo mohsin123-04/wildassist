@@ -390,7 +390,7 @@ export default function MessagesClient({
   const active = conversations.find((c) => c.id === selected);
 
   return (
-    <div className="flex h-[32rem] overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+    <div className="flex h-[75vh] min-h-[28rem] overflow-hidden rounded-2xl border border-zinc-200 bg-white sm:h-[32rem] sm:min-h-0">
       {/* Sidebar */}
       <aside
         className={`w-full flex-col border-r border-zinc-200 sm:flex sm:w-64 ${
