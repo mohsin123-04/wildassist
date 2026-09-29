@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Bird, Siren } from "lucide-react";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
 import Toast from "@/components/Toast";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,6 +51,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -87,6 +94,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <div className="flex flex-1 flex-col">{children}</div>
         <Toast />
+        <ServiceWorkerRegister />
 
         <footer className="border-t border-zinc-200 px-5 py-8">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-4 text-center">
