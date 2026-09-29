@@ -9,6 +9,7 @@ import { haversineKm } from "@/lib/centres";
 import ShareCase from "@/components/ShareCase";
 import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
+import LocalTime from "@/components/LocalTime";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -444,8 +445,8 @@ export default function CaseList({
       {totalCount != null && cases.length < totalCount && (
         <p className="mb-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
           Showing the {cases.length} most recent cases of{" "}
-          {totalCount.toLocaleString()}. Use the date filters above to find older
-          ones.
+          {totalCount.toLocaleString("en-US")}. Use the date filters above to
+          find older ones.
         </p>
       )}
 
@@ -520,7 +521,7 @@ export default function CaseList({
                       {c.title ?? c.situation.replace(/-/g, " ")}
                     </p>
                     <p className="mt-1 text-xs text-zinc-400">
-                      {new Date(c.created_at).toLocaleString()}
+                      <LocalTime iso={c.created_at} />
                     </p>
                   </div>
                   <span
