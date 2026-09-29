@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import MessagesClient from "./MessagesClient";
 
@@ -46,6 +47,12 @@ export default async function MessagesPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
+      <Link
+        href="/dashboard"
+        className="mb-4 inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden /> Dashboard
+      </Link>
       <div className="mb-5">
         <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
           {centre?.name ?? "Your centre"}

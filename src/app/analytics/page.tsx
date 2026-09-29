@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { X } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { SITUATIONS } from "@/lib/triage";
 import AnalyticsActions from "@/components/AnalyticsActions";
@@ -307,6 +307,12 @@ export default async function AnalyticsPage({
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
+      <Link
+        href="/dashboard"
+        className="no-print mb-4 inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden /> Dashboard
+      </Link>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
@@ -318,12 +324,6 @@ export default async function AnalyticsPage({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <AnalyticsActions rows={csvRows} filename={`wildassist-analytics-${range.key}.csv`} />
-          <Link
-            href="/dashboard"
-            className="no-print rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-          >
-            Dashboard
-          </Link>
         </div>
       </div>
 

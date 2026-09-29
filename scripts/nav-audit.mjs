@@ -42,7 +42,7 @@ async function run(label, viewport) {
     const a = [...document.querySelectorAll("footer a")].find(
       (x) => x.textContent.trim() === "Report an animal"
     );
-    a && a.click();
+    if (a) a.click();
   });
   await page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {});
   console.log(`footer "Report an animal" → triage: ${new URL(page.url()).pathname === "/triage" ? "✅" : "❌ " + page.url()}`);

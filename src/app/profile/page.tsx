@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import Avatar from "@/components/Avatar";
 import ProfileForm from "./ProfileForm";
@@ -30,8 +32,19 @@ export default async function ProfilePage() {
   const centreName =
     centres?.find((c) => c.id === profile?.centre_id)?.name ?? null;
 
+  const isVolunteer = profile?.role === "volunteer";
+  const backHref = isVolunteer ? "/transport" : "/dashboard";
+  const backLabel = isVolunteer ? "Transport" : "Dashboard";
+
   return (
     <main className="animate-in mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-5 py-8">
+      <Link
+        href={backHref}
+        className="-mb-1 inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden /> {backLabel}
+      </Link>
+
       {/* Identity header */}
       <div className="flex items-center gap-4">
         <Avatar
