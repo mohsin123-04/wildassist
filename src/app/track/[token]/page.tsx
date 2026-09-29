@@ -177,6 +177,21 @@ export default async function TrackPage({
         an urgent, life-threatening situation, call a wildlife rehabilitator or
         vet directly rather than waiting.
       </p>
+
+      <div className="mt-8 flex flex-wrap gap-2.5">
+        <Link
+          href="/triage"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+        >
+          Report another animal
+        </Link>
+        <Link
+          href="/emergency"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+        >
+          Emergency basics
+        </Link>
+      </div>
     </main>
   );
 }

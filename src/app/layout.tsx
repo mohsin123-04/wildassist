@@ -88,9 +88,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="flex flex-1 flex-col">{children}</div>
         <Toast />
 
-        <footer className="border-t border-zinc-200 px-5 py-6 text-center text-xs leading-5 text-zinc-400">
-          WildAssist offers general guidance only. In an emergency, contact a
-          licensed wildlife rehabilitator directly.
+        <footer className="border-t border-zinc-200 px-5 py-8">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-4 text-center">
+            <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+              <Link href="/" className="text-zinc-500 transition-colors hover:text-zinc-900">
+                Home
+              </Link>
+              <Link href="/triage" className="text-zinc-500 transition-colors hover:text-zinc-900">
+                Report an animal
+              </Link>
+              <Link href="/emergency" className="text-zinc-500 transition-colors hover:text-zinc-900">
+                Emergency
+              </Link>
+              <Link href="/login" className="text-zinc-500 transition-colors hover:text-zinc-900">
+                Staff login
+              </Link>
+            </nav>
+            <p className="max-w-xl text-xs leading-5 text-zinc-400">
+              WildAssist offers general guidance only. In an emergency, contact a
+              licensed wildlife rehabilitator directly.
+            </p>
+          </div>
         </footer>
       </body>
     </html>
