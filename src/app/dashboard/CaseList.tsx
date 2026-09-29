@@ -169,6 +169,7 @@ export default function CaseList({
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "board" | "map">("list");
+  const [showFilters, setShowFilters] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -441,6 +442,26 @@ export default function CaseList({
           <option value="urgent">Most urgent</option>
         </select>
         <button
+          onClick={() => setShowFilters((v) => !v)}
+          aria-expanded={showFilters}
+          className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
+            showFilters || dateFrom || dateTo || mineOnly
+              ? "border-zinc-300 bg-zinc-50 text-zinc-800"
+              : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+          }`}
+        >
+          Filters
+          {(dateFrom || dateTo || mineOnly) && (
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+          )}
+          <span
+            aria-hidden
+            className={`text-xs text-zinc-400 transition-transform ${showFilters ? "rotate-180" : ""}`}
+          >
+            ▾
+          </span>
+        </button>
+        <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
           className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
@@ -464,7 +485,8 @@ export default function CaseList({
         </div>
       </div>
 
-      {/* Date range + assignment filter */}
+      {/* Date range + assignment filter — collapsed by default to reduce clutter */}
+      {showFilters && (
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <label className="flex items-center gap-1.5 text-zinc-500">
           From
@@ -501,13 +523,21 @@ export default function CaseList({
           Assigned to me
         </Chip>
       </div>
+      )}
 
-      {/* Status filters */}
+      {/* Status filters. Hide "Closed" when the scope already excludes it, so a
+          contradictory (always-empty) combination can't be selected. */}
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
         <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
           All
         </Chip>
-        {STATUSES.map((s) => (
+        {STATUSES.filter(
+          (s) =>
+            !(
+              s.value === "closed" &&
+              (scope === "open" || scope === "needs-help")
+            )
+        ).map((s) => (
           <Chip
             key={s.value}
             active={statusFilter === s.value}
