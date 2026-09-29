@@ -17,10 +17,37 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Found an injured or orphaned wild animal in the US or Canada? WildAssist helps you figure out what to do and connects you to the nearest help, from wildlife rehabilitation centres to vets and hotlines.";
+
 export const metadata: Metadata = {
-  title: "WildAssist | Found an injured animal?",
-  description:
-    "Found an injured or orphaned wild animal in the US or Canada? WildAssist helps you figure out what to do and connects you to the nearest help, from wildlife rehabilitation centres to vets and hotlines.",
+  metadataBase: new URL("https://wildassist.vercel.app"),
+  title: {
+    default: "WildAssist — Found an injured animal?",
+    template: "%s · WildAssist",
+  },
+  description: DESCRIPTION,
+  applicationName: "WildAssist",
+  keywords: [
+    "injured wildlife",
+    "wildlife rehabilitation",
+    "found a baby bird",
+    "wildlife rescue",
+    "animal rescue near me",
+    "wildlife rehabilitator",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "WildAssist",
+    url: "https://wildassist.vercel.app",
+    title: "WildAssist — Found an injured animal?",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WildAssist — Found an injured animal?",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
