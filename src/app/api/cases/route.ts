@@ -121,6 +121,17 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid case data" }, { status: 400 });
   }
 
+  // Coerce and cap free-text/URL fields — this endpoint is public, so never
+  // trust the client to send well-typed or bounded values.
+  const safeDescription =
+    typeof description === "string" ? description.slice(0, 2000) : "";
+  const safeTitle =
+    typeof title === "string" ? title.trim().slice(0, 200) || null : null;
+  const safePhotoUrl =
+    typeof photoUrl === "string" && /^https:\/\//.test(photoUrl)
+      ? photoUrl.slice(0, 1000)
+      : null;
+
   const supabase = createAdminClient();
 
   // Auto-route a report to the nearest organization when we have coordinates.
@@ -197,19 +208,25 @@ export async function POST(req: NextRequest) {
             .map((c) => ({ c, d: haversineKm(lat, lng, c.lat!, c.lng!) }))
             .reduce((a, b) => (b.d < a.d ? b : a)).c;
           const closerExists = nearestOverall.id !== top.id;
-          const nearestTakesCat =
-            !category ||
-            category === "unsure" ||
-            (nearestOverall.takes as string[]).includes(category);
+          const catKnown = !!category && category !== "unsure";
+          const takesCat = (c: { takes?: string[] | null }) =>
+            !catKnown || (c.takes ?? []).includes(category as string);
+          const nearestTakesCat = takesCat(nearestOverall);
+          // Whether the CHOSEN facility actually lists this category. If no
+          // nearby facility does, rankCentres ranks them all equally and top is
+          // just the closest — so we must not claim it "can take" the animal.
+          const topTakesCat = takesCat(top as { takes?: string[] | null });
           const nearestRV = (nearestOverall as { rabies_vector?: boolean | null })
             .rabies_vector;
 
           if (closerExists && isRabiesVector && nearestRV === false) {
             routingNote = `A closer facility can't take rabies-vector animals like this one, so this went to ${top.name}, the nearest one that can.`;
-          } else if (closerExists && !nearestTakesCat) {
+          } else if (closerExists && !nearestTakesCat && topTakesCat) {
             routingNote = `The closest wildlife facility doesn't take ${catP}, so this went to ${top.name}, the nearest one that does.`;
-          } else {
+          } else if (topTakesCat) {
             routingNote = `${top.name} is the nearest wildlife facility that can take ${catP}.`;
+          } else {
+            routingNote = `No nearby facility lists ${catP}, so this went to ${top.name}, the closest wildlife facility — please call ahead to confirm they can help.`;
           }
 
           // If we're not certain the chosen facility can take this rabies-vector
@@ -252,13 +269,13 @@ export async function POST(req: NextRequest) {
     .insert({
       animal: animal!.trim(),
       situation,
-      description,
+      description: safeDescription,
       verdict,
-      title,
+      title: safeTitle,
       lat: typeof lat === "number" ? lat : null,
       lng: typeof lng === "number" ? lng : null,
       centre_id: assignedCentre?.id ?? null,
-      photo_url: typeof photoUrl === "string" ? photoUrl : null,
+      photo_url: safePhotoUrl,
       duplicate_of: duplicateOf,
       track_token: trackToken,
     })
@@ -274,7 +291,7 @@ export async function POST(req: NextRequest) {
     await notifyCentreStaff(
       supabase,
       { id: assignedCentre.id, name: assignedCentre.name },
-      { animal: animal!.trim(), title: title ?? null, verdict: verdict! },
+      { animal: animal!.trim(), title: safeTitle, verdict: verdict! },
       req.nextUrl.origin
     );
   }

@@ -17,8 +17,12 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/";
-  // Only allow same-site relative redirects (avoid open-redirect abuse).
-  const safeNext = next.startsWith("/") ? next : "/";
+  // Only allow same-site relative paths. Reject protocol-relative ("//host")
+  // and backslash tricks ("/\\host") that new URL() would resolve off-site.
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")
+      ? next
+      : "/";
 
   if (token_hash && type) {
     const supabase = await createClient();

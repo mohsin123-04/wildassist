@@ -10,11 +10,19 @@ import { haversineKm } from "./centres";
 export const DUP_RADIUS_KM = 2;
 export const DUP_WINDOW_HOURS = 24;
 
-// Words that describe the same animal's state/age, not its kind. Stripped before
-// comparing so "baby raccoon" and "injured raccoon" match "raccoon".
+// Words that describe an animal's state/age/size/colour/region — NOT its kind.
+// Stripped before comparing so "baby raccoon" matches "raccoon", and so a shared
+// descriptor can't falsely link different species ("grey squirrel" vs "grey fox",
+// "canada goose" vs "canada lynx", "great blue heron" vs "great horned owl").
 const QUALIFIERS = new Set([
+  // age / state
   "baby", "babies", "juvenile", "young", "adult", "adolescent", "orphaned",
-  "injured", "hurt", "sick", "dead", "a", "an", "the", "small", "large",
+  "injured", "hurt", "sick", "dead", "a", "an", "the",
+  // size / colour / region descriptors shared across many species
+  "small", "large", "little", "big", "grey", "gray", "brown", "black", "white",
+  "red", "tan", "golden", "blue", "green", "common", "great", "greater",
+  "lesser", "northern", "southern", "eastern", "western", "american", "canada",
+  "canadian", "european",
 ]);
 
 /** Lowercase, strip punctuation and qualifier words, collapse whitespace. */

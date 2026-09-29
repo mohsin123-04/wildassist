@@ -1,4 +1,5 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 
 /**
  * POST /api/register  { userId, role, phone?, city?, province?, country? }
@@ -6,11 +7,16 @@ import { createAdminClient } from "@/lib/supabase/server";
  * location details. Only allowed to set 'staff' or 'volunteer' (never 'admin'),
  * and only on a fresh default profile (role still 'staff' and no centre linked),
  * so it can't be used to flip established accounts.
+ *
+ * Called during signup, sometimes before the email is confirmed (no session
+ * yet), so it can't hard-require auth. Defenses: rate limiting, and — when the
+ * caller IS authenticated — they may only register their own account.
  */
 export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return Response.json({ ok: false, reason: "no-db" });
   }
+  if (!(await rateLimit(`register:${clientIp(req)}`, 10, 300))) return tooMany();
 
   let body: {
     userId?: string;
@@ -29,6 +35,15 @@ export async function POST(req: Request) {
   const { userId, role } = body;
   if (!userId || (role !== "staff" && role !== "volunteer")) {
     return Response.json({ error: "Invalid role" }, { status: 400 });
+  }
+
+  // If the caller has a session, they may only register their own account.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user && user.id !== userId) {
+    return Response.json({ error: "Not allowed" }, { status: 403 });
   }
 
   const update: Record<string, unknown> = { role };

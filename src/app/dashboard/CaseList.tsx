@@ -77,7 +77,6 @@ type Tab = "area" | "unassigned";
 
 export default function CaseList({
   initialCases,
-  totalCount,
   myCentreId,
   myId,
   myName,
@@ -86,7 +85,6 @@ export default function CaseList({
   isAdmin = false,
 }: {
   initialCases: CaseRow[];
-  totalCount?: number;
   myCentreId: string;
   myId: string;
   myName: string;
@@ -285,6 +283,7 @@ export default function CaseList({
   // details onto the original as a note (so nothing is lost), then close the dup.
   async function mergeAndClose(c: CaseRow, orig: CaseRow) {
     if (savingId === c.id) return;
+    setSavingId(c.id); // claim the lock immediately so a double-click can't double-insert
     const parts = [
       `Merged from a duplicate report made ${timeAgo(c.created_at)} (${new Date(
         c.created_at
@@ -303,10 +302,11 @@ export default function CaseList({
       .from("case_notes")
       .insert({ case_id: orig.id, author_id: myId, author_name: myName, body });
     if (error) {
+      setSavingId(null);
       flash("Couldn't save the merge note — case not closed.");
       return;
     }
-    await updateStatus(c.id, "closed");
+    await updateStatus(c.id, "closed"); // manages savingId itself
     flash("Merged into the original and closed.");
   }
 
@@ -441,14 +441,6 @@ export default function CaseList({
           </Chip>
         ))}
       </div>
-
-      {totalCount != null && cases.length < totalCount && (
-        <p className="mb-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
-          Showing the {cases.length} most recent cases of{" "}
-          {totalCount.toLocaleString("en-US")}. Use the date filters above to
-          find older ones.
-        </p>
-      )}
 
       {/* List or map */}
       {view === "map" ? (

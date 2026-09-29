@@ -1,11 +1,24 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
+vi.mock("@/lib/ratelimit", () => ({
+  rateLimit: vi.fn(async () => true),
+  clientIp: () => "test-ip",
+  tooMany: () => Response.json({ error: "Too many requests" }, { status: 429 }),
+}));
+
+// createClient (session-aware) defaults to no session — the common pre-email-
+// confirmation signup path, where the ownership check is skipped.
+const { getUser } = vi.hoisted(() => ({
+  getUser: vi.fn(async () => ({ data: { user: null } })),
+}));
 vi.mock("@/lib/supabase/server", () => ({
   createAdminClient: vi.fn(),
+  createClient: vi.fn(async () => ({ auth: { getUser } })),
 }));
 
 import { POST } from "./route";
 import { createAdminClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/ratelimit";
 
 // Build a chainable Supabase mock for:
 //   admin.from("profiles").update(...).eq(...).eq(...).is(...)
@@ -100,5 +113,18 @@ describe("POST /api/register", () => {
     mockAdmin({ error: { message: "db down" } });
     const res = await post({ userId: "u5", role: "staff" });
     expect(res.status).toBe(500);
+  });
+
+  it("returns 429 when rate limited", async () => {
+    mockAdmin();
+    vi.mocked(rateLimit).mockResolvedValueOnce(false);
+    expect((await post({ userId: "u1", role: "staff" })).status).toBe(429);
+  });
+
+  it("rejects registering someone else's account when authenticated", async () => {
+    mockAdmin();
+    getUser.mockResolvedValueOnce({ data: { user: { id: "someone-else" } } });
+    const res = await post({ userId: "u1", role: "staff" });
+    expect(res.status).toBe(403);
   });
 });

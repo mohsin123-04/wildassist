@@ -332,12 +332,15 @@ export default function MessagesClient({
 
   async function deleteMessage(id: string) {
     const deleted_at = new Date().toISOString();
+    // Redact the content, not just flag it — otherwise the original body is
+    // still readable via the raw table (RLS returns soft-deleted rows).
+    const redaction = { deleted_at, body: "", image_url: null, case_ref: null };
     setMessages((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, deleted_at } : x))
+      prev.map((x) => (x.id === id ? { ...x, ...redaction } : x))
     );
     await supabase
       .from("messages")
-      .update({ deleted_at })
+      .update(redaction)
       .eq("id", id)
       .eq("sender_id", myId);
   }

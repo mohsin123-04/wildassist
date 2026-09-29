@@ -47,22 +47,20 @@ export default async function DashboardPage() {
 
   // These two are independent (cases are filtered by RLS, not a centre id),
   // so fetch them concurrently to cut the dashboard's load time.
-  // Load the most recent cases (bounded) and the total count in one query, so a
-  // busy centre doesn't pull thousands of rows into the browser. The count lets
-  // the list tell staff when older cases are hidden.
-  const CASE_LIMIT = 300;
-  const [{ data: allCentres }, { data: cases, count: totalCases }] =
-    await Promise.all([
-      supabase.from("centres").select("id, name, town, lat, lng"),
-      supabase
-        .from("cases")
-        .select(
-          "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of, assigned_to",
-          { count: "exact" }
-        )
-        .order("created_at", { ascending: false })
-        .limit(CASE_LIMIT),
-    ]);
+  // Load the full visible case set so the dashboard's client-side search,
+  // filters, CSV export, and "view original" all operate on complete data.
+  // (A row cap here would silently break those; proper server-side pagination
+  // is the future fix once real volume warrants it. Analytics is separately
+  // bounded since it aggregates far more rows.)
+  const [{ data: allCentres }, { data: cases }] = await Promise.all([
+    supabase.from("centres").select("id, name, town, lat, lng"),
+    supabase
+      .from("cases")
+      .select(
+        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of, assigned_to"
+      )
+      .order("created_at", { ascending: false }),
+  ]);
   const centreNames = Object.fromEntries(
     (allCentres ?? []).map((c) => [c.id, c.name])
   );
@@ -123,7 +121,6 @@ export default async function DashboardPage() {
       {!isAdmin && <TeamPanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
-        totalCount={totalCases ?? (cases?.length ?? 0)}
         myCentreId={profile.centre_id ?? ""}
         myId={user.id}
         myName={profile.full_name ?? "A teammate"}

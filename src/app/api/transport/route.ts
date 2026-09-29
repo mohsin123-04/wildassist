@@ -68,9 +68,15 @@ export async function POST(req: Request) {
       .select("lat, lng")
       .eq("id", caseId)
       .single();
+    // A case with no coordinates can't be area-checked, so it must not be
+    // claimable by id (that would expose the finder's contact from anywhere).
+    if (!target || target.lat == null || target.lng == null) {
+      return Response.json(
+        { error: "That pickup can't be claimed (no location on file)." },
+        { status: 403 }
+      );
+    }
     if (
-      target?.lat != null &&
-      target?.lng != null &&
       haversineKm(body.lat, body.lng, target.lat, target.lng) > CLAIM_RADIUS_KM
     ) {
       return Response.json(
@@ -93,7 +99,8 @@ export async function POST(req: Request) {
       .from("cases")
       .update({ status: "at_centre" })
       .eq("id", caseId)
-      .eq("driver_id", user.id);
+      .eq("driver_id", user.id)
+      .eq("status", "in_transit");
   } else if (action === "release") {
     query = admin
       .from("cases")
@@ -104,7 +111,20 @@ export async function POST(req: Request) {
     return Response.json({ error: "Unknown action" }, { status: 400 });
   }
 
-  const { error } = await query;
+  const { data: affected, error } = await query.select("id");
   if (error) return Response.json({ error: error.message }, { status: 500 });
+  // The atomic guards (.is('driver_id', null) / .eq('status', ...)) mean a lost
+  // race matches 0 rows — tell the loser instead of a false success.
+  if (!affected || affected.length === 0) {
+    return Response.json(
+      {
+        error:
+          action === "claim"
+            ? "That pickup was just claimed by someone else."
+            : "That pickup could not be updated (it may have changed).",
+      },
+      { status: 409 }
+    );
+  }
   return Response.json({ ok: true });
 }

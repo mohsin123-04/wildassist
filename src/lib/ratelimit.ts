@@ -1,7 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/server";
 
-/** Best-effort client IP from the proxy headers. */
+/** Best-effort client IP. Prefer the platform's trusted single-IP header
+ *  (Vercel sets x-real-ip), which a client can't spoof past the edge; only then
+ *  fall back to the first x-forwarded-for hop. */
 export function clientIp(req: Request): string {
+  const real = req.headers.get("x-real-ip");
+  if (real?.trim()) return real.trim();
   const fwd = req.headers.get("x-forwarded-for") ?? "";
   return fwd.split(",")[0].trim() || "unknown";
 }
