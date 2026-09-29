@@ -391,35 +391,56 @@ export default function CaseList({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Clickable summary — each card filters the list to those cases */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat
-          label={isAdmin ? "All cases" : "In your area"}
-          value={areaCases.length}
-          active={scope === "area"}
-          onClick={() => selectScope("area")}
-        />
-        <Stat
-          label="Open"
-          value={stats.open}
-          accent="text-emerald-700"
-          active={scope === "open"}
-          onClick={() => selectScope("open")}
-        />
-        <Stat
-          label="Needs help"
-          value={stats.needsHelp}
-          accent="text-rose-700"
-          active={scope === "needs-help"}
-          onClick={() => selectScope("needs-help")}
-        />
-        <Stat
-          label="Unassigned"
-          value={stats.unassigned}
-          accent="text-amber-600"
-          active={scope === "unassigned"}
-          onClick={() => selectScope("unassigned")}
-        />
+      {/* Quick views — two independent axes, grouped and labeled so it's clear
+          they answer different questions (who owns it vs what state it's in). */}
+      <div>
+        <p className="mb-2 text-xs font-medium uppercase tracking-widest text-zinc-400">
+          Quick views · tap to filter
+        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
+          <div className="flex-1">
+            <div className="grid grid-cols-2 gap-3">
+              <Stat
+                label={isAdmin ? "All cases" : "In your area"}
+                value={areaCases.length}
+                active={scope === "area"}
+                onClick={() => selectScope("area")}
+              />
+              <Stat
+                label="Unassigned"
+                value={stats.unassigned}
+                accent="text-amber-600"
+                active={scope === "unassigned"}
+                onClick={() => selectScope("unassigned")}
+              />
+            </div>
+            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+              By assignment
+            </p>
+          </div>
+          <div className="hidden w-px self-stretch bg-zinc-200 sm:block" />
+          <div className="flex-1">
+            <div className="grid grid-cols-2 gap-3">
+              <Stat
+                label="Open"
+                value={stats.open}
+                accent="text-emerald-700"
+                active={scope === "open"}
+                onClick={() => selectScope("open")}
+              />
+              <Stat
+                label="Needs help"
+                value={stats.needsHelp}
+                accent="text-rose-700"
+                active={scope === "needs-help"}
+                onClick={() => selectScope("needs-help")}
+              />
+            </div>
+            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+              By status
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Search / sort / export */}
