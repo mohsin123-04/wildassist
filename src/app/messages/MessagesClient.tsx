@@ -290,7 +290,7 @@ export default function MessagesClient({
       fd.append("file", file);
       const r = await fetch("/api/message-photo", { method: "POST", body: fd });
       const d = await r.json().catch(() => ({}));
-      if (r.ok && d.url) await send(d.url);
+      if (r.ok && d.path) await send(d.path);
       else flash(d.error ?? "Couldn't upload the image.");
     } catch {
       flash("Couldn't upload the image.");
@@ -580,18 +580,24 @@ export default function MessagesClient({
                         </a>
                       ) : m.image_url ? (
                         <div className="flex max-w-[80%] flex-col gap-1">
-                          <a
-                            href={m.image_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={m.image_url}
-                              alt="Shared photo"
-                              className="max-h-64 w-full rounded-2xl object-cover"
-                            />
-                          </a>
+                          {m.id.startsWith("temp-") ? (
+                            <div className="flex h-40 w-56 items-center justify-center rounded-2xl bg-zinc-100 text-sm text-zinc-500">
+                              Sending photo…
+                            </div>
+                          ) : (
+                            <a
+                              href={`/api/message-image/${m.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`/api/message-image/${m.id}`}
+                                alt="Shared photo"
+                                className="max-h-64 w-full rounded-2xl object-cover"
+                              />
+                            </a>
+                          )}
                           {m.body && (
                             <div
                               className={`rounded-2xl px-3.5 py-2 text-sm leading-6 ${

@@ -6,8 +6,10 @@ const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 /**
  * POST /api/message-photo  (multipart form with `file`)
- * Uploads a photo to Storage for use in a chat message and returns its public
- * URL. Signed-in users only (unlike the public case-photo upload).
+ * Uploads a chat photo to the PRIVATE chat-images bucket and returns its storage
+ * path (not a URL). The path is stored on the message; images are then served
+ * only through /api/message-image/[id], which checks conversation membership and
+ * hands back a short-lived signed URL. Signed-in users only.
  */
 export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -48,10 +50,11 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
   const { error } = await admin.storage
-    .from("case-photos")
+    .from("chat-images")
     .upload(path, bytes, { contentType: file.type, upsert: false });
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  const { data } = admin.storage.from("case-photos").getPublicUrl(path);
-  return Response.json({ url: data.publicUrl });
+  // Return the storage path — the image is private and served via a signed URL
+  // (see /api/message-image/[id]), never a public URL.
+  return Response.json({ path });
 }
