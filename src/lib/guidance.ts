@@ -8,8 +8,12 @@
  * Sources (paraphrased). Claims were fact-checked in Sept 2026 against wildlife
  * authorities (Toronto Wildlife Centre, Ontario SPCA, Audubon, Tufts Wildlife
  * Clinic, Ontario Turtle Conservation Centre, Wildlife Preservation Canada, and
- * others). Still confirm details by phone, as intake, contacts, and seasonal
- * advice change:
+ * others). Independently re-verified 2026-09-29 — all 27 entries checked against
+ * authoritative sources (TWC, HSUS, IWRC, Cornell Lab, CDC, OTCC, university
+ * clinics, state/provincial agencies): 24 confirmed accurate; the baby-squirrel
+ * (daylight-only reunion, not overnight), skunk (blanket safe-capture method),
+ * and caught-by-pet (timing) entries were corrected. Still confirm details by
+ * phone, as intake, contacts, and seasonal advice change:
  *  - Toronto Wildlife Centre (torontowildlifecentre.com)
  *  - Ontario SPCA (ontariospca.ca)
  *  - International Wildlife Rehabilitation Council (theiwrc.org)
@@ -84,8 +88,8 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "caught-by-pet",
     animals: [],
     situations: ["caught-by-pet"],
-    text: "Any animal caught by a cat or dog needs professional care even if it looks unharmed. A cat or dog's mouth carries bacteria (such as Pasteurella) that cause fatal infections (septicaemia) in wildlife, often within a day. Treatment with antibiotics is needed quickly, ideally within a few hours. Contain it, keep handling to a minimum, and get it to a rehabilitator promptly.",
-    source: "RSPCA / Corvid Isle (verified 2026-09).",
+    text: "Any animal caught by a cat or dog needs professional care even if it looks unharmed. A cat or dog's mouth carries bacteria (such as Pasteurella) that can cause rapidly fatal infections (septicaemia) in wildlife. Antibiotics are needed as soon as possible, so contain it, keep handling to a minimum, and get it to a rehabilitator promptly.",
+    source: "RSPCA / Cornell Wildlife Health Lab / HSUS (re-verified 2026-09-29; timing softened to 'as soon as possible').",
   },
   {
     id: "entangled",
@@ -144,8 +148,8 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "baby-squirrel",
     animals: ["mammal"],
     situations: [],
-    text: "Baby squirrels are often not truly orphaned. A mother will retrieve her young during daylight. If the baby is uninjured, keep it warm and place it (in a shallow box with a towel and a wrapped heat source, mounted up off the ground near the tree, away from predators) close to where it was found, and give the mother time to reclaim it. Mothers often retrieve their young within a few hours but can take longer, so where possible give her until the next morning. If she has not returned by then, or the baby is injured, cold, or covered in insects, contain it and contact a rehabilitator. They need specialized formula; do not feed them.",
-    source: "Ontario SPCA / Toronto Wildlife Centre (verified 2026-09).",
+    text: "Baby squirrels are often not truly orphaned. A mother will retrieve her young during daylight, usually within a few hours. If the baby is uninjured, keep it warm and place it in a shallow box with a towel and a wrapped heat source at the base of the tree where it was found, close to where it fell. Squirrels do not search after dark, so never leave a baby outside overnight. If the mother has not returned by dusk (roughly five to six hours), bring the box indoors overnight with the heat source and put it back out the next morning to give her a full day. If she still has not returned, or the baby is injured, cold, or covered in insects, contain it and contact a rehabilitator. They need specialized formula; do not feed them.",
+    source: "Toronto Wildlife Centre / Greenwood Wildlife (re-verified 2026-09-29; corrected to daylight-only reunion, not overnight).",
   },
   {
     id: "baby-rabbit",
@@ -186,8 +190,8 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "skunk",
     animals: ["mammal"],
     situations: [],
-    text: "Keep your distance from skunks, which can spray and may carry rabies. A common problem is a skunk with its head stuck in a container (like a cup or jar); if you can help safely from behind, you can try to free it, but otherwise call a rehabilitator. Never corner or chase a skunk. For any injured skunk, contact a rehabilitator rather than handling it.",
-    source: "Wildlife-rehabilitation guidance (verified 2026-09).",
+    text: "Keep your distance from skunks, which can spray and may carry rabies. A common emergency is a skunk with its head stuck in a container (like a cup or jar), which can suffocate it, so act promptly — but call a wildlife rehabilitator first for guidance. If none is available and you can act safely, the recommended method is to gently drape a blanket over the skunk so it cannot raise its tail to spray, then slowly pull the container off and step back; wear gloves and eye protection. Never corner or chase a skunk. For any injured skunk, contact a rehabilitator rather than handling it.",
+    source: "MSPCA / WildCare (re-verified 2026-09-29; added the blanket safe-capture method).",
   },
   {
     id: "fox-coyote",
