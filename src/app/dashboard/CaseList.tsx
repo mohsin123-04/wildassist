@@ -117,6 +117,30 @@ export default function CaseList({
     });
   }, []);
 
+  // Live updates: merge remote case changes so two staff working at once don't
+  // clobber each other or see stale status/ownership. Only cases already loaded
+  // (and thus RLS-visible) are touched, so this is safe regardless of realtime
+  // RLS config. New cases still surface via the notification bell / reload.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("dashboard-cases")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "cases" },
+        (payload) => {
+          const row = payload.new as Partial<CaseRow> & { id: string };
+          setCases((cs) =>
+            cs.map((c) => (c.id === row.id ? { ...c, ...row } : c))
+          );
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   // Deep link: /dashboard?case=<id> reveals and scrolls to that specific case
   // (e.g. from a "shared case" message). Runs once, once cases are present.
   const deepLinked = useRef(false);
