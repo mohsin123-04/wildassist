@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { Bird } from "lucide-react";
+import { Bird, Siren } from "lucide-react";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
 import Toast from "@/components/Toast";
@@ -47,8 +47,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <div className="flex items-center gap-1">
               <Link
                 href="/emergency"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-100"
               >
+                <Siren className="h-4 w-4" aria-hidden />
                 Emergency
               </Link>
               <NotificationBell />
