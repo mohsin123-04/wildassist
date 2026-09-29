@@ -227,11 +227,12 @@ export default function CaseList({
     });
 
   function exportCsv() {
-    const cols: (keyof CaseRow)[] = [
-      "created_at",
+    const header = [
+      "id",
+      "reported_at",
       "animal",
       "situation",
-      "verdict",
+      "assessment",
       "status",
       "title",
       "description",
@@ -239,15 +240,32 @@ export default function CaseList({
       "reporter_phone",
       "lat",
       "lng",
-      "centre_id",
+      "centre",
     ];
     const esc = (v: unknown) => {
       const s = v == null ? "" : String(v);
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     };
+    // Human-readable, cross-referenceable row: real id, centre name (not slug),
+    // and the situation with its hyphens removed.
+    const row = (c: CaseRow) => [
+      c.id,
+      c.created_at,
+      c.animal,
+      c.situation.replace(/-/g, " "),
+      c.verdict,
+      c.status,
+      c.title ?? "",
+      c.description ?? "",
+      c.reporter_name ?? "",
+      c.reporter_phone ?? "",
+      c.lat ?? "",
+      c.lng ?? "",
+      c.centre_id ? (centreNames[c.centre_id] ?? c.centre_id) : "",
+    ];
     const rows = [
-      cols.join(","),
-      ...filtered.map((c) => cols.map((col) => esc(c[col])).join(",")),
+      header.join(","),
+      ...filtered.map((c) => row(c).map(esc).join(",")),
     ];
     const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

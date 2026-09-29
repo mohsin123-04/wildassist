@@ -90,26 +90,39 @@ export async function GET() {
   ];
 
   // Unread counts: messages newer than the user's last_read, not sent by them.
+  // Prefer the SQL aggregate (counts in the DB, transfers one row per convo);
+  // fall back to counting in JS if the function isn't present yet.
   const allIds = convList.map((c2) => c2.id);
-  const { data: reads } = await admin
-    .from("conversation_reads")
-    .select("conversation_id, last_read")
-    .eq("user_id", c.userId)
-    .in("conversation_id", allIds);
-  const lastRead: Record<string, string> = {};
-  for (const r of reads ?? []) lastRead[r.conversation_id] = r.last_read;
-
-  const { data: msgs } = await admin
-    .from("messages")
-    .select("conversation_id, sender_id, created_at")
-    .in("conversation_id", allIds);
-
   const unread: Record<string, number> = {};
-  for (const m of msgs ?? []) {
-    if (m.sender_id === c.userId) continue;
-    const lr = lastRead[m.conversation_id];
-    if (!lr || new Date(m.created_at) > new Date(lr)) {
-      unread[m.conversation_id] = (unread[m.conversation_id] ?? 0) + 1;
+
+  const { data: counts, error: rpcErr } = await admin.rpc("unread_counts", {
+    p_user: c.userId,
+    p_conv: allIds,
+  });
+  if (!rpcErr && Array.isArray(counts)) {
+    for (const r of counts as { conversation_id: string; cnt: number }[]) {
+      unread[r.conversation_id] = Number(r.cnt);
+    }
+  } else {
+    const { data: reads } = await admin
+      .from("conversation_reads")
+      .select("conversation_id, last_read")
+      .eq("user_id", c.userId)
+      .in("conversation_id", allIds);
+    const lastRead: Record<string, string> = {};
+    for (const r of reads ?? []) lastRead[r.conversation_id] = r.last_read;
+
+    const { data: msgs } = await admin
+      .from("messages")
+      .select("conversation_id, sender_id, created_at")
+      .in("conversation_id", allIds);
+
+    for (const m of msgs ?? []) {
+      if (m.sender_id === c.userId) continue;
+      const lr = lastRead[m.conversation_id];
+      if (!lr || new Date(m.created_at) > new Date(lr)) {
+        unread[m.conversation_id] = (unread[m.conversation_id] ?? 0) + 1;
+      }
     }
   }
 

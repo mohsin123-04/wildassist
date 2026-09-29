@@ -108,14 +108,24 @@ export default function MessagesClient({
   const typingChanRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const typingTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const lastTypingSent = useRef(0);
+  const markReadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  async function markRead(convId: string) {
-    setUnread((u) => ({ ...u, [convId]: 0 }));
-    await supabase.from("conversation_reads").upsert(
-      { conversation_id: convId, user_id: myId, last_read: new Date().toISOString() },
-      { onConflict: "conversation_id,user_id" }
-    );
-    window.dispatchEvent(new Event("messages-read"));
+  // Clear the badge immediately, but debounce the DB write so a burst of
+  // incoming messages doesn't fire one upsert each.
+  function markRead(convId: string) {
+    setUnread((u) => (u[convId] ? { ...u, [convId]: 0 } : u));
+    if (markReadTimer.current) clearTimeout(markReadTimer.current);
+    markReadTimer.current = setTimeout(async () => {
+      await supabase.from("conversation_reads").upsert(
+        {
+          conversation_id: convId,
+          user_id: myId,
+          last_read: new Date().toISOString(),
+        },
+        { onConflict: "conversation_id,user_id" }
+      );
+      window.dispatchEvent(new Event("messages-read"));
+    }, 1500);
   }
 
   async function loadConversations(pick?: string) {
