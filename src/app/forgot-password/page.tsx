@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Bird } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +14,14 @@ export default function ForgotPasswordPage() {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expired, setExpired] = useState(false);
+
+  // Arrived here from an invalid/expired reset link (/auth/confirm redirect).
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("error") === "expired") {
+      setExpired(true);
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -64,6 +72,12 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <>
+            {expired && (
+              <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                That reset link was invalid or has expired. Request a new one
+                below.
+              </p>
+            )}
             <p className="mt-2 text-sm leading-6 text-zinc-600">
               Enter the email for your account and we&apos;ll send you a link to
               choose a new password.
