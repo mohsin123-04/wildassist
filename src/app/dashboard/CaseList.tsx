@@ -76,6 +76,7 @@ type Tab = "area" | "unassigned";
 
 export default function CaseList({
   initialCases,
+  totalCount,
   myCentreId,
   myId,
   myName,
@@ -84,6 +85,7 @@ export default function CaseList({
   isAdmin = false,
 }: {
   initialCases: CaseRow[];
+  totalCount?: number;
   myCentreId: string;
   myId: string;
   myName: string;
@@ -438,6 +440,14 @@ export default function CaseList({
           </Chip>
         ))}
       </div>
+
+      {totalCount != null && cases.length < totalCount && (
+        <p className="mb-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
+          Showing the {cases.length} most recent cases of{" "}
+          {totalCount.toLocaleString()}. Use the date filters above to find older
+          ones.
+        </p>
+      )}
 
       {/* List or map */}
       {view === "map" ? (

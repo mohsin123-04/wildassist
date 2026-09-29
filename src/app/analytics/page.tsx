@@ -104,14 +104,42 @@ export default async function AnalyticsPage({
     redirect("/dashboard");
   }
 
-  const [{ data: rows }, { data: eventRows }] = await Promise.all([
-    supabase
-      .from("cases")
-      .select("id, created_at, animal, situation, verdict, status, centre_id, duplicate_of"),
-    supabase.from("case_events").select("case_id, to_status, created_at"),
-  ]);
+  // Only fetch the window we need. For fixed ranges (7d/30d) fetch two windows
+  // so the "vs previous period" comparison still works; "all time" fetches all.
+  const now = Date.now();
+  const windowMs = range.days ? range.days * DAY : null;
+  const fetchSinceIso = windowMs
+    ? new Date(now - 2 * windowMs).toISOString()
+    : null;
+
+  let casesQ = supabase
+    .from("cases")
+    .select("id, created_at, animal, situation, verdict, status, centre_id, duplicate_of");
+  let eventsQ = supabase
+    .from("case_events")
+    .select("case_id, to_status, created_at");
+  if (fetchSinceIso) {
+    casesQ = casesQ.gte("created_at", fetchSinceIso);
+    eventsQ = eventsQ.gte("created_at", fetchSinceIso);
+  }
+
+  const [{ data: rows }, { data: eventRows }, { data: openRows }] =
+    await Promise.all([
+      casesQ,
+      eventsQ,
+      // Live open queue is an all-time metric — fetched separately and bounded.
+      supabase
+        .from("cases")
+        .select("id, created_at, animal, verdict, status")
+        .neq("status", "closed")
+        .limit(1000),
+    ]);
   const all = (rows ?? []) as Row[];
   const events = (eventRows ?? []) as EventRow[];
+  const openAll = (openRows ?? []) as Pick<
+    Row,
+    "id" | "created_at" | "animal" | "verdict" | "status"
+  >[];
 
   let centreNames: Record<string, string> = {};
   if (isAdmin && all.length) {
@@ -120,9 +148,7 @@ export default async function AnalyticsPage({
   }
 
   // --- windowing + drill-down filters ---
-  const now = Date.now();
   const at = (iso: string) => new Date(iso).getTime();
-  const windowMs = range.days ? range.days * DAY : null;
   const earliest = all.length
     ? Math.min(...all.map((c) => at(c.created_at)))
     : now - 30 * DAY;
@@ -152,9 +178,9 @@ export default async function AnalyticsPage({
   const dupCount = cases.filter((c) => c.duplicate_of).length;
   const dupPct = cases.length ? Math.round((dupCount / cases.length) * 100) : 0;
 
-  // Live queue: current open cases (ignores the range; respects the animal filter).
-  const openQueue = all.filter(
-    (c) => c.status !== "closed" && (!animalFilter || c.animal === animalFilter)
+  // Live queue: current open cases (all-time; respects the animal filter).
+  const openQueue = openAll.filter(
+    (c) => !animalFilter || c.animal === animalFilter
   );
   const needsHelpOpen = openQueue.filter((c) => c.verdict === "help").length;
   const openAges = openQueue.map((c) => now - at(c.created_at));
