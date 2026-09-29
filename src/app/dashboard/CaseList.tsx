@@ -67,6 +67,13 @@ const STATUSES: { value: CaseRow["status"]; label: string }[] = [
   { value: "closed", label: "Closed" },
 ];
 
+const STATUS_DOT: Record<CaseRow["status"], string> = {
+  reported: "bg-zinc-400",
+  in_transit: "bg-amber-400",
+  at_centre: "bg-sky-400",
+  closed: "bg-emerald-500",
+};
+
 const VERDICT_BADGE: Record<CaseRow["verdict"], string> = {
   help: "bg-rose-100 text-rose-700",
   leave: "bg-emerald-100 text-emerald-700",
@@ -161,7 +168,7 @@ export default function CaseList({
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "board" | "map">("list");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -414,7 +421,7 @@ export default function CaseList({
           Export CSV
         </button>
         <div className="flex h-10 overflow-hidden rounded-xl border border-zinc-200">
-          {(["list", "map"] as const).map((v) => (
+          {(["list", "board", "map"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
@@ -484,8 +491,77 @@ export default function CaseList({
         ))}
       </div>
 
-      {/* List or map */}
-      {view === "map" ? (
+      {/* List, board, or map */}
+      {view === "board" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {STATUSES.map((s) => {
+            const col = filtered.filter((c) => c.status === s.value);
+            return (
+              <div
+                key={s.value}
+                className="flex flex-col rounded-2xl border border-zinc-200 bg-zinc-50/50"
+              >
+                <div className="flex items-center justify-between border-b border-zinc-200 px-3 py-2.5">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700">
+                    <span className={`h-2 w-2 rounded-full ${STATUS_DOT[s.value]}`} />
+                    {s.label}
+                  </span>
+                  <span className="text-xs font-medium text-zinc-500">
+                    {col.length}
+                  </span>
+                </div>
+                <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-2">
+                  {col.length === 0 ? (
+                    <p className="px-1 py-4 text-center text-xs text-zinc-400">
+                      None
+                    </p>
+                  ) : (
+                    col.map((c) => {
+                      const urgent =
+                        c.verdict === "help" && c.status !== "closed";
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => goToCase(c.id)}
+                          className={`w-full rounded-xl border bg-white p-2.5 text-left shadow-sm transition-colors hover:bg-zinc-50 ${
+                            urgent
+                              ? "border-zinc-200 border-l-2 border-l-rose-400"
+                              : "border-zinc-200"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="truncate text-sm font-medium capitalize text-zinc-900">
+                              {c.animal}
+                            </span>
+                            {c.duplicate_of && (
+                              <span className="shrink-0 text-[10px] font-medium text-orange-600">
+                                dup
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-xs text-zinc-600">
+                            {c.title ?? c.situation.replace(/-/g, " ")}
+                          </p>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
+                            <span>{timeAgo(c.created_at)}</span>
+                            {c.assigned_to && (
+                              <span className="truncate text-sky-600">
+                                {c.assigned_to === myId
+                                  ? "you"
+                                  : teammateName[c.assigned_to] ?? "assigned"}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : view === "map" ? (
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-10 text-center">
