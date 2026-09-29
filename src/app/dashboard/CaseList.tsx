@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Bird, MapPin, Car, Phone, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -115,6 +115,18 @@ export default function CaseList({
         .then(() => window.dispatchEvent(new Event("cases-seen")));
     });
   }, []);
+
+  // Deep link: /dashboard?case=<id> reveals and scrolls to that specific case
+  // (e.g. from a "shared case" message). Runs once, once cases are present.
+  const deepLinked = useRef(false);
+  useEffect(() => {
+    if (deepLinked.current) return;
+    const id = new URLSearchParams(window.location.search).get("case");
+    if (id && cases.some((c) => c.id === id)) {
+      deepLinked.current = true;
+      goToCase(id);
+    }
+  }, [cases]);
 
   const [statusFilter, setStatusFilter] = useState<"all" | CaseRow["status"]>(
     "all"

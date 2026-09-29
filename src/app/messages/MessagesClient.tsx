@@ -562,7 +562,7 @@ export default function MessagesClient({
                         </div>
                       ) : m.case_ref ? (
                         <a
-                          href="/dashboard"
+                          href={`/dashboard?case=${m.case_ref.id}`}
                           className="block max-w-[85%] rounded-2xl border border-zinc-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-zinc-50"
                         >
                           <span className="text-xs font-medium uppercase tracking-wide text-emerald-600">
