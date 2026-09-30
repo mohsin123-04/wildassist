@@ -18,7 +18,7 @@ async function requireManager() {
   return { userId: user.id, centreId: profile.centre_id };
 }
 
-/** GET /api/team — roster of the signed-in user's centre (any member can view). */
+/** GET /api/team, roster of the signed-in user's centre (any member can view). */
 export async function GET() {
   const supabase = await createClient();
   const {

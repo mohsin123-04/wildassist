@@ -87,7 +87,7 @@ export default function NearestHelpButton() {
           </button>
         </div>
         <p className="mt-3 text-xs text-stone-500">
-          Verified number. Hours vary — if there&apos;s no answer, use the guided
+          Verified number. Hours vary. If there&apos;s no answer, use the guided
           report and the details still reach nearby help.
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function NearestHelpButton() {
       )}
       {state.kind === "none" && (
         <p className="mt-3 text-sm text-rose-700">
-          Couldn&apos;t load the centre list — please try again in a moment.
+          Couldn&apos;t load the centre list. Please try again in a moment.
         </p>
       )}
     </div>

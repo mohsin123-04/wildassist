@@ -9,8 +9,8 @@ import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
  * so it can't be used to flip established accounts.
  *
  * Called during signup, sometimes before the email is confirmed (no session
- * yet), so it can't hard-require auth. Defenses: rate limiting, and — when the
- * caller IS authenticated — they may only register their own account.
+ * yet), so it can't hard-require auth. Defenses: rate limiting, and, when the
+ * caller IS authenticated, they may only register their own account.
  */
 export async function POST(req: Request) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {

@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
           <div className="mt-4">
             <p className="text-sm leading-6 text-zinc-600">
               This reset link is invalid or has expired. Reset links are
-              single-use and time-limited — please request a new one.
+              single-use and time-limited. Please request a new one.
             </p>
             <Link
               href="/forgot-password"

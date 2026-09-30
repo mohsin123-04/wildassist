@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Editorial display serif — gives headings a distinct voice from the body,
+// Editorial display serif, gives headings a distinct voice from the body,
 // the single biggest lever against a generic "default template" look.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -31,7 +31,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL("https://wildassist.vercel.app"),
   title: {
-    default: "WildAssist — Found an injured animal?",
+    default: "WildAssist: Found an injured animal?",
     template: "%s · WildAssist",
   },
   description: DESCRIPTION,
@@ -48,12 +48,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "WildAssist",
     url: "https://wildassist.vercel.app",
-    title: "WildAssist — Found an injured animal?",
+    title: "WildAssist: Found an injured animal?",
     description: DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "WildAssist — Found an injured animal?",
+    title: "WildAssist: Found an injured animal?",
     description: DESCRIPTION,
   },
 };

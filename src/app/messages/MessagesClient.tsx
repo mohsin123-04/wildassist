@@ -247,7 +247,7 @@ export default function MessagesClient({
   }, [selected]);
 
   // Auto-scroll only when the reader is already at the bottom or just sent a
-  // message — don't yank someone who has scrolled up to read older messages.
+  // message, don't yank someone who has scrolled up to read older messages.
   useEffect(() => {
     const last = messages[messages.length - 1];
     if (last?.sender_id === myId || atBottomRef.current) {
@@ -343,7 +343,7 @@ export default function MessagesClient({
 
   async function deleteMessage(id: string) {
     const deleted_at = new Date().toISOString();
-    // Redact the content, not just flag it — otherwise the original body is
+    // Redact the content, not just flag it, otherwise the original body is
     // still readable via the raw table (RLS returns soft-deleted rows).
     const redaction = { deleted_at, body: "", image_url: null, case_ref: null };
     setMessages((prev) =>

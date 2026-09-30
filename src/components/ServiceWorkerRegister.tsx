@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 /** Registers the service worker so the app is installable and works offline.
- *  Failures are swallowed — the app runs identically without it. */
+ *  Failures are swallowed, the app runs identically without it. */
 export default function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) {

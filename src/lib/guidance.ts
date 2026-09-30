@@ -8,7 +8,7 @@
  * Sources (paraphrased). Claims were fact-checked in Sept 2026 against wildlife
  * authorities (Toronto Wildlife Centre, Ontario SPCA, Audubon, Tufts Wildlife
  * Clinic, Ontario Turtle Conservation Centre, Wildlife Preservation Canada, and
- * others). Independently re-verified 2026-09-29 — all 27 entries checked against
+ * others). Independently re-verified 2026-09-29, all 27 entries checked against
  * authoritative sources (TWC, HSUS, IWRC, Cornell Lab, CDC, OTCC, university
  * clinics, state/provincial agencies): 24 confirmed accurate; the baby-squirrel
  * (daylight-only reunion, not overnight), skunk (blanket safe-capture method),
@@ -190,7 +190,7 @@ export const GUIDANCE: GuidanceEntry[] = [
     id: "skunk",
     animals: ["mammal"],
     situations: [],
-    text: "Keep your distance from skunks, which can spray and may carry rabies. A common emergency is a skunk with its head stuck in a container (like a cup or jar), which can suffocate it, so act promptly — but call a wildlife rehabilitator first for guidance. If none is available and you can act safely, the recommended method is to gently drape a blanket over the skunk so it cannot raise its tail to spray, then slowly pull the container off and step back; wear gloves and eye protection. Never corner or chase a skunk. For any injured skunk, contact a rehabilitator rather than handling it.",
+    text: "Keep your distance from skunks, which can spray and may carry rabies. A common emergency is a skunk with its head stuck in a container (like a cup or jar), which can suffocate it, so act promptly, but call a wildlife rehabilitator first for guidance. If none is available and you can act safely, the recommended method is to gently drape a blanket over the skunk so it cannot raise its tail to spray, then slowly pull the container off and step back; wear gloves and eye protection. Never corner or chase a skunk. For any injured skunk, contact a rehabilitator rather than handling it.",
     source: "MSPCA / WildCare (re-verified 2026-09-29; added the blanket safe-capture method).",
   },
   {

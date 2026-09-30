@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   return Response.json({ url });
 }
 
-/** DELETE /api/avatar — removes the avatar photo, falling back to initials. */
+/** DELETE /api/avatar, removes the avatar photo, falling back to initials. */
 export async function DELETE() {
   const supabase = await createClient();
   const {

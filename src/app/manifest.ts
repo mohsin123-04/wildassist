@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "WildAssist — Wildlife rescue help",
+    name: "WildAssist: Wildlife rescue help",
     short_name: "WildAssist",
     description:
       "Found an injured or orphaned wild animal? Clear next steps and the nearest help across the US and Canada.",

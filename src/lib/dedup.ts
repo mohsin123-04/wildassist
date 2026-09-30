@@ -10,7 +10,7 @@ import { haversineKm } from "./centres";
 export const DUP_RADIUS_KM = 2;
 export const DUP_WINDOW_HOURS = 24;
 
-// Words that describe an animal's state/age/size/colour/region — NOT its kind.
+// Words that describe an animal's state/age/size/colour/region, NOT its kind.
 // Stripped before comparing so "baby raccoon" matches "raccoon", and so a shared
 // descriptor can't falsely link different species ("grey squirrel" vs "grey fox",
 // "canada goose" vs "canada lynx", "great blue heron" vs "great horned owl").

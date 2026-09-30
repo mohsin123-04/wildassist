@@ -70,7 +70,7 @@ export default function EnablePushCard() {
         body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),
       });
       if (!res.ok) throw new Error("register failed");
-      flash("Notifications on — you'll hear about new cases.");
+      flash("Notifications on. You'll hear about new cases.");
       setShow(false);
     } catch {
       flash("Couldn't turn on notifications.");
@@ -85,7 +85,7 @@ export default function EnablePushCard() {
     <div className="mb-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
       <BellRing className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden />
       <p className="min-w-0 flex-1 text-sm text-emerald-900">
-        Get a notification the moment a new case is routed to your centre —
+        Get a notification the moment a new case is routed to your centre,
         even when this tab is closed.
       </p>
       <button

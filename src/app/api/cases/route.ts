@@ -22,7 +22,7 @@ const CATEGORY_PLURAL: Record<string, string> = {
 // Routing model switch. While this is a demo/portfolio project (access isn't
 // sold yet), route to every seeded org so the map stays populated. Flip to true
 // to gate routing on real onboarding (org has staff) once access is a paid
-// product — see the routing block below.
+// product, see the routing block below.
 const ROUTE_ONLY_ONBOARDED = false;
 
 // When ROUTE_ONLY_ONBOARDED is true, don't route to a participant further than
@@ -30,7 +30,7 @@ const ROUTE_ONLY_ONBOARDED = false;
 const ROUTE_RADIUS_KM = 150;
 
 /**
- * Notify the staff at the centre a new case was routed to — web push to their
+ * Notify the staff at the centre a new case was routed to, web push to their
  * registered devices, plus email when configured. Best-effort: any failure
  * (including missing keys) is swallowed so it never affects the report being
  * saved. "leave" cases need no action, so they are skipped.
@@ -53,7 +53,7 @@ async function notifyCentreStaff(
     // Push to every registered device (works even with email dormant).
     await sendPushToUsers(staffIds, {
       title: `New ${info.verdict === "help" ? "urgent " : ""}case: ${info.animal}`,
-      body: `${info.title ?? "A new report"} — routed to ${centre.name}. Tap to open.`,
+      body: `${info.title ?? "A new report"}, routed to ${centre.name}. Tap to open.`,
       url: `/case/${info.caseId}`,
     });
 
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid case data" }, { status: 400 });
   }
 
-  // Coerce and cap free-text/URL fields — this endpoint is public, so never
+  // Coerce and cap free-text/URL fields, this endpoint is public, so never
   // trust the client to send well-typed or bounded values.
   const safeDescription =
     typeof description === "string" ? description.slice(0, 2000) : "";
@@ -228,7 +228,7 @@ export async function POST(req: NextRequest) {
           const nearestTakesCat = takesCat(nearestOverall);
           // Whether the CHOSEN facility actually lists this category. If no
           // nearby facility does, rankCentres ranks them all equally and top is
-          // just the closest — so we must not claim it "can take" the animal.
+          // just the closest, so we must not claim it "can take" the animal.
           const topTakesCat = takesCat(top as { takes?: string[] | null });
           const nearestRV = (nearestOverall as { rabies_vector?: boolean | null })
             .rabies_vector;
@@ -240,7 +240,7 @@ export async function POST(req: NextRequest) {
           } else if (topTakesCat) {
             routingNote = `${top.name} is the nearest wildlife facility that can take ${catP}.`;
           } else {
-            routingNote = `No nearby facility lists ${catP}, so this went to ${top.name}, the closest wildlife facility — please call ahead to confirm they can help.`;
+            routingNote = `No nearby facility lists ${catP}, so this went to ${top.name}, the closest wildlife facility, please call ahead to confirm they can help.`;
           }
 
           // If we're not certain the chosen facility can take this rabies-vector

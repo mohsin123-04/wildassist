@@ -23,7 +23,7 @@ const VERDICT_BADGE: Record<string, string> = {
 };
 
 /**
- * Full-page view of a single case — a shareable, roomier alternative to the
+ * Full-page view of a single case, a shareable, roomier alternative to the
  * inline dashboard expansion. Access control is RLS: the case is fetched with
  * the viewer's own session, so staff outside its area simply get "not found".
  */
@@ -106,7 +106,7 @@ export default async function CasePage({
                 href={`/case/${c.duplicate_of}`}
                 className="rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-700 hover:bg-orange-200"
               >
-                possible duplicate — view original
+                possible duplicate, view original
               </Link>
             )}
           </div>

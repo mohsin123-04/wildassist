@@ -40,7 +40,7 @@ export default function Home() {
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-8 text-cream/75">
               Take a breath. Answer a few quick questions and WildAssist tells
-              you exactly what to do — then connects the animal to the nearest
+              you exactly what to do, then connects the animal to the nearest
               help, from rehabilitation centres to vets and hotlines.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
@@ -68,7 +68,7 @@ export default function Home() {
             </dl>
           </div>
 
-          {/* Real product shot — tilted, overlapping into the cream band below */}
+          {/* Real product shot, tilted, overlapping into the cream band below */}
           <div className="animate-in relative mx-auto w-full max-w-[290px] lg:max-w-[320px] lg:-mb-28 lg:translate-y-6">
             <div className="rotate-[2deg] overflow-hidden rounded-[2.4rem] border-[6px] border-forest-950 bg-forest-950 shadow-2xl shadow-black/40 transition-transform duration-500 hover:rotate-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}

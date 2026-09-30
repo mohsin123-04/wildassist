@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
  * Verifies email auth links (password recovery, signup confirmation, email
  * change) server-side using the token hash. Unlike the PKCE `code` flow, this
  * works even when the link is opened on a different device or browser than the
- * one that requested it — verifyOtp establishes the session in cookies here,
+ * one that requested it, verifyOtp establishes the session in cookies here,
  * then we redirect to the target page.
  *
  * Point the relevant Supabase email templates at:
@@ -32,6 +32,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Invalid or expired link — send them to request a fresh reset link.
+  // Invalid or expired link, send them to request a fresh reset link.
   return NextResponse.redirect(new URL("/forgot-password?error=expired", origin));
 }

@@ -31,7 +31,7 @@ async function centreOfUser() {
   return { centreId: profile.centre_id };
 }
 
-/** GET /api/centre-code — the signed-in staff member's centre join code. */
+/** GET /api/centre-code, the signed-in staff member's centre join code. */
 export async function GET() {
   const ctx = await centreOfUser();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });
@@ -51,7 +51,7 @@ export async function GET() {
   return Response.json({ code });
 }
 
-/** POST /api/centre-code — regenerate the join code. */
+/** POST /api/centre-code, regenerate the join code. */
 export async function POST() {
   const ctx = await centreOfUser();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });

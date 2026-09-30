@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     .upload(path, bytes, { contentType: file.type, upsert: false });
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
-  // Return the storage path — the image is private and served via a signed URL
+  // Return the storage path, the image is private and served via a signed URL
   // (see /api/message-image/[id]), never a public URL.
   return Response.json({ path });
 }

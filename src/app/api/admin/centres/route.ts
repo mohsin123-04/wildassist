@@ -1,6 +1,6 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 
-/** GET /api/admin/centres — all centres with their codes + manager (admin only). */
+/** GET /api/admin/centres, all centres with their codes + manager (admin only). */
 export async function GET() {
   const supabase = await createClient();
   const {

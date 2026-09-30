@@ -367,7 +367,7 @@ export default function CaseList({
       .insert({ case_id: orig.id, author_id: myId, author_name: myName, body });
     if (error) {
       setSavingId(null);
-      flash("Couldn't save the merge note — case not closed.");
+      flash("Couldn't save the merge note, case not closed.");
       return;
     }
     await updateStatus(c.id, "closed"); // manages savingId itself
@@ -391,7 +391,7 @@ export default function CaseList({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Quick views — two independent axes, grouped and labeled so it's clear
+      {/* Quick views, two independent axes, grouped and labeled so it's clear
           they answer different questions (who owns it vs what state it's in). */}
       <div>
         <p className="mb-2 text-xs font-medium uppercase tracking-widest text-zinc-400">
@@ -506,7 +506,7 @@ export default function CaseList({
         </div>
       </div>
 
-      {/* Date range + assignment filter — collapsed by default to reduce clutter */}
+      {/* Date range + assignment filter, collapsed by default to reduce clutter */}
       {showFilters && (
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <label className="flex items-center gap-1.5 text-zinc-500">
@@ -763,7 +763,7 @@ export default function CaseList({
                                 {dist != null
                                   ? `, ${fmtDistance(dist)}`
                                   : ""}
-                                {orig.title ? ` — "${orig.title}"` : ""}.
+                                {orig.title ? `, "${orig.title}"` : ""}.
                               </p>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 <button

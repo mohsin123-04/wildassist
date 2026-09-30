@@ -20,7 +20,7 @@ async function ctx() {
 }
 
 /**
- * GET /api/conversations — the user's conversations (main channel + DMs +
+ * GET /api/conversations, the user's conversations (main channel + DMs +
  * groups) with display labels, plus the centre's members for starting new ones.
  */
 export async function GET() {

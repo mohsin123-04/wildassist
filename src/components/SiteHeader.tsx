@@ -7,7 +7,7 @@ import { Bird, Siren } from "lucide-react";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
 
-// Routes whose top section is a dark hero — the header floats transparent over
+// Routes whose top section is a dark hero, the header floats transparent over
 // them at the top of the page, then turns solid once you scroll past the hero.
 const DARK_HERO_ROUTES = new Set(["/"]);
 

@@ -512,7 +512,7 @@ export default function AnalyticsClient({
             <p className="-mt-1 text-xs text-zinc-500">
               <span className="font-medium text-orange-600">{m.dupCount}</span>{" "}
               possible duplicate{m.dupCount === 1 ? "" : "s"} flagged ({m.dupPct}% of
-              cases) — merge or dismiss them on the dashboard.
+              cases), merge or dismiss them on the dashboard.
             </p>
           )}
 
@@ -522,19 +522,19 @@ export default function AnalyticsClient({
               How long cases have been waiting right now
             </p>
             {m.openQueue.length === 0 ? (
-              <p className="mt-3 text-sm text-emerald-700">Nothing open — the queue is clear.</p>
+              <p className="mt-3 text-sm text-emerald-700">Nothing open. The queue is clear.</p>
             ) : (
               <div className="mt-3 flex flex-wrap items-baseline gap-x-8 gap-y-3">
                 <Metric big value={String(m.openQueue.length)} label="cases open" />
                 <Metric
                   big
-                  value={m.oldestOpen !== null ? formatDuration(m.oldestOpen) : "—"}
+                  value={m.oldestOpen !== null ? formatDuration(m.oldestOpen) : "N/A"}
                   label="oldest waiting"
                   accent={m.oldestOpen !== null && m.oldestOpen > 3 * DAY ? "text-rose-700" : "text-zinc-900"}
                 />
                 <Metric
                   big
-                  value={m.medianOpenAge !== null ? formatDuration(m.medianOpenAge) : "—"}
+                  value={m.medianOpenAge !== null ? formatDuration(m.medianOpenAge) : "N/A"}
                   label="median age"
                 />
               </div>

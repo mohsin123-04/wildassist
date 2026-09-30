@@ -30,7 +30,7 @@ export async function GET(
     .maybeSingle();
   if (!msg?.image_url) return new NextResponse("Not found", { status: 404 });
 
-  // Legacy images stored as public URLs — redirect as-is.
+  // Legacy images stored as public URLs, redirect as-is.
   if (/^https?:\/\//.test(msg.image_url)) {
     return NextResponse.redirect(msg.image_url);
   }

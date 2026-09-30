@@ -114,7 +114,7 @@ export async function POST(req: Request) {
   const { data: affected, error } = await query.select("id");
   if (error) return Response.json({ error: error.message }, { status: 500 });
   // The atomic guards (.is('driver_id', null) / .eq('status', ...)) mean a lost
-  // race matches 0 rows — tell the loser instead of a false success.
+  // race matches 0 rows, tell the loser instead of a false success.
   if (!affected || affected.length === 0) {
     return Response.json(
       {

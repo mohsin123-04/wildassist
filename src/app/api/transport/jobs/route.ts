@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     .in("status", ["in_transit"])
     .order("created_at", { ascending: false });
 
-  // The volunteer's completed deliveries — a record of their contribution
+  // The volunteer's completed deliveries, a record of their contribution
   // (no reporter PII; the handoff is done).
   const { data: doneRaw } = await admin
     .from("cases")

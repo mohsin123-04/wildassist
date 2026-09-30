@@ -112,7 +112,7 @@ export default function TriagePage() {
         })
       );
     } catch {
-      // storage unavailable — fine
+      // storage unavailable, fine
     }
   }, [step, animalOption, situation, description]);
 

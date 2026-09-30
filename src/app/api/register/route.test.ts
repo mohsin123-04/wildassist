@@ -6,7 +6,7 @@ vi.mock("@/lib/ratelimit", () => ({
   tooMany: () => Response.json({ error: "Too many requests" }, { status: 429 }),
 }));
 
-// createClient (session-aware) defaults to no session — the common pre-email-
+// createClient (session-aware) defaults to no session, the common pre-email-
 // confirmation signup path, where the ownership check is skipped.
 const { getUser } = vi.hoisted(() => ({
   getUser: vi.fn(async () => ({ data: { user: null } })),

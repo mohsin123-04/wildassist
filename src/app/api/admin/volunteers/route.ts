@@ -18,7 +18,7 @@ async function requireApprover() {
   return { ok: true as const };
 }
 
-/** GET /api/admin/volunteers — all volunteers with approval status. */
+/** GET /api/admin/volunteers, all volunteers with approval status. */
 export async function GET() {
   const ctx = await requireApprover();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });
@@ -34,7 +34,7 @@ export async function GET() {
   return Response.json({ volunteers: data ?? [] });
 }
 
-/** POST /api/admin/volunteers  { userId, approved } — approve or revoke. */
+/** POST /api/admin/volunteers  { userId, approved }, approve or revoke. */
 export async function POST(req: Request) {
   const ctx = await requireApprover();
   if ("error" in ctx) return Response.json({ error: ctx.error }, { status: ctx.status });

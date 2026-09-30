@@ -70,7 +70,7 @@ export default async function TrackPage({
   const admin = createAdminClient();
 
   // Look up by the unguessable token (service role, but we only return
-  // non-identifying fields below — no reporter details, location, or notes).
+  // non-identifying fields below, no reporter details, location, or notes).
   const { data: c } = await admin
     .from("cases")
     .select("id, animal, title, situation, status, created_at, centre_id")
@@ -216,7 +216,7 @@ export default async function TrackPage({
       </div>
 
       <p className="mt-6 text-xs leading-5 text-stone-500">
-        This page updates on its own as the animal is helped — bookmark it to
+        This page updates on its own as the animal is helped. Bookmark it to
         check back. For an urgent, life-threatening situation, call a wildlife
         rehabilitator or vet directly rather than waiting.
       </p>

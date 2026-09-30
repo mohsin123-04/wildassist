@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 // Social share card (used for links shared to iMessage, Slack, social, etc.).
-export const alt = "WildAssist — Found an injured animal?";
+export const alt = "WildAssist: Found an injured animal?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -77,7 +77,7 @@ export default function Image() {
               lineHeight: 1.35,
             }}
           >
-            Clear next steps, and the nearest help — wildlife centres, vets, and
+            Clear next steps, and the nearest help, wildlife centres, vets, and
             hotlines across the US &amp; Canada.
           </div>
         </div>

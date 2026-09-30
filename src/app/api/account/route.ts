@@ -1,7 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 
 /**
- * DELETE /api/account — permanently deletes the signed-in user's account.
+ * DELETE /api/account, permanently deletes the signed-in user's account.
  * The profile row cascades via the foreign key on auth.users.
  */
 export async function DELETE() {
