@@ -54,9 +54,12 @@ export default function LoginPage() {
   }, []);
 
   function routeByRole() {
-    // The dashboard redirects volunteers to /transport server-side, so we can
-    // navigate straight there without extra round-trips to look up the role.
-    router.replace("/dashboard");
+    // Hard navigation (not router.replace): a full document load guarantees the
+    // new auth cookie reaches the server and the header mounts already
+    // signed-in, instead of briefly showing "Staff login" and flipping once
+    // onAuthStateChange fires. The dashboard redirects volunteers to /transport
+    // server-side, so we can send everyone there.
+    window.location.assign("/dashboard");
   }
 
   async function handleSubmit(e: React.FormEvent) {

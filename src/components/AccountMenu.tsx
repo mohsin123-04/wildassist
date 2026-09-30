@@ -2,14 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { flash } from "@/lib/flash";
 import Avatar from "@/components/Avatar";
 
 export default function AccountMenu({ light = false }: { light?: boolean }) {
-  const router = useRouter();
   // undefined = still checking, null = logged out, User = logged in
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -121,11 +118,12 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
   }, [open]);
 
   async function signOut() {
-    await createClient().auth.signOut();
     setOpen(false);
-    flash("You've been signed out");
-    router.push("/");
-    router.refresh();
+    await createClient().auth.signOut();
+    // Hard navigation gives a clean slate: the header remounts already
+    // signed-out instead of showing the account pill and flipping to "Staff
+    // login" once the sign-out event propagates. Avoids the logout flicker.
+    window.location.assign("/");
   }
 
   // Still checking: reserve space to avoid layout shift.
