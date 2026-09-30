@@ -22,6 +22,16 @@
   --color-clay-100: #efe0d5;
   --color-clay-600: #a85c3b;
   --color-clay-700: #8c4b30;
+
+  /* Forest: deep green anchor sections that give the site depth and drama
+     against the cream. Cream + moss are the on-dark companions. */
+  --color-forest-950: #0c261b;
+  --color-forest-900: #0f2e21;
+  --color-forest-800: #163d2c;
+  --color-forest-700: #1e5140;
+  --color-cream: #f3ecdf;
+  --color-moss-300: #a7cbb3;
+  --color-moss-400: #8bbd9c;
 }
 
 body {

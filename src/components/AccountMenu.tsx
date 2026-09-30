@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import Avatar from "@/components/Avatar";
 
-export default function AccountMenu() {
+export default function AccountMenu({ light = false }: { light?: boolean }) {
   const router = useRouter();
   // undefined = still checking, null = logged out, User = logged in
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -138,7 +138,11 @@ export default function AccountMenu() {
     return (
       <Link
         href="/login"
-        className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+        className={
+          light
+            ? "rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur transition-colors hover:bg-white/20"
+            : "rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+        }
       >
         Staff login
       </Link>
