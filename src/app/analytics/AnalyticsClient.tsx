@@ -21,9 +21,9 @@ type EventRow = { case_id: string; to_status: string; created_at: string };
 const DAY = 24 * 60 * 60 * 1000;
 
 const RANGES = [
-  { key: "7d", label: "7 days" },
-  { key: "30d", label: "30 days" },
+  { key: "week", label: "Week" },
   { key: "month", label: "Month" },
+  { key: "year", label: "Year" },
   { key: "all", label: "All time" },
 ] as const;
 type RangeKey = (typeof RANGES)[number]["key"];
@@ -76,41 +76,58 @@ export default function AnalyticsClient({
   useEffect(() => setMounted(true), []);
   const [now] = useState(() => Date.now());
 
-  const [rangeKey, setRangeKey] = useState<RangeKey>("30d");
-  const [month, setMonth] = useState(() => {
-    const d = new Date();
-    return { y: d.getFullYear(), m: d.getMonth() };
-  });
+  const [rangeKey, setRangeKey] = useState<RangeKey>("month");
+  const [anchorMs, setAnchorMs] = useState(() => Date.now());
   const [animalFilter, setAnimalFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
-  // Compute the active window [startMs, endMs) + the comparison window.
+  // Compute the active calendar window [startMs, endMs) + the comparison window.
   const win = useMemo(() => {
-    if (rangeKey === "7d" || rangeKey === "30d") {
-      const w = (rangeKey === "7d" ? 7 : 30) * DAY;
+    const a = new Date(anchorMs);
+    const cap = (end: number) => Math.min(end, now + 1);
+    if (rangeKey === "week") {
+      const dow = (a.getDay() + 6) % 7; // Monday = 0
+      const start = new Date(a.getFullYear(), a.getMonth(), a.getDate() - dow).getTime();
+      const end = start + 7 * DAY;
+      const fmt = (t: number) =>
+        new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
       return {
-        startMs: now - w,
-        endMs: now,
-        windowLabel: `last ${rangeKey === "7d" ? "7 days" : "30 days"}`,
-        prevLabel: `previous ${rangeKey === "7d" ? "7 days" : "30 days"}`,
-        prevStartMs: now - 2 * w,
-        prevEndMs: now - w,
+        startMs: start,
+        endMs: cap(end),
+        windowLabel: `${fmt(start)} – ${fmt(end - DAY)}`,
+        prevLabel: "previous week",
+        prevStartMs: start - 7 * DAY,
+        prevEndMs: start,
+        navigable: true,
       };
     }
     if (rangeKey === "month") {
-      const start = new Date(month.y, month.m, 1).getTime();
-      const end = new Date(month.y, month.m + 1, 1).getTime();
-      const name = new Date(month.y, month.m, 1).toLocaleDateString(undefined, {
-        month: "long",
-        year: "numeric",
-      });
+      const start = new Date(a.getFullYear(), a.getMonth(), 1).getTime();
+      const end = new Date(a.getFullYear(), a.getMonth() + 1, 1).getTime();
       return {
         startMs: start,
-        endMs: Math.min(end, now + 1),
-        windowLabel: name,
+        endMs: cap(end),
+        windowLabel: new Date(start).toLocaleDateString(undefined, {
+          month: "long",
+          year: "numeric",
+        }),
         prevLabel: "previous month",
-        prevStartMs: new Date(month.y, month.m - 1, 1).getTime(),
+        prevStartMs: new Date(a.getFullYear(), a.getMonth() - 1, 1).getTime(),
         prevEndMs: start,
+        navigable: true,
+      };
+    }
+    if (rangeKey === "year") {
+      const start = new Date(a.getFullYear(), 0, 1).getTime();
+      const end = new Date(a.getFullYear() + 1, 0, 1).getTime();
+      return {
+        startMs: start,
+        endMs: cap(end),
+        windowLabel: String(a.getFullYear()),
+        prevLabel: "previous year",
+        prevStartMs: new Date(a.getFullYear() - 1, 0, 1).getTime(),
+        prevEndMs: start,
+        navigable: true,
       };
     }
     const earliest = all.length
@@ -123,8 +140,9 @@ export default function AnalyticsClient({
       prevLabel: null as string | null,
       prevStartMs: null as number | null,
       prevEndMs: null as number | null,
+      navigable: false,
     };
-  }, [rangeKey, month, now, all]);
+  }, [rangeKey, anchorMs, now, all]);
 
   const m = useMemo(() => {
     const { startMs, endMs, prevStartMs, prevEndMs } = win;
@@ -328,12 +346,16 @@ export default function AnalyticsClient({
     [m, win.windowLabel, animalFilter, statusFilter, isAdmin]
   );
 
-  const nextMonthDisabled =
-    new Date(month.y, month.m + 1, 1).getTime() > now;
-  const stepMonth = (delta: number) =>
-    setMonth((cur) => {
-      const d = new Date(cur.y, cur.m + delta, 1);
-      return { y: d.getFullYear(), m: d.getMonth() };
+  const nextDisabled = win.endMs > now; // already viewing the current period
+  const stepPeriod = (delta: number) =>
+    setAnchorMs((cur) => {
+      const a = new Date(cur);
+      if (rangeKey === "week") return cur + delta * 7 * DAY;
+      if (rangeKey === "month")
+        return new Date(a.getFullYear(), a.getMonth() + delta, 1).getTime();
+      if (rangeKey === "year")
+        return new Date(a.getFullYear() + delta, 0, 1).getTime();
+      return cur;
     });
 
   if (!mounted) {
@@ -370,7 +392,7 @@ export default function AnalyticsClient({
         </div>
         <AnalyticsActions
           rows={csvRows}
-          filename={`wildassist-analytics-${rangeKey === "month" ? win.windowLabel.replace(" ", "-") : rangeKey}.csv`}
+          filename={`wildassist-analytics-${win.windowLabel.replace(/[^a-z0-9]+/gi, "-")}.csv`}
         />
       </div>
 
@@ -391,12 +413,12 @@ export default function AnalyticsClient({
         ))}
       </div>
 
-      {/* Month navigator */}
-      {rangeKey === "month" && (
+      {/* Period navigator (week / month / year) */}
+      {win.navigable && (
         <div className="no-print mb-4 flex items-center gap-2">
           <button
-            onClick={() => stepMonth(-1)}
-            aria-label="Previous month"
+            onClick={() => stepPeriod(-1)}
+            aria-label={`Previous ${rangeKey}`}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -405,9 +427,9 @@ export default function AnalyticsClient({
             {win.windowLabel}
           </span>
           <button
-            onClick={() => stepMonth(1)}
-            disabled={nextMonthDisabled}
-            aria-label="Next month"
+            onClick={() => stepPeriod(1)}
+            disabled={nextDisabled}
+            aria-label={`Next ${rangeKey}`}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
