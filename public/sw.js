@@ -5,7 +5,7 @@
 //  - Static assets under /_next/ are content-hashed, so cache-first is safe.
 //  - Cross-origin requests (Supabase, etc.) are never intercepted.
 // Bump CACHE to invalidate old caches on the next deploy.
-const CACHE = "wildassist-v1";
+const CACHE = "wildassist-v2";
 const PUBLIC = ["/", "/emergency", "/triage"];
 const PRECACHE = [...PUBLIC, "/icon.svg"];
 
@@ -80,4 +80,41 @@ self.addEventListener("fetch", (event) => {
     );
   }
   // Everything else: let the network handle it (no interception).
+});
+
+// ---- Web push -------------------------------------------------------------
+// Payload: { title, body, url } (JSON). Clicking focuses an open tab on the
+// same origin (navigating it to the case) or opens a new one.
+self.addEventListener("push", (event) => {
+  let data = { title: "WildAssist", body: "New activity.", url: "/dashboard" };
+  try {
+    if (event.data) data = { ...data, ...event.data.json() };
+  } catch {
+    // keep defaults
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon.svg",
+      badge: "/icon.svg",
+      data: { url: data.url },
+      tag: "wildassist-case",
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/dashboard";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((tabs) => {
+      for (const tab of tabs) {
+        if (new URL(tab.url).origin === self.location.origin) {
+          tab.navigate(url);
+          return tab.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
+  );
 });

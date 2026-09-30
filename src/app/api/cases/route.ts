@@ -4,6 +4,7 @@ import { SITUATIONS, type AnimalType } from "@/lib/triage";
 import { rankCentres, haversineKm, type Centre } from "@/lib/centres";
 import { rateLimit, clientIp, tooMany } from "@/lib/ratelimit";
 import { sendEmail, newCaseEmail } from "@/lib/email";
+import { sendPushToUsers } from "@/lib/push";
 import { findDuplicate, DUP_WINDOW_HOURS } from "@/lib/dedup";
 import { detectDanger } from "@/lib/safety";
 
@@ -29,14 +30,15 @@ const ROUTE_ONLY_ONBOARDED = false;
 const ROUTE_RADIUS_KM = 150;
 
 /**
- * Email the staff at the centre a new case was routed to. Best-effort: any
- * failure (including no RESEND_API_KEY) is swallowed so it never affects the
- * report being saved. "leave" cases need no action, so they are skipped.
+ * Notify the staff at the centre a new case was routed to — web push to their
+ * registered devices, plus email when configured. Best-effort: any failure
+ * (including missing keys) is swallowed so it never affects the report being
+ * saved. "leave" cases need no action, so they are skipped.
  */
 async function notifyCentreStaff(
   admin: Admin,
   centre: { id: string; name: string },
-  info: { animal: string; title: string | null; verdict: string },
+  info: { animal: string; title: string | null; verdict: string; caseId: string },
   origin: string
 ) {
   try {
@@ -46,11 +48,19 @@ async function notifyCentreStaff(
       .select("id")
       .eq("centre_id", centre.id);
     if (!staff || staff.length === 0) return;
+    const staffIds = staff.map((s) => s.id);
+
+    // Push to every registered device (works even with email dormant).
+    await sendPushToUsers(staffIds, {
+      title: `New ${info.verdict === "help" ? "urgent " : ""}case: ${info.animal}`,
+      body: `${info.title ?? "A new report"} — routed to ${centre.name}. Tap to open.`,
+      url: `/dashboard?case=${info.caseId}`,
+    });
 
     const emails = (
       await Promise.all(
-        staff.map(async (s) => {
-          const { data } = await admin.auth.admin.getUserById(s.id);
+        staffIds.map(async (id) => {
+          const { data } = await admin.auth.admin.getUserById(id);
           return data.user?.email ?? null;
         })
       )
@@ -290,12 +300,18 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  // Let the receiving centre's staff know (dormant without RESEND_API_KEY).
+  // Let the receiving centre's staff know (push to registered devices; email
+  // too once RESEND_API_KEY is configured).
   if (assignedCentre) {
     await notifyCentreStaff(
       supabase,
       { id: assignedCentre.id, name: assignedCentre.name },
-      { animal: animal!.trim(), title: safeTitle, verdict: verdict! },
+      {
+        animal: animal!.trim(),
+        title: safeTitle,
+        verdict: verdict!,
+        caseId: data.id,
+      },
       req.nextUrl.origin
     );
   }

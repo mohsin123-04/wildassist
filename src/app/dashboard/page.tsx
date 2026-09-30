@@ -6,6 +6,7 @@ import CentreCodePanel from "./CentreCodePanel";
 import TeamPanel from "./TeamPanel";
 import AdminCentres from "./AdminCentres";
 import AdminVolunteers from "./AdminVolunteers";
+import EnablePushCard from "@/components/EnablePushCard";
 
 export const dynamic = "force-dynamic";
 
@@ -115,6 +116,7 @@ export default async function DashboardPage() {
             : "Cases routed to you from the public triage tool."}
         </p>
       </div>
+      <EnablePushCard />
       {isAdmin && <AdminCentres />}
       {(isAdmin || isManager) && <AdminVolunteers />}
       {isManager && <CentreCodePanel />}
