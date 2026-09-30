@@ -207,13 +207,29 @@ export default function AnalyticsClient({
       ? Math.round((responseMs.length / cases.length) * 100)
       : 0;
 
+    // Bucket size follows the span: days → weeks → calendar months, so a year
+    // reads as 12 monthly bars instead of 52 slivers.
     const spanDays = Math.max(1, Math.ceil((endMs - startMs) / DAY));
-    const weekly = spanDays > 45;
-    const step = weekly ? 7 * DAY : DAY;
+    const bucketUnit: "day" | "week" | "month" =
+      spanDays > 180 ? "month" : spanDays > 45 ? "week" : "day";
+    const bounds: number[] = [];
+    if (bucketUnit === "month") {
+      const s = new Date(startMs);
+      let t = new Date(s.getFullYear(), s.getMonth(), 1).getTime();
+      while (t < endMs) {
+        bounds.push(Math.max(t, startMs));
+        const d = new Date(t);
+        t = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+      }
+    } else {
+      const step = bucketUnit === "week" ? 7 * DAY : DAY;
+      for (let t = startMs; t < endMs; t += step) bounds.push(t);
+    }
     const buckets: { label: string; count: number; medianResp: number | null }[] =
       [];
-    for (let t = startMs; t < endMs; t += step) {
-      const bEnd = t + step;
+    for (let i = 0; i < bounds.length; i++) {
+      const t = bounds[i];
+      const bEnd = bounds[i + 1] ?? endMs;
       const inB = cases.filter((c) => {
         const x = at(c.created_at);
         return x >= t && x < bEnd;
@@ -224,7 +240,11 @@ export default function AnalyticsClient({
       buckets.push({
         label: new Date(t).toLocaleDateString(
           [],
-          weekly ? { month: "short", day: "numeric" } : { day: "numeric" }
+          bucketUnit === "month"
+            ? { month: "short" }
+            : bucketUnit === "week"
+              ? { month: "short", day: "numeric" }
+              : { day: "numeric" }
         ),
         count: inB.length,
         medianResp: resp.length ? median(resp) : null,
@@ -301,7 +321,7 @@ export default function AnalyticsClient({
       maxResp,
       hasRespTrend,
       labelEvery,
-      weekly,
+      bucketUnit,
       byAnimal,
       bySituation,
       byCentre,
@@ -559,7 +579,7 @@ export default function AnalyticsClient({
           {m.hasRespTrend && (
             <TimeChart
               title="Response time trend"
-              subtitle={`Median report to first pickup, per ${m.weekly ? "week" : "day"} · shorter is better`}
+              subtitle={`Median report to first pickup, per ${m.bucketUnit} · shorter is better`}
               caption={`Peak ${formatDuration(m.maxResp)}`}
               barClass="bg-sky-400/80"
               bars={m.buckets.map((d, i) => ({
@@ -572,8 +592,8 @@ export default function AnalyticsClient({
 
           <TimeChart
             title={`Intake · ${win.windowLabel}`}
-            subtitle={m.weekly ? "Reports per week" : "Reports per day"}
-            caption={`Peak ${m.maxBucket} in a ${m.weekly ? "week" : "day"}`}
+            subtitle={`Reports per ${m.bucketUnit}`}
+            caption={`Peak ${m.maxBucket} in a ${m.bucketUnit}`}
             barClass="bg-emerald-500/80"
             bars={m.buckets.map((d, i) => ({
               heightPct: d.count ? Math.max(6, (d.count / m.maxBucket) * 100) : 0,
