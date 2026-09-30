@@ -43,6 +43,10 @@ export default function AccountMenu({
   const [avatarColor, setAvatarColor] = useState<string | null>(
     initialProfile?.avatar_color ?? null
   );
+  // Whether the profile has resolved, so we can show a skeleton while it loads
+  // instead of briefly exposing the raw email in the pill. Seeded true when the
+  // server already provided the profile.
+  const [profileLoaded, setProfileLoaded] = useState(!!initialProfile);
   const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -94,6 +98,7 @@ export default function AccountMenu({
           | null;
         const name = Array.isArray(centres) ? centres[0]?.name : centres?.name;
         setCentreName(name ?? null);
+        setProfileLoaded(true);
       });
   }, [user, reload]);
 
@@ -176,7 +181,10 @@ export default function AccountMenu({
   }
 
   const email = user.email ?? "Account";
-  const label = displayName || email;
+  // The pill never shows the raw email: the member's name if known, a skeleton
+  // while the profile is still resolving, or a neutral fallback for the rare
+  // account with no name set. (Email stays in the dropdown below.)
+  const pillLabel = displayName || (profileLoaded ? "Account" : null);
 
   return (
     <div className="relative" ref={menuRef}>
@@ -187,15 +195,27 @@ export default function AccountMenu({
         {msgUnread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
         )}
-        <Avatar
-          url={avatarUrl}
-          name={displayName}
-          email={email}
-          color={avatarColor}
-          size={28}
-        />
+        {displayName || profileLoaded ? (
+          <Avatar
+            url={avatarUrl}
+            name={displayName}
+            email={displayName ? null : email}
+            color={avatarColor}
+            size={28}
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="h-7 w-7 shrink-0 animate-pulse rounded-full bg-stone-200"
+          />
+        )}
         <span className="hidden max-w-[10rem] truncate text-sm font-medium text-emerald-950 sm:block">
-          {label}
+          {pillLabel ?? (
+            <span
+              aria-hidden
+              className="inline-block h-3 w-16 animate-pulse rounded bg-stone-200 align-middle"
+            />
+          )}
         </span>
         <span
           aria-hidden
@@ -219,7 +239,7 @@ export default function AccountMenu({
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate text-sm font-medium text-emerald-950">
-                    {label}
+                    {displayName || email}
                   </p>
                   {role && role !== "staff" && (
                     <span
