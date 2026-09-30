@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #09090b; /* zinc-950 */
-  --muted: #fafafa; /* subtle section bg */
+  --background: #faf9f6; /* warm paper — calmer than sterile pure white */
+  --foreground: #1c1917; /* warm ink (stone-900) */
+  --muted: #f3f1ea; /* warm section background */
 }
 
 @theme inline {
@@ -12,8 +12,16 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  /* Headings use the same crisp sans as body (clean SaaS look). */
-  --font-display: var(--font-geist-sans);
+  /* Editorial serif for headings, clean sans for body — typographic contrast
+     is the main thing separating a crafted site from a default template. */
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+
+  /* Clay: a warm, earthy accent that harmonises with the emerald brand and
+     the natural subject. Used sparingly for emphasis, not as a second brand. */
+  --color-clay-50: #f8f1ec;
+  --color-clay-100: #efe0d5;
+  --color-clay-600: #a85c3b;
+  --color-clay-700: #8c4b30;
 }
 
 body {
@@ -24,15 +32,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Tighter tracking on display headings for a modern feel. */
+/* The serif carries its own rhythm — only a hair of negative tracking, and
+   optical sizing so large headings feel deliberate rather than blown-up body. */
 .font-display {
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  letter-spacing: -0.011em;
+  font-optical-sizing: auto;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -40,8 +51,9 @@ body {
   }
 }
 
+/* A slower, eased entrance reads as considered rather than snappy/generic. */
 .animate-in {
-  animation: fadeInUp 0.3s ease-out both;
+  animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Print: drop the app chrome and interactive controls so reports come out clean. */
