@@ -404,34 +404,34 @@ export default function MessagesClient({
   const active = conversations.find((c) => c.id === selected);
 
   return (
-    <div className="flex h-[75vh] min-h-[28rem] overflow-hidden rounded-2xl border border-zinc-200 bg-white sm:h-[32rem] sm:min-h-0">
+    <div className="flex h-[75vh] min-h-[28rem] overflow-hidden rounded-2xl border border-stone-200 bg-white sm:h-[32rem] sm:min-h-0">
       {/* Sidebar */}
       <aside
-        className={`w-full flex-col border-r border-zinc-200 sm:flex sm:w-64 ${
+        className={`w-full flex-col border-r border-stone-200 sm:flex sm:w-64 ${
           mobileThread ? "hidden" : "flex"
         }`}
       >
         <div
           ref={newMenuRef}
-          className="relative flex items-center justify-between border-b border-zinc-200 px-3 py-2.5"
+          className="relative flex items-center justify-between border-b border-stone-200 px-3 py-2.5"
         >
-          <span className="text-sm font-semibold text-zinc-900">Conversations</span>
+          <span className="text-sm font-semibold text-stone-900">Conversations</span>
           <button
             onClick={() => setNewMenu(newMenu ? null : "menu")}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-200 text-lg text-zinc-600 hover:bg-zinc-50"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 text-lg text-stone-600 hover:bg-stone-50"
             aria-label="New conversation"
           >
             +
           </button>
           {newMenu === "menu" && (
-            <div className="absolute right-2 top-11 z-20 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+            <div className="absolute right-2 top-11 z-20 w-56 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
               <button
                 onClick={() => setNewMenu("group")}
-                className="flex w-full items-center gap-2 border-b border-zinc-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-zinc-50"
+                className="flex w-full items-center gap-2 border-b border-stone-100 px-3 py-2.5 text-left text-sm font-medium text-emerald-700 hover:bg-stone-50"
               >
                 <Users className="h-4 w-4" aria-hidden /> New group chat
               </button>
-              <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-500">
+              <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-stone-500">
                 Direct message
               </p>
               <div className="max-h-48 overflow-y-auto pb-1">
@@ -439,7 +439,7 @@ export default function MessagesClient({
                   <button
                     key={m.id}
                     onClick={() => startDm(m.id)}
-                    className="block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
+                    className="block w-full px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50"
                   >
                     {m.full_name || "Unnamed"}
                   </button>
@@ -450,10 +450,10 @@ export default function MessagesClient({
         </div>
 
         {conversations.length > 5 && (
-          <div className="border-b border-zinc-200 p-2">
+          <div className="border-b border-stone-200 p-2">
             <div className="relative">
               <Search
-                className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400"
+                className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400"
                 aria-hidden
               />
               <input
@@ -461,7 +461,7 @@ export default function MessagesClient({
                 onChange={(e) => setConvQuery(e.target.value)}
                 placeholder="Search conversations"
                 aria-label="Search conversations"
-                className="w-full rounded-lg border border-zinc-200 bg-white py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:border-zinc-400"
+                className="w-full rounded-lg border border-stone-200 bg-white py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:border-stone-400"
               />
             </div>
           </div>
@@ -475,7 +475,7 @@ export default function MessagesClient({
               : conversations;
             if (shown.length === 0) {
               return (
-                <p className="px-2.5 py-6 text-center text-sm text-zinc-500">
+                <p className="px-2.5 py-6 text-center text-sm text-stone-500">
                   No conversations match “{convQuery.trim()}”.
                 </p>
               );
@@ -488,7 +488,7 @@ export default function MessagesClient({
                 key={c.id}
                 onClick={() => openConversation(c.id)}
                 className={`mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                  isSel ? "bg-emerald-700 text-white" : "text-zinc-700 hover:bg-zinc-100"
+                  isSel ? "bg-emerald-700 text-white" : "text-stone-700 hover:bg-stone-100"
                 }`}
               >
                 <ConvIcon kind={c.kind} label={c.label} selected={isSel} />
@@ -519,15 +519,15 @@ export default function MessagesClient({
           />
         ) : (
           <>
-            <div className="flex items-center gap-2 border-b border-zinc-200 px-4 py-2.5">
+            <div className="flex items-center gap-2 border-b border-stone-200 px-4 py-2.5">
               <button
                 onClick={() => setMobileThread(false)}
-                className="text-sm text-zinc-500 hover:text-zinc-900 sm:hidden"
+                className="text-sm text-stone-500 hover:text-stone-900 sm:hidden"
                 aria-label="Back"
               >
                 ←
               </button>
-              <p className="truncate text-sm font-semibold text-zinc-900">
+              <p className="truncate text-sm font-semibold text-stone-900">
                 {active ? `${active.kind === "channel" ? "# " : ""}${active.label}` : "Select a conversation"}
               </p>
             </div>
@@ -542,7 +542,7 @@ export default function MessagesClient({
               className="flex-1 space-y-3 overflow-y-auto p-4"
             >
               {messages.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-center text-sm text-zinc-500">
+                <div className="flex h-full items-center justify-center text-center text-sm text-stone-500">
                   {active?.kind === "channel"
                     ? "No messages yet. Say hello to your team."
                     : "Start the conversation."}
@@ -556,7 +556,7 @@ export default function MessagesClient({
                     <Fragment key={m.id}>
                       {showDay && (
                         <div className="flex justify-center py-1">
-                          <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600">
+                          <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-medium text-stone-600">
                             {dayLabel(m.created_at)}
                           </span>
                         </div>
@@ -565,12 +565,12 @@ export default function MessagesClient({
                         className={`group flex flex-col ${mine ? "items-end" : "items-start"}`}
                       >
                       {!mine && active?.kind !== "dm" && (
-                        <span className="mb-0.5 px-1 text-xs font-medium text-zinc-500">
+                        <span className="mb-0.5 px-1 text-xs font-medium text-stone-500">
                           {m.sender_name || "Someone"}
                         </span>
                       )}
                       {m.deleted_at ? (
-                        <div className="max-w-[80%] rounded-2xl bg-zinc-50 px-3.5 py-2 text-sm italic leading-6 text-zinc-500">
+                        <div className="max-w-[80%] rounded-2xl bg-stone-50 px-3.5 py-2 text-sm italic leading-6 text-stone-500">
                           This message was deleted
                         </div>
                       ) : editingId === m.id ? (
@@ -588,7 +588,7 @@ export default function MessagesClient({
                             }}
                             rows={2}
                             autoFocus
-                            className="w-full resize-none rounded-xl border border-zinc-300 bg-white p-2.5 text-sm text-zinc-800 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+                            className="w-full resize-none rounded-xl border border-stone-300 bg-white p-2.5 text-sm text-stone-800 outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
                           />
                           <div className="flex gap-2">
                             <button
@@ -599,7 +599,7 @@ export default function MessagesClient({
                             </button>
                             <button
                               onClick={() => setEditingId(null)}
-                              className="inline-flex h-8 items-center rounded-lg border border-zinc-200 px-3 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                              className="inline-flex h-8 items-center rounded-lg border border-stone-200 px-3 text-xs font-medium text-stone-600 hover:bg-stone-50"
                             >
                               Cancel
                             </button>
@@ -608,22 +608,22 @@ export default function MessagesClient({
                       ) : m.case_ref ? (
                         <a
                           href={`/case/${m.case_ref.id}`}
-                          className="block max-w-[85%] rounded-2xl border border-zinc-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-zinc-50"
+                          className="block max-w-[85%] rounded-2xl border border-stone-200 bg-white p-3 text-left shadow-sm transition-colors hover:bg-stone-50"
                         >
                           <span className="text-xs font-medium uppercase tracking-wide text-emerald-700">
                             Shared case
                           </span>
-                          <span className="mt-0.5 block text-sm font-medium capitalize text-zinc-900">
+                          <span className="mt-0.5 block text-sm font-medium capitalize text-stone-900">
                             {m.case_ref.animal} · {m.case_ref.title}
                           </span>
-                          <span className="mt-1 inline-block text-xs text-zinc-500">
+                          <span className="mt-1 inline-block text-xs text-stone-500">
                             View in dashboard →
                           </span>
                         </a>
                       ) : m.image_url ? (
                         <div className="flex max-w-[80%] flex-col gap-1">
                           {m.id.startsWith("temp-") ? (
-                            <div className="flex h-40 w-56 items-center justify-center rounded-2xl bg-zinc-100 text-sm text-zinc-500">
+                            <div className="flex h-40 w-56 items-center justify-center rounded-2xl bg-stone-100 text-sm text-stone-500">
                               Sending photo…
                             </div>
                           ) : (
@@ -645,7 +645,7 @@ export default function MessagesClient({
                               className={`rounded-2xl px-3.5 py-2 text-sm leading-6 ${
                                 mine
                                   ? "rounded-br-md bg-emerald-700 text-white"
-                                  : "rounded-bl-md bg-zinc-100 text-zinc-800"
+                                  : "rounded-bl-md bg-stone-100 text-stone-800"
                               }`}
                             >
                               {m.body}
@@ -657,14 +657,14 @@ export default function MessagesClient({
                           className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-6 ${
                             mine
                               ? "rounded-br-md bg-emerald-700 text-white"
-                              : "rounded-bl-md bg-zinc-100 text-zinc-800"
+                              : "rounded-bl-md bg-stone-100 text-stone-800"
                           }`}
                         >
                           {m.body}
                         </div>
                       )}
                       <div className="mt-0.5 flex items-center gap-2 px-1">
-                        <span className="text-[10px] text-zinc-500">
+                        <span className="text-[10px] text-stone-500">
                           {new Date(m.created_at).toLocaleTimeString([], {
                             hour: "numeric",
                             minute: "2-digit",
@@ -675,13 +675,13 @@ export default function MessagesClient({
                           <span className="flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                             <button
                               onClick={() => startEdit(m)}
-                              className="text-[10px] font-medium text-zinc-500 hover:text-zinc-700"
+                              className="text-[10px] font-medium text-stone-500 hover:text-stone-700"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => deleteMessage(m.id)}
-                              className="text-[10px] font-medium text-zinc-500 hover:text-rose-700"
+                              className="text-[10px] font-medium text-stone-500 hover:text-rose-700"
                             >
                               Delete
                             </button>
@@ -699,7 +699,7 @@ export default function MessagesClient({
             <div
               role="status"
               aria-live="polite"
-              className="h-4 px-4 text-xs italic text-zinc-500"
+              className="h-4 px-4 text-xs italic text-stone-500"
             >
               {typingNames.length > 0 &&
                 (typingNames.length === 1
@@ -707,7 +707,7 @@ export default function MessagesClient({
                   : `${typingNames.length} people are typing…`)}
             </div>
 
-            <div className="flex items-center gap-2 border-t border-zinc-200 p-3">
+            <div className="flex items-center gap-2 border-t border-stone-200 p-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -720,10 +720,10 @@ export default function MessagesClient({
                 disabled={!selected || uploading}
                 aria-label="Attach a photo"
                 title="Attach a photo"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-lg text-zinc-500 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 text-lg text-stone-500 transition-colors hover:bg-stone-50 disabled:opacity-50"
               >
                 {uploading ? (
-                  <span className="text-sm text-zinc-500">…</span>
+                  <span className="text-sm text-stone-500">…</span>
                 ) : (
                   <Camera className="h-5 w-5" aria-hidden />
                 )}
@@ -743,7 +743,7 @@ export default function MessagesClient({
                 }}
                 placeholder={`Message ${active?.label ?? "…"}`}
                 disabled={!selected}
-                className="h-10 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 disabled:opacity-50"
+                className="h-10 flex-1 rounded-xl border border-stone-200 bg-white px-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5 disabled:opacity-50"
               />
               <button
                 onClick={() => send()}
@@ -772,13 +772,13 @@ function ConvIcon({
   const base = "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold";
   if (kind === "channel")
     return (
-      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-zinc-200 text-zinc-600"}`}>
+      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-stone-200 text-stone-600"}`}>
         #
       </span>
     );
   if (kind === "group")
     return (
-      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-zinc-200 text-zinc-600"}`}>
+      <span className={`${base} ${selected ? "bg-white/15 text-white" : "bg-stone-200 text-stone-600"}`}>
         <Users className="h-3.5 w-3.5" aria-hidden />
       </span>
     );
@@ -805,14 +805,14 @@ function GroupCreator({
 
   return (
     <div className="flex-1 overflow-y-auto p-5">
-      <p className="text-sm font-semibold text-zinc-900">New group chat</p>
+      <p className="text-sm font-semibold text-stone-900">New group chat</p>
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Group name (e.g. Weekend drivers)"
-        className="mt-3 h-10 w-full rounded-xl border border-zinc-200 px-4 text-sm outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+        className="mt-3 h-10 w-full rounded-xl border border-stone-200 px-4 text-sm outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
       />
-      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-500">
+      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-stone-500">
         Add teammates
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -822,8 +822,8 @@ function GroupCreator({
             onClick={() => toggle(m.id)}
             className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
               picked.includes(m.id)
-                ? "border-zinc-900 bg-zinc-900 text-white"
-                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                ? "border-stone-900 bg-stone-900 text-white"
+                : "border-stone-200 text-stone-600 hover:bg-stone-50"
             }`}
           >
             {m.full_name || "Unnamed"}
@@ -834,18 +834,18 @@ function GroupCreator({
         <button
           onClick={() => onCreate(title, picked)}
           disabled={picked.length < 2}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
         >
           Create group
         </button>
         <button
           onClick={onCancel}
-          className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 px-5 text-sm font-medium text-stone-600 hover:bg-stone-50"
         >
           Cancel
         </button>
       </div>
-      <p className="mt-2 text-xs text-zinc-500">Pick at least two teammates.</p>
+      <p className="mt-2 text-xs text-stone-500">Pick at least two teammates.</p>
     </div>
   );
 }

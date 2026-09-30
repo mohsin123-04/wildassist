@@ -44,13 +44,13 @@ export default function CaseStatusControl({
   }
 
   return (
-    <label className="flex items-center gap-2 text-sm text-zinc-600">
+    <label className="flex items-center gap-2 text-sm text-stone-600">
       Status
       <select
         value={status}
         disabled={saving}
         onChange={(e) => update(e.target.value as Status)}
-        className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
+        className="rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-800 outline-none focus:border-emerald-400 disabled:opacity-50"
       >
         {STATUSES.map((s) => (
           <option key={s.value} value={s.value}>

@@ -29,7 +29,7 @@ const RANGES = [
 type RangeKey = (typeof RANGES)[number]["key"];
 
 const STATUS_META = [
-  { key: "reported", label: "Reported", color: "bg-zinc-400" },
+  { key: "reported", label: "Reported", color: "bg-stone-400" },
   { key: "in_transit", label: "In transit", color: "bg-amber-400" },
   { key: "at_centre", label: "At centre", color: "bg-sky-400" },
   { key: "closed", label: "Closed", color: "bg-emerald-500" },
@@ -381,14 +381,14 @@ export default function AnalyticsClient({
   if (!mounted) {
     return (
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
-        <div className="h-3 w-20 animate-pulse rounded bg-zinc-100" />
-        <div className="mt-2 h-7 w-32 animate-pulse rounded bg-zinc-200" />
+        <div className="h-3 w-20 animate-pulse rounded bg-stone-100" />
+        <div className="mt-2 h-7 w-32 animate-pulse rounded bg-stone-200" />
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl border border-zinc-200 bg-white" />
+            <div key={i} className="h-20 animate-pulse rounded-2xl border border-stone-200 bg-white" />
           ))}
         </div>
-        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-zinc-200 bg-white" />
+        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-stone-200 bg-white" />
       </main>
     );
   }
@@ -397,16 +397,16 @@ export default function AnalyticsClient({
     <main className="animate-in mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8">
       <Link
         href="/dashboard"
-        className="no-print mb-4 inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+        className="no-print mb-4 inline-flex w-fit items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden /> Dashboard
       </Link>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+          <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
             {isAdmin ? "Nationwide" : "Your area"}
           </p>
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-stone-900">
             Analytics
           </h1>
         </div>
@@ -417,15 +417,15 @@ export default function AnalyticsClient({
       </div>
 
       {/* Range selector */}
-      <div className="no-print mb-4 inline-flex gap-1 self-start rounded-xl border border-zinc-200 bg-white p-1">
+      <div className="no-print mb-4 inline-flex gap-1 self-start rounded-xl border border-stone-200 bg-white p-1">
         {RANGES.map((r) => (
           <button
             key={r.key}
             onClick={() => setRangeKey(r.key)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               r.key === rangeKey
-                ? "bg-zinc-900 text-white"
-                : "text-zinc-600 hover:bg-zinc-50"
+                ? "bg-stone-900 text-white"
+                : "text-stone-600 hover:bg-stone-50"
             }`}
           >
             {r.label}
@@ -439,18 +439,18 @@ export default function AnalyticsClient({
           <button
             onClick={() => stepPeriod(-1)}
             aria-label={`Previous ${rangeKey}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-600 transition-colors hover:bg-stone-50"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="min-w-[10rem] text-center font-display text-base font-semibold text-zinc-900">
+          <span className="min-w-[10rem] text-center font-display text-base font-semibold text-stone-900">
             {win.windowLabel}
           </span>
           <button
             onClick={() => stepPeriod(1)}
             disabled={nextDisabled}
             aria-label={`Next ${rangeKey}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -460,11 +460,11 @@ export default function AnalyticsClient({
       {/* Active drill-down filters */}
       {(animalFilter || statusFilter) && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-zinc-500">Filtered by</span>
+          <span className="text-xs font-medium text-stone-500">Filtered by</span>
           {animalFilter && (
             <button
               onClick={() => setAnimalFilter(null)}
-              className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium capitalize text-zinc-700 hover:bg-zinc-50"
+              className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium capitalize text-stone-700 hover:bg-stone-50"
             >
               {animalFilter}
               <X className="h-3 w-3" aria-hidden />
@@ -473,7 +473,7 @@ export default function AnalyticsClient({
           {statusFilter && (
             <button
               onClick={() => setStatusFilter(null)}
-              className="inline-flex items-center gap-1 rounded-full border border-zinc-300 bg-white px-2.5 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+              className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 hover:bg-stone-50"
             >
               {STATUS_LABEL[statusFilter]}
               <X className="h-3 w-3" aria-hidden />
@@ -483,7 +483,7 @@ export default function AnalyticsClient({
       )}
 
       {m.cases.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-10 text-center text-sm text-zinc-500">
+        <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 p-10 text-center text-sm text-stone-500">
           No cases in {win.windowLabel}. Try a wider range or clearing filters.
         </div>
       ) : (
@@ -509,16 +509,16 @@ export default function AnalyticsClient({
           </div>
 
           {m.dupCount > 0 && (
-            <p className="-mt-1 text-xs text-zinc-500">
+            <p className="-mt-1 text-xs text-stone-500">
               <span className="font-medium text-orange-600">{m.dupCount}</span>{" "}
               possible duplicate{m.dupCount === 1 ? "" : "s"} flagged ({m.dupPct}% of
               cases), merge or dismiss them on the dashboard.
             </p>
           )}
 
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-            <h2 className="font-display text-base font-semibold text-zinc-900">Open queue</h2>
-            <p className="mt-0.5 text-xs text-zinc-500">
+          <section className="rounded-2xl border border-stone-200 bg-white p-5">
+            <h2 className="font-display text-base font-semibold text-stone-900">Open queue</h2>
+            <p className="mt-0.5 text-xs text-stone-500">
               How long cases have been waiting right now
             </p>
             {m.openQueue.length === 0 ? (
@@ -530,7 +530,7 @@ export default function AnalyticsClient({
                   big
                   value={m.oldestOpen !== null ? formatDuration(m.oldestOpen) : "N/A"}
                   label="oldest waiting"
-                  accent={m.oldestOpen !== null && m.oldestOpen > 3 * DAY ? "text-rose-700" : "text-zinc-900"}
+                  accent={m.oldestOpen !== null && m.oldestOpen > 3 * DAY ? "text-rose-700" : "text-stone-900"}
                 />
                 <Metric
                   big
@@ -543,23 +543,23 @@ export default function AnalyticsClient({
 
           <div className="grid gap-5 sm:grid-cols-2">
             {!statusFilter && (
-              <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-                <h2 className="font-display text-base font-semibold text-zinc-900">Case status</h2>
-                <p className="mt-0.5 text-xs text-zinc-500">Where cases stand · click to filter</p>
+              <section className="rounded-2xl border border-stone-200 bg-white p-5">
+                <h2 className="font-display text-base font-semibold text-stone-900">Case status</h2>
+                <p className="mt-0.5 text-xs text-stone-500">Where cases stand · click to filter</p>
                 <SegBar segments={m.statusSegments} total={m.cases.length} onSelect={setStatusFilter} />
               </section>
             )}
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-              <h2 className="font-display text-base font-semibold text-zinc-900">Triage outcome</h2>
-              <p className="mt-0.5 text-xs text-zinc-500">What WildAssist advised finders</p>
+            <section className="rounded-2xl border border-stone-200 bg-white p-5">
+              <h2 className="font-display text-base font-semibold text-stone-900">Triage outcome</h2>
+              <p className="mt-0.5 text-xs text-stone-500">What WildAssist advised finders</p>
               <SegBar segments={m.verdictSegments} total={m.cases.length} />
             </section>
           </div>
 
-          <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-            <h2 className="font-display text-base font-semibold text-zinc-900">Response time</h2>
+          <section className="rounded-2xl border border-stone-200 bg-white p-5">
+            <h2 className="font-display text-base font-semibold text-stone-900">Response time</h2>
             {m.medianResponse === null ? (
-              <p className="mt-2 text-sm text-zinc-500">
+              <p className="mt-2 text-sm text-stone-500">
                 Not enough data yet. This shows the typical time from a report to its
                 first pickup once cases start moving.
               </p>
@@ -635,7 +635,7 @@ function Stat({
   value,
   sub,
   subUp,
-  accent = "text-zinc-900",
+  accent = "text-stone-900",
 }: {
   label: string;
   value: number | string;
@@ -644,9 +644,9 @@ function Stat({
   accent?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+    <div className="rounded-2xl border border-stone-200 bg-white p-4">
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
-      <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
+      <p className="mt-0.5 text-xs text-stone-500">{label}</p>
       {sub && (
         <p className={`mt-1 text-xs ${subUp ? "text-emerald-700" : "text-rose-700"}`}>{sub}</p>
       )}
@@ -657,7 +657,7 @@ function Stat({
 function Metric({
   value,
   label,
-  accent = "text-zinc-900",
+  accent = "text-stone-900",
   big,
 }: {
   value: string;
@@ -670,7 +670,7 @@ function Metric({
       <p className={`font-display font-semibold ${big ? "text-3xl" : "text-xl"} ${accent}`}>
         {value}
       </p>
-      <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
+      <p className="mt-0.5 text-xs text-stone-500">{label}</p>
     </div>
   );
 }
@@ -686,7 +686,7 @@ function SegBar({
 }) {
   return (
     <div className="mt-4">
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-zinc-100">
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-stone-100">
         {segments.map(
           (s) =>
             s.value > 0 && (
@@ -704,19 +704,19 @@ function SegBar({
           const inner = (
             <>
               <span className={`h-2 w-2 rounded-full ${s.color}`} />
-              {s.label} <span className="font-medium text-zinc-900">{s.value}</span>
+              {s.label} <span className="font-medium text-stone-900">{s.value}</span>
             </>
           );
           return onSelect ? (
             <button
               key={s.key}
               onClick={() => onSelect(s.key)}
-              className="flex items-center gap-1.5 rounded-md px-1 text-xs text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+              className="flex items-center gap-1.5 rounded-md px-1 text-xs text-stone-600 hover:bg-stone-50 hover:text-stone-900"
             >
               {inner}
             </button>
           ) : (
-            <span key={s.key} className="flex items-center gap-1.5 px-1 text-xs text-zinc-600">
+            <span key={s.key} className="flex items-center gap-1.5 px-1 text-xs text-stone-600">
               {inner}
             </span>
           );
@@ -740,13 +740,13 @@ function TimeChart({
   bars: { heightPct: number; title: string; label: string }[];
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-      <h2 className="font-display text-base font-semibold text-zinc-900">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>}
-      <div className="mt-4 flex h-32 items-end gap-1 border-b border-zinc-200">
+    <section className="rounded-2xl border border-stone-200 bg-white p-5">
+      <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
+      <div className="mt-4 flex h-32 items-end gap-1 border-b border-stone-200">
         {bars.map((b, i) => (
           <div key={i} className="flex h-full flex-1 items-end">
-            <div className="flex h-full w-full items-end rounded-t bg-zinc-50">
+            <div className="flex h-full w-full items-end rounded-t bg-stone-50">
               <div
                 className={`w-full rounded-t ${barClass}`}
                 style={{ height: `${b.heightPct}%` }}
@@ -758,12 +758,12 @@ function TimeChart({
       </div>
       <div className="mt-1 flex gap-1">
         {bars.map((b, i) => (
-          <span key={i} className="flex-1 text-center text-[10px] text-zinc-500">
+          <span key={i} className="flex-1 text-center text-[10px] text-stone-500">
             {b.label}
           </span>
         ))}
       </div>
-      {caption && <p className="mt-1 text-xs text-zinc-500">{caption}</p>}
+      {caption && <p className="mt-1 text-xs text-stone-500">{caption}</p>}
     </section>
   );
 }
@@ -783,23 +783,23 @@ function BarPanel({
 }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-      <h2 className="font-display text-base font-semibold text-zinc-900">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>}
+    <section className="rounded-2xl border border-stone-200 bg-white p-5">
+      <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex flex-col gap-2.5">
         {rows.map((r) => {
           const body = (
             <>
-              <span className="w-28 shrink-0 truncate text-sm capitalize text-zinc-600">
+              <span className="w-28 shrink-0 truncate text-sm capitalize text-stone-600">
                 {r.label}
               </span>
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-100">
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-stone-100">
                 <div
                   className="h-full rounded-full bg-emerald-500"
                   style={{ width: `${(r.value / max) * 100}%` }}
                 />
               </div>
-              <span className="shrink-0 text-right text-sm font-medium text-zinc-700">
+              <span className="shrink-0 text-right text-sm font-medium text-stone-700">
                 {format ? format(r.value) : r.value}
               </span>
             </>
@@ -808,7 +808,7 @@ function BarPanel({
             <button
               key={r.label}
               onClick={() => onSelect(r.key as string)}
-              className="-mx-1 flex items-center gap-3 rounded-lg px-1 py-0.5 text-left hover:bg-zinc-50"
+              className="-mx-1 flex items-center gap-3 rounded-lg px-1 py-0.5 text-left hover:bg-stone-50"
             >
               {body}
             </button>

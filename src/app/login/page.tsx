@@ -12,7 +12,7 @@ type Mode = "signin" | "signup";
 type Role = "staff" | "volunteer";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 const ROLES: { value: Role; Icon: LucideIcon; title: string; desc: string }[] = [
   {
@@ -114,7 +114,7 @@ export default function LoginPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-7">
+      <div className="rounded-2xl border border-stone-200 bg-white p-7">
         <div className="flex items-center gap-2">
           <span
             aria-hidden
@@ -122,13 +122,13 @@ export default function LoginPage() {
           >
             <Bird className="h-5 w-5" />
           </span>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">
             {mode === "signin" ? "Sign in" : "Create your account"}
           </h1>
         </div>
-        <p className="mt-2 text-sm leading-6 text-zinc-600">
+        <p className="mt-2 text-sm leading-6 text-stone-600">
           WildAssist accounts are for{" "}
-          <span className="font-medium text-zinc-800">
+          <span className="font-medium text-stone-800">
             wildlife centre staff and rescue volunteers
           </span>
           . Found an animal?{" "}
@@ -151,8 +151,8 @@ export default function LoginPage() {
                     onClick={() => setRole(r.value)}
                     className={`flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-all ${
                       role === r.value
-                        ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
-                        : "border-zinc-200 bg-white hover:border-zinc-300"
+                        ? "border-stone-900 bg-stone-50 ring-1 ring-stone-900"
+                        : "border-stone-200 bg-white hover:border-stone-300"
                     }`}
                   >
                     <span
@@ -162,10 +162,10 @@ export default function LoginPage() {
                       <r.Icon className="h-5 w-5" />
                     </span>
                     <span>
-                      <span className="block text-sm font-semibold text-zinc-900">
+                      <span className="block text-sm font-semibold text-stone-900">
                         {r.title}
                       </span>
-                      <span className="mt-0.5 block text-xs leading-5 text-zinc-500">
+                      <span className="mt-0.5 block text-xs leading-5 text-stone-500">
                         {r.desc}
                       </span>
                     </span>
@@ -180,8 +180,8 @@ export default function LoginPage() {
                 onChange={(e) => setName(e.target.value)}
               />
               {role === "volunteer" && (
-                <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/60 p-3.5">
-                  <p className="text-xs font-medium text-zinc-500">
+                <div className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-stone-50/60 p-3.5">
+                  <p className="text-xs font-medium text-stone-500">
                     So a centre can verify and reach you about pickups.
                   </p>
                   <input
@@ -246,7 +246,7 @@ export default function LoginPage() {
             <div className="-mt-1 flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-xs font-medium text-zinc-500 underline-offset-2 hover:text-zinc-800 hover:underline"
+                className="text-xs font-medium text-stone-500 underline-offset-2 hover:text-stone-800 hover:underline"
               >
                 Forgot password?
               </Link>
@@ -263,7 +263,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-1 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? (
               <Spinner label="Please wait…" />
@@ -291,7 +291,7 @@ export default function LoginPage() {
 
       <Link
         href="/"
-        className="mt-6 text-center text-sm text-zinc-500 hover:text-zinc-800"
+        className="mt-6 text-center text-sm text-stone-500 hover:text-stone-800"
       >
         ← Back to WildAssist
       </Link>

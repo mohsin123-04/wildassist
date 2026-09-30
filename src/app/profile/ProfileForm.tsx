@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 export default function ProfileForm({
   initialName,
@@ -67,17 +67,17 @@ export default function ProfileForm({
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-zinc-900">
+    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-stone-900">
         Profile
       </h2>
-      <p className="mt-0.5 text-sm text-zinc-500">
+      <p className="mt-0.5 text-sm text-stone-500">
         How you appear to your centre team.
       </p>
 
       <div className="mt-5 flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-zinc-700">Display name</span>
+          <span className="text-sm font-medium text-stone-700">Display name</span>
           <input
             className={inputClass}
             value={name}
@@ -88,7 +88,7 @@ export default function ProfileForm({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-zinc-700">
+            <span className="text-sm font-medium text-stone-700">
               Role / title
             </span>
             <input
@@ -99,7 +99,7 @@ export default function ProfileForm({
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-zinc-700">Phone</span>
+            <span className="text-sm font-medium text-stone-700">Phone</span>
             <input
               className={inputClass}
               value={phone}
@@ -110,10 +110,10 @@ export default function ProfileForm({
         </div>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-zinc-700">Bio</span>
+          <span className="text-sm font-medium text-stone-700">Bio</span>
           <textarea
             rows={3}
-            className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+            className="w-full resize-none rounded-xl border border-stone-200 bg-white p-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="A sentence about you and your work at the centre."
@@ -129,7 +129,7 @@ export default function ProfileForm({
       <button
         onClick={save}
         disabled={saving || !dirty}
-        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50"
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-50"
       >
         {saving ? <Spinner label="Saving…" /> : "Save changes"}
       </button>

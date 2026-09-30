@@ -82,7 +82,7 @@ export default function NotificationBell() {
     <Link
       href="/dashboard"
       aria-label={`${count} new cases`}
-      className="relative flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-emerald-50"
+      className="relative flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 transition-colors hover:bg-emerald-50"
     >
       <svg
         viewBox="0 0 24 24"

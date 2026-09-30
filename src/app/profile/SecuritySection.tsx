@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 export default function SecuritySection({ email }: { email: string }) {
   const [password, setPassword] = useState("");
@@ -62,14 +62,14 @@ export default function SecuritySection({ email }: { email: string }) {
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-zinc-900">
+    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-stone-900">
         Security
       </h2>
 
       {/* Change password */}
       <div className="mt-5 flex flex-col gap-3">
-        <p className="text-sm font-medium text-zinc-700">Change password</p>
+        <p className="text-sm font-medium text-stone-700">Change password</p>
         <input
           className={inputClass}
           type="password"
@@ -92,18 +92,18 @@ export default function SecuritySection({ email }: { email: string }) {
         <button
           onClick={changePassword}
           disabled={pwBusy || !password}
-          className="inline-flex h-10 w-fit items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+          className="inline-flex h-10 w-fit items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
         >
           {pwBusy ? <Spinner label="Updating…" /> : "Update password"}
         </button>
       </div>
 
-      <hr className="my-6 border-zinc-100" />
+      <hr className="my-6 border-stone-100" />
 
       {/* Change email */}
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-zinc-700">Change email</p>
-        <p className="text-sm text-zinc-500">Current: {email}</p>
+        <p className="text-sm font-medium text-stone-700">Change email</p>
+        <p className="text-sm text-stone-500">Current: {email}</p>
         <input
           className={inputClass}
           type="email"
@@ -119,7 +119,7 @@ export default function SecuritySection({ email }: { email: string }) {
         <button
           onClick={changeEmail}
           disabled={emailBusy || !newEmail}
-          className="inline-flex h-10 w-fit items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+          className="inline-flex h-10 w-fit items-center justify-center rounded-xl border border-stone-200 px-5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
         >
           {emailBusy ? <Spinner label="Sending…" /> : "Update email"}
         </button>

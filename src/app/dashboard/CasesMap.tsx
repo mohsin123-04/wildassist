@@ -20,7 +20,7 @@ export default function CasesMap({
   const located = cases.filter((c) => c.lat != null && c.lng != null);
 
   return (
-    <div className="h-[440px] w-full overflow-hidden rounded-2xl border border-zinc-200">
+    <div className="h-[440px] w-full overflow-hidden rounded-2xl border border-stone-200">
       <MapContainer
         center={center}
         zoom={9}
@@ -49,14 +49,14 @@ export default function CasesMap({
                   {c.animal} · {c.verdict}
                 </p>
                 <p>{c.title ?? c.situation.replace(/-/g, " ")}</p>
-                <p className="text-zinc-500">{c.status.replace(/_/g, " ")}</p>
+                <p className="text-stone-500">{c.status.replace(/_/g, " ")}</p>
               </div>
             </Popup>
           </CircleMarker>
         ))}
       </MapContainer>
       {located.length === 0 && (
-        <p className="p-4 text-center text-sm text-zinc-500">
+        <p className="p-4 text-center text-sm text-stone-500">
           No cases with a location to map yet.
         </p>
       )}

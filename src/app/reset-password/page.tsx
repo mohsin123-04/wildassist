@@ -9,7 +9,7 @@ import { flash } from "@/lib/flash";
 import Spinner from "@/components/Spinner";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 type Ready = "checking" | "ready" | "invalid";
 
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-7">
+      <div className="rounded-2xl border border-stone-200 bg-white p-7">
         <div className="flex items-center gap-2">
           <span
             aria-hidden
@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
           >
             <Bird className="h-5 w-5" />
           </span>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">
             Choose a new password
           </h1>
         </div>
@@ -93,7 +93,7 @@ export default function ResetPasswordPage() {
           </div>
         ) : ready === "invalid" ? (
           <div className="mt-4">
-            <p className="text-sm leading-6 text-zinc-600">
+            <p className="text-sm leading-6 text-stone-600">
               This reset link is invalid or has expired. Reset links are
               single-use and time-limited. Please request a new one.
             </p>
@@ -134,7 +134,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={busy}
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
             >
               {busy ? <Spinner label="Updating…" /> : "Update password"}
             </button>

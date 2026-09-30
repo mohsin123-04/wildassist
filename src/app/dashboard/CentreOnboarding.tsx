@@ -37,11 +37,11 @@ export default function CentreOnboarding({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
-      <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+    <div className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm">
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">
         Join your centre
       </h1>
-      <p className="mt-1 text-sm leading-6 text-zinc-600">
+      <p className="mt-1 text-sm leading-6 text-stone-600">
         Cases contain the contact details of people who reported animals, so
         access is protected. Enter the join code your centre gave you to see its
         cases.
@@ -49,11 +49,11 @@ export default function CentreOnboarding({
 
       <div className="mt-5 flex flex-col gap-3">
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-zinc-700">Centre</span>
+          <span className="text-sm font-medium text-stone-700">Centre</span>
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
-            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+            className="h-11 w-full rounded-xl border border-stone-200 bg-white px-3 outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
           >
             <option value="">Select a centre…</option>
             {centres.map((c) => (
@@ -65,12 +65,12 @@ export default function CentreOnboarding({
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-zinc-700">Join code</span>
+          <span className="text-sm font-medium text-stone-700">Join code</span>
           <input
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="e.g. TWC-2026"
-            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+            className="h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
           />
         </label>
       </div>
@@ -80,7 +80,7 @@ export default function CentreOnboarding({
       <button
         onClick={join}
         disabled={!selected || !code.trim() || loading}
-        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50"
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-50"
       >
         {loading ? <Spinner label="Joining…" /> : "Join centre"}
       </button>

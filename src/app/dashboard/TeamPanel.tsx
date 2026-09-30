@@ -13,7 +13,7 @@ type Member = {
 const ROLE_BADGE: Record<string, string> = {
   manager: "bg-emerald-100 text-emerald-700",
   admin: "bg-violet-100 text-violet-700",
-  staff: "bg-zinc-100 text-zinc-600",
+  staff: "bg-stone-100 text-stone-600",
 };
 
 export default function TeamPanel() {
@@ -56,24 +56,24 @@ export default function TeamPanel() {
   const managers = members.filter((m) => m.role === "manager").length;
 
   return (
-    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-          <Users className="h-4 w-4 text-zinc-400" aria-hidden />
+        <span className="flex items-center gap-2 text-sm font-medium text-stone-900">
+          <Users className="h-4 w-4 text-stone-400" aria-hidden />
           Your team ({members.length})
         </span>
         <ChevronDown
           aria-hidden
-          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
         <div className="mt-3">
-          <p className="text-sm leading-6 text-zinc-500">
+          <p className="text-sm leading-6 text-stone-500">
             {canManage
               ? "Everyone at your centre. Promote a colleague to co-manager, or remove someone who has left."
               : `Everyone at your centre. ${managers} manager${managers === 1 ? "" : "s"} can manage the team and join code.`}
@@ -88,13 +88,13 @@ export default function TeamPanel() {
               return (
                 <li
                   key={m.id}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-2.5"
+                  className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-3 py-2.5"
                 >
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                       isManager
                         ? "bg-emerald-700 text-white"
-                        : "bg-zinc-200 text-zinc-600"
+                        : "bg-stone-200 text-stone-600"
                     }`}
                   >
                     {name.charAt(0).toUpperCase()}
@@ -102,16 +102,16 @@ export default function TeamPanel() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="truncate text-sm font-medium text-zinc-900">
+                      <span className="truncate text-sm font-medium text-stone-900">
                         {name}
                       </span>
                       {isMe && (
-                        <span className="shrink-0 rounded-lg bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                        <span className="shrink-0 rounded-lg bg-stone-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                           You
                         </span>
                       )}
                     </div>
-                    <p className="truncate text-xs text-zinc-500">
+                    <p className="truncate text-xs text-stone-500">
                       {m.title ||
                         m.role.charAt(0).toUpperCase() + m.role.slice(1)}
                     </p>
@@ -119,7 +119,7 @@ export default function TeamPanel() {
 
                   {!canManage && (
                     <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${ROLE_BADGE[m.role] ?? "bg-zinc-100 text-zinc-600"}`}
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${ROLE_BADGE[m.role] ?? "bg-stone-100 text-stone-600"}`}
                     >
                       {m.role}
                     </span>
@@ -178,7 +178,7 @@ function ActionBtn({
       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
         danger
           ? "border-rose-200 text-rose-700 hover:bg-rose-50"
-          : "border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+          : "border-stone-200 text-stone-700 hover:bg-stone-50"
       }`}
     >
       {label}

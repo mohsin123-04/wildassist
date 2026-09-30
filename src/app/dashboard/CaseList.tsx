@@ -29,7 +29,7 @@ function fmtDistance(km: number): string {
 const CasesMap = dynamic(() => import("./CasesMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-500">
+    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-stone-200 bg-white text-sm text-stone-500">
       Loading map…
     </div>
   ),
@@ -68,7 +68,7 @@ const STATUSES: { value: CaseRow["status"]; label: string }[] = [
 ];
 
 const STATUS_DOT: Record<CaseRow["status"], string> = {
-  reported: "bg-zinc-400",
+  reported: "bg-stone-400",
   in_transit: "bg-amber-400",
   at_centre: "bg-sky-400",
   closed: "bg-emerald-500",
@@ -394,7 +394,7 @@ export default function CaseList({
       {/* Quick views, two independent axes, grouped and labeled so it's clear
           they answer different questions (who owns it vs what state it's in). */}
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-widest text-zinc-400">
+        <p className="mb-2 text-xs font-medium uppercase tracking-widest text-stone-400">
           Quick views · tap to filter
         </p>
         <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
@@ -414,11 +414,11 @@ export default function CaseList({
                 onClick={() => selectScope("unassigned")}
               />
             </div>
-            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-stone-400">
               By assignment
             </p>
           </div>
-          <div className="hidden w-px self-stretch bg-zinc-200 sm:block" />
+          <div className="hidden w-px self-stretch bg-stone-200 sm:block" />
           <div className="flex-1">
             <div className="grid grid-cols-2 gap-3">
               <Stat
@@ -436,7 +436,7 @@ export default function CaseList({
                 onClick={() => selectScope("needs-help")}
               />
             </div>
-            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-stone-400">
               By status
             </p>
           </div>
@@ -450,13 +450,13 @@ export default function CaseList({
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Search cases"
           placeholder="Search animal, title, description, reporter…"
-          className="h-10 min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-4 text-sm outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+          className="h-10 min-w-0 flex-1 rounded-xl border border-stone-200 bg-white px-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
           aria-label="Sort cases"
-          className="h-10 rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
+          className="h-10 rounded-xl border border-stone-200 bg-white px-3 text-sm text-stone-700 outline-none focus:border-emerald-400"
         >
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>
@@ -467,8 +467,8 @@ export default function CaseList({
           aria-expanded={showFilters}
           className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
             showFilters || dateFrom || dateTo || mineOnly
-              ? "border-zinc-300 bg-zinc-50 text-zinc-800"
-              : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+              ? "border-stone-300 bg-stone-50 text-stone-800"
+              : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
           }`}
         >
           Filters
@@ -477,7 +477,7 @@ export default function CaseList({
           )}
           <span
             aria-hidden
-            className={`text-xs text-zinc-400 transition-transform ${showFilters ? "rotate-180" : ""}`}
+            className={`text-xs text-stone-400 transition-transform ${showFilters ? "rotate-180" : ""}`}
           >
             ▾
           </span>
@@ -485,19 +485,19 @@ export default function CaseList({
         <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
-          className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
         >
           Export CSV
         </button>
-        <div className="flex h-10 overflow-hidden rounded-xl border border-zinc-200">
+        <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200">
           {(["list", "board", "map"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
               className={`px-3 text-sm font-medium capitalize transition-colors ${
                 view === v
-                  ? "bg-zinc-900 text-white"
-                  : "bg-white text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-stone-900 text-white"
+                  : "bg-white text-stone-600 hover:bg-stone-50"
               }`}
             >
               {v}
@@ -509,24 +509,24 @@ export default function CaseList({
       {/* Date range + assignment filter, collapsed by default to reduce clutter */}
       {showFilters && (
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <label className="flex items-center gap-1.5 text-zinc-500">
+        <label className="flex items-center gap-1.5 text-stone-500">
           From
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
             aria-label="Reported from date"
-            className="h-9 rounded-lg border border-zinc-200 bg-white px-2 text-zinc-700 outline-none focus:border-emerald-400"
+            className="h-9 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
           />
         </label>
-        <label className="flex items-center gap-1.5 text-zinc-500">
+        <label className="flex items-center gap-1.5 text-stone-500">
           to
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
             aria-label="Reported to date"
-            className="h-9 rounded-lg border border-zinc-200 bg-white px-2 text-zinc-700 outline-none focus:border-emerald-400"
+            className="h-9 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
           />
         </label>
         {(dateFrom || dateTo) && (
@@ -535,7 +535,7 @@ export default function CaseList({
               setDateFrom("");
               setDateTo("");
             }}
-            className="text-xs font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+            className="text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
           >
             Clear dates
           </button>
@@ -577,20 +577,20 @@ export default function CaseList({
             return (
               <div
                 key={s.value}
-                className="flex flex-col rounded-2xl border border-zinc-200 bg-zinc-50/50"
+                className="flex flex-col rounded-2xl border border-stone-200 bg-stone-50/50"
               >
-                <div className="flex items-center justify-between border-b border-zinc-200 px-3 py-2.5">
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700">
+                <div className="flex items-center justify-between border-b border-stone-200 px-3 py-2.5">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-stone-700">
                     <span className={`h-2 w-2 rounded-full ${STATUS_DOT[s.value]}`} />
                     {s.label}
                   </span>
-                  <span className="text-xs font-medium text-zinc-500">
+                  <span className="text-xs font-medium text-stone-500">
                     {col.length}
                   </span>
                 </div>
                 <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-2">
                   {col.length === 0 ? (
-                    <p className="px-1 py-4 text-center text-xs text-zinc-400">
+                    <p className="px-1 py-4 text-center text-xs text-stone-400">
                       None
                     </p>
                   ) : (
@@ -601,14 +601,14 @@ export default function CaseList({
                         <button
                           key={c.id}
                           onClick={() => goToCase(c.id)}
-                          className={`w-full rounded-xl border bg-white p-2.5 text-left shadow-sm transition-colors hover:bg-zinc-50 ${
+                          className={`w-full rounded-xl border bg-white p-2.5 text-left shadow-sm transition-colors hover:bg-stone-50 ${
                             urgent
-                              ? "border-zinc-200 border-l-2 border-l-rose-400"
-                              : "border-zinc-200"
+                              ? "border-stone-200 border-l-2 border-l-rose-400"
+                              : "border-stone-200"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <span className="truncate text-sm font-medium capitalize text-zinc-900">
+                            <span className="truncate text-sm font-medium capitalize text-stone-900">
                               {c.animal}
                             </span>
                             {c.duplicate_of && (
@@ -617,10 +617,10 @@ export default function CaseList({
                               </span>
                             )}
                           </div>
-                          <p className="mt-0.5 truncate text-xs text-zinc-600">
+                          <p className="mt-0.5 truncate text-xs text-stone-600">
                             {c.title ?? c.situation.replace(/-/g, " ")}
                           </p>
-                          <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-stone-400">
                             <span>{timeAgo(c.created_at)}</span>
                             {c.assigned_to && (
                               <span className="truncate text-sky-600">
@@ -642,10 +642,10 @@ export default function CaseList({
       ) : view === "map" ? (
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/50 p-10 text-center">
-          <Bird className="mx-auto h-8 w-8 text-zinc-300" aria-hidden />
-          <p className="mt-2 font-medium text-zinc-900">Nothing here</p>
-          <p className="mt-1 text-sm text-zinc-500">
+        <div className="rounded-2xl border border-dashed border-stone-200 bg-white/50 p-10 text-center">
+          <Bird className="mx-auto h-8 w-8 text-stone-300" aria-hidden />
+          <p className="mt-2 font-medium text-stone-900">Nothing here</p>
+          <p className="mt-1 text-sm text-stone-500">
             {scope === "unassigned"
               ? "No unassigned cases right now."
               : scope === "open"
@@ -668,8 +668,8 @@ export default function CaseList({
                 id={`case-${c.id}`}
                 className={`rounded-2xl border bg-white shadow-sm scroll-mt-24 ${
                   c.verdict === "help" && c.status !== "closed"
-                    ? "border-zinc-200 border-l-4 border-l-rose-400"
-                    : "border-zinc-200"
+                    ? "border-stone-200 border-l-4 border-l-rose-400"
+                    : "border-stone-200"
                 }`}
               >
                 <button
@@ -683,11 +683,11 @@ export default function CaseList({
                       >
                         {c.verdict}
                       </span>
-                      <span className="text-sm font-medium capitalize text-zinc-900">
+                      <span className="text-sm font-medium capitalize text-stone-900">
                         {c.animal}
                       </span>
                       {otherCentre && (
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">
                           {otherCentre}
                         </span>
                       )}
@@ -709,23 +709,23 @@ export default function CaseList({
                         </span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm text-zinc-700">
+                    <p className="mt-1.5 text-sm text-stone-700">
                       {c.title ?? c.situation.replace(/-/g, " ")}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-xs text-stone-500">
                       <LocalTime iso={c.created_at} />
                     </p>
                   </div>
                   <span
                     aria-hidden
-                    className={`mt-1 shrink-0 text-lg leading-none text-zinc-500 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    className={`mt-1 shrink-0 text-lg leading-none text-stone-500 transition-transform ${expanded ? "rotate-180" : ""}`}
                   >
                     ▾
                   </span>
                 </button>
 
                 {expanded && (
-                  <div className="border-t border-zinc-100 px-4 py-3">
+                  <div className="border-t border-stone-100 px-4 py-3">
                     {c.duplicate_of && (
                       <div
                         role="alert"
@@ -809,10 +809,10 @@ export default function CaseList({
                     )}
                     {c.description && (
                       <div className="mb-3">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
                           Reporter&apos;s description
                         </p>
-                        <p className="mt-1 text-sm leading-6 text-zinc-700">
+                        <p className="mt-1 text-sm leading-6 text-stone-700">
                           {c.description}
                         </p>
                       </div>
@@ -836,7 +836,7 @@ export default function CaseList({
                           <MapPin className="h-4 w-4" aria-hidden /> View reported location
                         </a>
                       ) : (
-                        <span className="text-sm text-zinc-500">
+                        <span className="text-sm text-stone-500">
                           No location shared
                         </span>
                       )}
@@ -845,16 +845,16 @@ export default function CaseList({
                         <button
                           onClick={() => claim(c.id)}
                           disabled={claimingId === c.id}
-                          className="ml-auto inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                          className="ml-auto inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-4 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
                         >
                           {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
                         </button>
                       ) : c.centre_id === null ? (
-                        <span className="ml-auto text-sm text-zinc-500">
+                        <span className="ml-auto text-sm text-stone-500">
                           Unassigned
                         </span>
                       ) : (
-                        <label className="ml-auto flex items-center gap-2 text-sm text-zinc-500">
+                        <label className="ml-auto flex items-center gap-2 text-sm text-stone-500">
                           Status
                           <select
                             value={c.status}
@@ -862,7 +862,7 @@ export default function CaseList({
                             onChange={(e) =>
                               updateStatus(c.id, e.target.value as CaseRow["status"])
                             }
-                            className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm text-zinc-800 outline-none focus:border-emerald-400 disabled:opacity-50"
+                            className="rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-800 outline-none focus:border-emerald-400 disabled:opacity-50"
                           >
                             {STATUSES.map((s) => (
                               <option key={s.value} value={s.value}>
@@ -907,12 +907,12 @@ export default function CaseList({
                     )}
 
                     {/* Reporter contact */}
-                    <div className="mt-4 border-t border-zinc-100 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    <div className="mt-4 border-t border-stone-100 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
                         Reported by
                       </p>
                       {c.reporter_name || c.reporter_phone ? (
-                        <p className="mt-1 text-sm text-zinc-700">
+                        <p className="mt-1 text-sm text-stone-700">
                           {c.reporter_name && <span>{c.reporter_name}</span>}
                           {c.reporter_name && c.reporter_phone && " · "}
                           {c.reporter_phone && (
@@ -925,7 +925,7 @@ export default function CaseList({
                           )}
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-zinc-500">
+                        <p className="mt-1 text-sm text-stone-500">
                           The finder didn&apos;t leave contact details.
                         </p>
                       )}
@@ -933,10 +933,10 @@ export default function CaseList({
 
                     {/* Assignment */}
                     {teammates.length > 0 && (
-                      <div className="mt-4 border-t border-zinc-100 pt-3">
+                      <div className="mt-4 border-t border-stone-100 pt-3">
                         <label
                           htmlFor={`assign-${c.id}`}
-                          className="text-xs font-semibold uppercase tracking-wide text-zinc-500"
+                          className="text-xs font-semibold uppercase tracking-wide text-stone-500"
                         >
                           Assigned to
                         </label>
@@ -946,7 +946,7 @@ export default function CaseList({
                           onChange={(e) =>
                             assignCase(c.id, e.target.value || null)
                           }
-                          className="mt-1 block h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-emerald-400"
+                          className="mt-1 block h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-stone-700 outline-none focus:border-emerald-400"
                         >
                           <option value="">Unassigned</option>
                           {teammates.map((t) => (
@@ -968,7 +968,7 @@ export default function CaseList({
                     />
 
                     {/* Share to team */}
-                    <div className="mt-4 border-t border-zinc-100 pt-3">
+                    <div className="mt-4 border-t border-stone-100 pt-3">
                       <ShareCase caseId={c.id} />
                     </div>
 
@@ -988,7 +988,7 @@ export default function CaseList({
 function Stat({
   label,
   value,
-  accent = "text-zinc-900",
+  accent = "text-stone-900",
   active = false,
   onClick,
 }: {
@@ -1001,12 +1001,12 @@ function Stat({
   const content = (
     <>
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
-      <p className="mt-0.5 text-xs text-zinc-500">{label}</p>
+      <p className="mt-0.5 text-xs text-stone-500">{label}</p>
     </>
   );
   const base = "rounded-2xl border p-4 text-left shadow-sm transition-all";
   if (!onClick) {
-    return <div className={`${base} border-zinc-200 bg-white`}>{content}</div>;
+    return <div className={`${base} border-stone-200 bg-white`}>{content}</div>;
   }
   return (
     <button
@@ -1014,8 +1014,8 @@ function Stat({
       aria-pressed={active}
       className={`${base} ${
         active
-          ? "border-zinc-900 bg-white ring-1 ring-zinc-900"
-          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+          ? "border-stone-900 bg-white ring-1 ring-stone-900"
+          : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
       }`}
     >
       {content}
@@ -1037,8 +1037,8 @@ function Chip({
       onClick={onClick}
       className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "bg-zinc-900 text-white"
-          : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+          ? "bg-stone-900 text-white"
+          : "border border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
       }`}
     >
       {children}

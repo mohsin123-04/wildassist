@@ -156,7 +156,7 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-emerald-50"
+        className="relative flex items-center gap-2 rounded-full border border-stone-200 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-emerald-50"
       >
         {msgUnread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
@@ -173,15 +173,15 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
         </span>
         <span
           aria-hidden
-          className={`text-base leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-base leading-none text-stone-500 transition-transform ${open ? "rotate-180" : ""}`}
         >
           ▾
         </span>
       </button>
 
       {open && (
-        <div className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-          <div className="border-b border-zinc-100 px-4 py-3">
+        <div className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
+          <div className="border-b border-stone-100 px-4 py-3">
             <div className="flex items-center gap-2.5">
               <Avatar
                 url={avatarUrl}
@@ -202,14 +202,14 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
                           ? "bg-violet-100 text-violet-700"
                           : role === "manager"
                             ? "bg-emerald-100 text-emerald-700"
-                            : "bg-zinc-100 text-zinc-600"
+                            : "bg-stone-100 text-stone-600"
                       }`}
                     >
                       {role}
                     </span>
                   )}
                 </div>
-                <p className="truncate text-xs text-zinc-500">
+                <p className="truncate text-xs text-stone-500">
                   {displayName ? email : (centreName ?? "No centre linked yet")}
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
           <Link
             href="/dashboard"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="block px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
           >
             Dashboard
           </Link>
@@ -226,7 +226,7 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
             <Link
               href="/messages"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-between px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+              className="flex items-center justify-between px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
             >
               Messages
               {msgUnread > 0 && (
@@ -240,7 +240,7 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
             <Link
               href="/analytics"
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+              className="block px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
             >
               Analytics
             </Link>
@@ -248,7 +248,7 @@ export default function AccountMenu({ light = false }: { light?: boolean }) {
           <Link
             href="/profile"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="block px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
           >
             Profile
           </Link>

@@ -58,15 +58,15 @@ export default async function CasePage({
   if (!c) {
     return (
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-5 py-16 text-center">
-        <h1 className="font-display text-2xl font-semibold text-zinc-900">
+        <h1 className="font-display text-2xl font-semibold text-stone-900">
           Case not found
         </h1>
-        <p className="mt-2 text-zinc-600">
+        <p className="mt-2 text-stone-600">
           It may have been removed, or it&apos;s outside your centre&apos;s area.
         </p>
         <Link
           href="/dashboard"
-          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           Back to dashboard
         </Link>
@@ -87,7 +87,7 @@ export default async function CasePage({
     <main className="animate-in mx-auto w-full max-w-3xl flex-1 px-5 py-8">
       <Link
         href="/dashboard"
-        className="inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+        className="inline-flex w-fit items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden /> Dashboard
       </Link>
@@ -97,7 +97,7 @@ export default async function CasePage({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${VERDICT_BADGE[c.verdict] ?? "bg-zinc-100 text-zinc-600"}`}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${VERDICT_BADGE[c.verdict] ?? "bg-stone-100 text-stone-600"}`}
             >
               {c.verdict}
             </span>
@@ -110,11 +110,11 @@ export default async function CasePage({
               </Link>
             )}
           </div>
-          <h1 className="mt-2 font-display text-2xl font-semibold capitalize tracking-tight text-zinc-900">
+          <h1 className="mt-2 font-display text-2xl font-semibold capitalize tracking-tight text-stone-900">
             {c.animal}
             {c.title ? ` · ${c.title}` : ""}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm text-stone-600">
             {c.situation.replace(/-/g, " ")} · reported{" "}
             <LocalTime iso={c.created_at} />
             {centre ? ` · routed to ${centre.name}` : " · unassigned"}
@@ -135,18 +135,18 @@ export default async function CasePage({
           <img
             src={`/api/case-image/${c.id}`}
             alt="Reported animal"
-            className="max-h-96 w-full rounded-2xl border border-zinc-200 object-cover"
+            className="max-h-96 w-full rounded-2xl border border-stone-200 object-cover"
           />
         </a>
       )}
 
       {/* Details */}
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-          <h2 className="font-display text-base font-semibold text-zinc-900">
+        <section className="rounded-2xl border border-stone-200 bg-white p-5">
+          <h2 className="font-display text-base font-semibold text-stone-900">
             Report
           </h2>
-          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-700">
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-stone-700">
             {c.description || "No description provided."}
           </p>
           {c.lat != null && c.lng != null && (
@@ -161,13 +161,13 @@ export default async function CasePage({
           )}
         </section>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-          <h2 className="font-display text-base font-semibold text-zinc-900">
+        <section className="rounded-2xl border border-stone-200 bg-white p-5">
+          <h2 className="font-display text-base font-semibold text-stone-900">
             People
           </h2>
           <div className="mt-2 flex flex-col gap-3 text-sm">
-            <div className="flex items-center gap-2 text-zinc-700">
-              <User className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+            <div className="flex items-center gap-2 text-stone-700">
+              <User className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
               <span>
                 {c.reporter_name || "Anonymous reporter"}
                 {c.reporter_phone && (
@@ -184,8 +184,8 @@ export default async function CasePage({
               </span>
             </div>
             {c.driver_name && (
-              <div className="flex items-center gap-2 text-zinc-700">
-                <Car className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+              <div className="flex items-center gap-2 text-stone-700">
+                <Car className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
                 <span>
                   {c.driver_name} (driver)
                   {driver?.phone && (
@@ -215,8 +215,8 @@ export default async function CasePage({
               </div>
             )}
             {centre && (
-              <p className="text-zinc-500">
-                Routed to <span className="font-medium text-zinc-700">{centre.name}</span>{" "}
+              <p className="text-stone-500">
+                Routed to <span className="font-medium text-stone-700">{centre.name}</span>{" "}
                 in {centre.town}.
               </p>
             )}
@@ -225,7 +225,7 @@ export default async function CasePage({
       </div>
 
       {/* Notes + timeline */}
-      <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-5">
+      <div className="mt-5 rounded-2xl border border-stone-200 bg-white p-5">
         <CaseNotes
           caseId={c.id}
           myId={user.id}

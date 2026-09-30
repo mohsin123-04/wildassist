@@ -68,12 +68,12 @@ export default function CaseTimeline({
   ];
 
   return (
-    <div className="mt-4 border-t border-zinc-100 pt-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+    <div className="mt-4 border-t border-stone-100 pt-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
         History
       </p>
       {events === null ? (
-        <p className="mt-2 text-sm text-zinc-500">Loading…</p>
+        <p className="mt-2 text-sm text-stone-500">Loading…</p>
       ) : (
         <ol className="mt-2 flex flex-col gap-3">
           {points.map((p, i) => (
@@ -81,18 +81,18 @@ export default function CaseTimeline({
               <div className="flex flex-col items-center">
                 <span
                   className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                    i === points.length - 1 ? "bg-emerald-500" : "bg-zinc-300"
+                    i === points.length - 1 ? "bg-emerald-500" : "bg-stone-300"
                   }`}
                 />
                 {i < points.length - 1 && (
-                  <span className="w-px flex-1 bg-zinc-200" />
+                  <span className="w-px flex-1 bg-stone-200" />
                 )}
               </div>
               <div className="pb-0.5 text-sm">
-                <span className="font-medium text-zinc-800">{p.label}</span>
-                <span className="text-zinc-500"> · {when(p.at)}</span>
+                <span className="font-medium text-stone-800">{p.label}</span>
+                <span className="text-stone-500"> · {when(p.at)}</span>
                 {p.actor && (
-                  <span className="block text-xs text-zinc-500">
+                  <span className="block text-xs text-stone-500">
                     by {p.actor}
                   </span>
                 )}

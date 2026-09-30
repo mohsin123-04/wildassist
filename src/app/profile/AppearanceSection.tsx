@@ -66,11 +66,11 @@ export default function AppearanceSection({
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-zinc-900">
+    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-stone-900">
         Appearance
       </h2>
-      <p className="mt-0.5 text-sm text-zinc-500">
+      <p className="mt-0.5 text-sm text-stone-500">
         Upload a photo, or pick a color for your initials.
       </p>
 
@@ -87,7 +87,7 @@ export default function AppearanceSection({
           <button
             onClick={() => inputRef.current?.click()}
             disabled={busy}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
           >
             {busy ? <Spinner label="Working…" /> : "Upload photo"}
           </button>
@@ -95,7 +95,7 @@ export default function AppearanceSection({
             <button
               onClick={removePhoto}
               disabled={busy}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 px-5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
             >
               Remove
             </button>
@@ -104,7 +104,7 @@ export default function AppearanceSection({
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-sm font-medium text-zinc-700">Initials color</p>
+        <p className="mb-2 text-sm font-medium text-stone-700">Initials color</p>
         <div className="flex flex-wrap gap-2.5">
           {AVATAR_COLORS.map((c) => (
             <button
@@ -113,7 +113,7 @@ export default function AppearanceSection({
               aria-label={`Use ${c}`}
               style={{ backgroundColor: c }}
               className={`h-8 w-8 rounded-full transition-transform hover:scale-110 ${
-                color === c ? "ring-2 ring-offset-2 ring-zinc-900" : ""
+                color === c ? "ring-2 ring-offset-2 ring-stone-900" : ""
               }`}
             />
           ))}
@@ -121,7 +121,7 @@ export default function AppearanceSection({
       </div>
 
       {error && <p className="mt-4 text-sm text-rose-700">{error}</p>}
-      <p className="mt-3 text-xs text-zinc-500">
+      <p className="mt-3 text-xs text-stone-500">
         PNG, JPG, or WebP, up to 2 MB.
       </p>
     </section>

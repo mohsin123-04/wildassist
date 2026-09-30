@@ -32,7 +32,7 @@ export default function TransportMap({
   const mineIds = new Set(mine.map((j) => j.id));
 
   return (
-    <div className="h-[340px] w-full overflow-hidden rounded-2xl border border-zinc-200">
+    <div className="h-[340px] w-full overflow-hidden rounded-2xl border border-stone-200">
       <MapContainer
         center={center}
         zoom={zoom}
@@ -78,7 +78,7 @@ export default function TransportMap({
                   <p className="font-semibold capitalize">{j.animal}</p>
                   <p>{j.title ?? "Injured animal needs transport"}</p>
                   {j.distanceKm != null && (
-                    <p className="text-zinc-500">
+                    <p className="text-stone-500">
                       {Math.round(j.distanceKm)} km away
                       {isMine ? " · your pickup" : ""}
                     </p>

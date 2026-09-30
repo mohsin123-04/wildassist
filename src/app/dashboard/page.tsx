@@ -87,7 +87,7 @@ export default async function DashboardPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
           {isAdmin
             ? "Admin overview"
             : firstName
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
               : "Centre dashboard"}
         </p>
         <div className="mt-1 flex flex-wrap items-center gap-2.5">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">
             {isAdmin ? "All cases" : (centre?.name ?? "Your centre")}
           </h1>
           <span
@@ -104,13 +104,13 @@ export default async function DashboardPage() {
                 ? "bg-violet-100 text-violet-700"
                 : isManager
                   ? "bg-emerald-100 text-emerald-700"
-                  : "bg-zinc-100 text-zinc-600"
+                  : "bg-stone-100 text-stone-600"
             }`}
           >
             {profile?.role ?? "staff"}
           </span>
         </div>
-        <p className="mt-1 text-zinc-600">
+        <p className="mt-1 text-stone-600">
           {isAdmin
             ? "Every reported case across all centres."
             : "Cases routed to you from the public triage tool."}

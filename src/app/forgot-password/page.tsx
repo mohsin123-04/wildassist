@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/Spinner";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-7">
+      <div className="rounded-2xl border border-stone-200 bg-white p-7">
         <div className="flex items-center gap-2">
           <span
             aria-hidden
@@ -50,16 +50,16 @@ export default function ForgotPasswordPage() {
           >
             <Bird className="h-5 w-5" />
           </span>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-stone-900">
             Reset your password
           </h1>
         </div>
 
         {sent ? (
           <div className="mt-4">
-            <p className="text-sm leading-6 text-zinc-600">
+            <p className="text-sm leading-6 text-stone-600">
               If an account exists for{" "}
-              <span className="font-medium text-zinc-800">{email}</span>, we&apos;ve
+              <span className="font-medium text-stone-800">{email}</span>, we&apos;ve
               sent a link to reset your password. Check your inbox (and spam), then
               follow the link to set a new one.
             </p>
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                 below.
               </p>
             )}
-            <p className="mt-2 text-sm leading-6 text-zinc-600">
+            <p className="mt-2 text-sm leading-6 text-stone-600">
               Enter the email for your account and we&apos;ll send you a link to
               choose a new password.
             </p>
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
               >
                 {busy ? <Spinner label="Sending…" /> : "Send reset link"}
               </button>

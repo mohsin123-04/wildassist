@@ -34,24 +34,24 @@ export default function CentreCodePanel() {
   }
 
   return (
-    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-          <UserPlus className="h-4 w-4 text-zinc-400" aria-hidden />
+        <span className="flex items-center gap-2 text-sm font-medium text-stone-900">
+          <UserPlus className="h-4 w-4 text-stone-400" aria-hidden />
           Invite staff to your centre
         </span>
         <ChevronDown
           aria-hidden
-          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
         <div className="mt-3">
-          <p className="text-sm leading-6 text-zinc-600">
+          <p className="text-sm leading-6 text-stone-600">
             Share this join code with colleagues at your centre. They enter it
             when they sign up as staff.
           </p>
@@ -63,7 +63,7 @@ export default function CentreCodePanel() {
             <button
               onClick={copy}
               disabled={!code}
-              className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+              className="inline-flex h-9 items-center justify-center rounded-xl border border-stone-200 px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
             >
               {copied ? "Copied" : "Copy"}
             </button>
@@ -73,13 +73,13 @@ export default function CentreCodePanel() {
             {!confirming ? (
               <button
                 onClick={() => setConfirming(true)}
-                className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+                className="text-sm font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
               >
                 Regenerate code
               </button>
             ) : (
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="text-zinc-600">
+                <span className="text-stone-600">
                   This invalidates the old code. Continue?
                 </span>
                 <button
@@ -91,7 +91,7 @@ export default function CentreCodePanel() {
                 </button>
                 <button
                   onClick={() => setConfirming(false)}
-                  className="text-zinc-500 hover:text-zinc-800"
+                  className="text-stone-500 hover:text-stone-800"
                 >
                   Cancel
                 </button>

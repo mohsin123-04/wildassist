@@ -61,13 +61,13 @@ export default function AdminVolunteers() {
   const pending = vols.filter((v) => !v.volunteer_approved).length;
 
   return (
-    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-          <HeartHandshake className="h-4 w-4 text-zinc-400" aria-hidden />
+        <span className="flex items-center gap-2 text-sm font-medium text-stone-900">
+          <HeartHandshake className="h-4 w-4 text-stone-400" aria-hidden />
           Volunteers ({vols.length})
           {pending > 0 && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
@@ -77,18 +77,18 @@ export default function AdminVolunteers() {
         </span>
         <ChevronDown
           aria-hidden
-          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
         <div className="mt-3">
-          <p className="mb-3 text-sm leading-6 text-zinc-600">
+          <p className="mb-3 text-sm leading-6 text-stone-600">
             Approve volunteers before they can see and claim transport jobs. This
             protects finders&apos; contact details and animal locations.
           </p>
           {vols.length === 0 ? (
-            <p className="text-sm text-zinc-500">No volunteers yet.</p>
+            <p className="text-sm text-stone-500">No volunteers yet.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {vols.map((v) => {
@@ -98,11 +98,11 @@ export default function AdminVolunteers() {
                 return (
                 <li
                   key={v.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2"
                 >
                   <span className="min-w-0 text-sm">
                     <span className="flex items-center gap-2">
-                      <span className="font-medium text-zinc-900">
+                      <span className="font-medium text-stone-900">
                         {v.full_name || "Unnamed volunteer"}
                       </span>
                       <span
@@ -116,7 +116,7 @@ export default function AdminVolunteers() {
                       </span>
                     </span>
                     {(v.phone || location) && (
-                      <span className="mt-0.5 block text-xs text-zinc-500">
+                      <span className="mt-0.5 block text-xs text-stone-500">
                         {v.phone && (
                           <a
                             href={`tel:${v.phone.replace(/[^0-9+]/g, "")}`}
@@ -134,7 +134,7 @@ export default function AdminVolunteers() {
                     <button
                       onClick={() => setApproved(v.id, false)}
                       disabled={busyId === v.id}
-                      className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 transition-colors hover:bg-white disabled:opacity-50"
+                      className="rounded-full border border-stone-200 px-3 py-1 text-xs font-medium text-stone-600 transition-colors hover:bg-white disabled:opacity-50"
                     >
                       Revoke
                     </button>
@@ -142,7 +142,7 @@ export default function AdminVolunteers() {
                     <button
                       onClick={() => setApproved(v.id, true)}
                       disabled={busyId === v.id}
-                      className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                      className="rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
                     >
                       Approve
                     </button>

@@ -16,7 +16,7 @@ type CentreRow = {
 const SPECIES = ["bird", "mammal", "reptile", "amphibian", "fish"] as const;
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5";
+  "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
 
 export default function AdminCentres() {
   const [centres, setCentres] = useState<CentreRow[]>([]);
@@ -83,18 +83,18 @@ export default function AdminCentres() {
   }
 
   return (
-    <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-          <Building2 className="h-4 w-4 text-zinc-400" aria-hidden />
+        <span className="flex items-center gap-2 text-sm font-medium text-stone-900">
+          <Building2 className="h-4 w-4 text-stone-400" aria-hidden />
           Centres ({centres.length})
         </span>
         <ChevronDown
           aria-hidden
-          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -102,7 +102,7 @@ export default function AdminCentres() {
         <div className="mt-4 flex flex-col gap-5">
           {/* Add form */}
           <div>
-            <p className="mb-2 text-sm font-medium text-zinc-700">Add a centre</p>
+            <p className="mb-2 text-sm font-medium text-stone-700">Add a centre</p>
             <div className="flex flex-col gap-3">
               <input
                 className={inputClass}
@@ -128,7 +128,7 @@ export default function AdminCentres() {
                     </option>
                   ))}
                 </select>
-                <label className="flex h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 text-sm text-zinc-700">
+                <label className="flex h-11 items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 text-sm text-stone-700">
                   <input
                     type="checkbox"
                     checked={directoryOnly}
@@ -139,7 +139,7 @@ export default function AdminCentres() {
                 </label>
               </div>
               {directoryOnly && (
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-stone-500">
                   A directory listing has no staff accounts or dashboard. It is
                   shown to finders as a nearby contact and does not receive cases.
                 </p>
@@ -153,7 +153,7 @@ export default function AdminCentres() {
                     className={`rounded-full border px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
                       takes.includes(s)
                         ? "border-emerald-500 bg-emerald-50 text-emerald-800"
-                        : "border-zinc-200 bg-white text-zinc-500"
+                        : "border-stone-200 bg-white text-stone-500"
                     }`}
                   >
                     {s}
@@ -203,7 +203,7 @@ export default function AdminCentres() {
               <button
                 onClick={submit}
                 disabled={busy || !name.trim() || !address.trim()}
-                className="inline-flex h-11 w-fit items-center justify-center rounded-xl bg-zinc-900 px-6 font-medium text-white shadow-sm transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                className="inline-flex h-11 w-fit items-center justify-center rounded-xl bg-stone-900 px-6 font-medium text-white shadow-sm transition-colors hover:bg-stone-800 disabled:opacity-50"
               >
                 {busy ? <Spinner label="Creating…" /> : "Create centre"}
               </button>
@@ -212,18 +212,18 @@ export default function AdminCentres() {
 
           {/* Existing centres */}
           <div>
-            <p className="mb-2 text-sm font-medium text-zinc-700">All centres</p>
+            <p className="mb-2 text-sm font-medium text-stone-700">All centres</p>
             <ul className="flex flex-col gap-2">
               {centres.map((c) => (
                 <li
                   key={c.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-[var(--background)] px-3 py-2 text-sm"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-stone-200 bg-[var(--background)] px-3 py-2 text-sm"
                 >
                   <span>
-                    <span className="font-medium text-zinc-900">{c.name}</span>
-                    <span className="text-zinc-500"> · {c.town}</span>
+                    <span className="font-medium text-stone-900">{c.name}</span>
+                    <span className="text-stone-500"> · {c.town}</span>
                     {c.manager_email && (
-                      <span className="text-zinc-500"> · mgr {c.manager_email}</span>
+                      <span className="text-stone-500"> · mgr {c.manager_email}</span>
                     )}
                   </span>
                   {c.code && (

@@ -27,7 +27,7 @@ function shortWhen(iso: string): string {
 const TransportMap = dynamic(() => import("./TransportMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[340px] items-center justify-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-500">
+    <div className="flex h-[340px] items-center justify-center rounded-2xl border border-stone-200 bg-white text-sm text-stone-500">
       Loading map…
     </div>
   ),
@@ -132,7 +132,7 @@ export default function TransportList({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+      <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-sm text-stone-500">
         Finding transport requests near you…
       </div>
     );
@@ -147,7 +147,7 @@ export default function TransportList({
       {hasMappable && (
         <div>
           <TransportMap coords={coords} available={available} mine={mine} />
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
             <Legend color="#2563eb" label="You" />
             <Legend color="#059669" label="Your pickups" />
             <Legend color="#e11d48" label="Available nearby" />
@@ -170,14 +170,14 @@ export default function TransportList({
                   <button
                     onClick={() => act(j.id, "deliver")}
                     disabled={busyId === j.id}
-                    className="inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-4 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
                   >
                     Mark delivered
                   </button>
                   <button
                     onClick={() => act(j.id, "release")}
                     disabled={busyId === j.id}
-                    className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-xl border border-stone-200 px-4 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50 disabled:opacity-50"
                   >
                     Release
                   </button>
@@ -201,7 +201,7 @@ export default function TransportList({
                 <button
                   onClick={() => act(j.id, "claim")}
                   disabled={busyId === j.id}
-                  className="inline-flex h-9 items-center justify-center rounded-xl bg-zinc-900 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                  className="inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
                 >
                   {busyId === j.id ? "Claiming…" : "Claim pickup"}
                 </button>
@@ -215,32 +215,32 @@ export default function TransportList({
         <div>
           <button
             onClick={() => setShowHistory((v) => !v)}
-            className="flex items-center gap-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
+            className="flex items-center gap-2 text-sm font-medium text-stone-600 transition-colors hover:text-stone-900"
           >
             <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden />
             {completed.length} pickup{completed.length === 1 ? "" : "s"}{" "}
             delivered
-            <span className="text-zinc-400">{showHistory ? "▲" : "▼"}</span>
+            <span className="text-stone-400">{showHistory ? "▲" : "▼"}</span>
           </button>
           {showHistory && (
             <ul className="mt-3 flex flex-col gap-2">
               {completed.map((j) => (
                 <li
                   key={j.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm"
                 >
                   <span className="min-w-0 truncate">
-                    <span className="font-medium capitalize text-zinc-800">
+                    <span className="font-medium capitalize text-stone-800">
                       {j.animal}
                     </span>
                     {j.centre_id && centreNames[j.centre_id] && (
-                      <span className="text-zinc-500">
+                      <span className="text-stone-500">
                         {" "}
                         → {centreNames[j.centre_id]}
                       </span>
                     )}
                   </span>
-                  <span className="shrink-0 text-xs text-zinc-400">
+                  <span className="shrink-0 text-xs text-stone-400">
                     {shortWhen(j.created_at)}
                   </span>
                 </li>
@@ -268,7 +268,7 @@ function Legend({ color, label }: { color: string; label: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
+      <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
         {title}
       </h2>
       <div className="flex flex-col gap-3">{children}</div>
@@ -278,9 +278,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-10 text-center">
-      <Inbox className="mx-auto h-8 w-8 text-zinc-300" aria-hidden />
-      <p className="mt-2 text-sm text-zinc-500">{text}</p>
+    <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 p-10 text-center">
+      <Inbox className="mx-auto h-8 w-8 text-stone-300" aria-hidden />
+      <p className="mt-2 text-sm text-stone-500">{text}</p>
     </div>
   );
 }
@@ -297,9 +297,9 @@ function JobCard({
   actions: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+    <div className="rounded-2xl border border-stone-200 bg-white p-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium capitalize text-zinc-900">
+        <span className="text-sm font-medium capitalize text-stone-900">
           {job.animal}
         </span>
         {job.distanceKm != null && (
@@ -308,7 +308,7 @@ function JobCard({
           </span>
         )}
       </div>
-      <p className="mt-1 text-sm text-zinc-700">
+      <p className="mt-1 text-sm text-stone-700">
         {job.title ?? "Injured animal needs transport"}
       </p>
 
@@ -323,7 +323,7 @@ function JobCard({
             <Navigation className="h-3.5 w-3.5" aria-hidden /> Directions
           </a>
         )}
-        {centreName && <span className="text-zinc-500">→ {centreName}</span>}
+        {centreName && <span className="text-stone-500">→ {centreName}</span>}
         {showContact && job.reporter_phone && (
           <a
             href={`tel:${job.reporter_phone.replace(/[^0-9+]/g, "")}`}

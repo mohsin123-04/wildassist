@@ -60,18 +60,18 @@ export default function ShareCase({ caseId }: { caseId: string }) {
     <div className="relative inline-block" ref={menuRef}>
       <button
         onClick={toggle}
-        className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-200 px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+        className="inline-flex h-9 items-center justify-center rounded-xl border border-stone-200 px-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
       >
         Share to team
       </button>
       {open && (
-        <div className="absolute left-0 z-20 mt-2 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-          <p className="border-b border-zinc-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <div className="absolute left-0 z-20 mt-2 w-60 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
+          <p className="border-b border-stone-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-stone-500">
             Share into
           </p>
           <div className="max-h-56 overflow-y-auto py-1">
             {convs.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-zinc-500">
+              <p className="px-3 py-2 text-sm text-stone-500">
                 {loaded ? "No conversations." : "Loading…"}
               </p>
             ) : (
@@ -79,7 +79,7 @@ export default function ShareCase({ caseId }: { caseId: string }) {
                 <button
                   key={c.id}
                   onClick={() => share(c.id, c.label)}
-                  className="flex w-full items-center px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="flex w-full items-center px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-stone-50"
                 >
                   <span className="truncate">
                     {c.kind === "channel" ? "# " : ""}

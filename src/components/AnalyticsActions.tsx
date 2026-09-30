@@ -35,13 +35,13 @@ export default function AnalyticsActions({
     <div className="no-print flex gap-2">
       <button
         onClick={exportCsv}
-        className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+        className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
       >
         <Download className="h-4 w-4" aria-hidden /> CSV
       </button>
       <button
         onClick={() => window.print()}
-        className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+        className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
       >
         <Printer className="h-4 w-4" aria-hidden /> Print
       </button>

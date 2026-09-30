@@ -61,13 +61,13 @@ export default async function ProfilePage() {
     <main className="animate-in mx-auto w-full max-w-4xl flex-1 px-5 py-8">
       <Link
         href={backHref}
-        className="inline-flex w-fit items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+        className="inline-flex w-fit items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden /> {backLabel}
       </Link>
 
       {/* Identity header: banner band + overlapping avatar + meta */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         {/* Banner takes the member's chosen avatar color (emerald by default). */}
         <div
           className="h-24 sm:h-28"
@@ -91,37 +91,37 @@ export default async function ProfilePage() {
           </div>
 
           <div className="mt-3 min-w-0">
-            <h1 className="truncate font-display text-2xl font-semibold tracking-tight text-zinc-900">
+            <h1 className="truncate font-display text-2xl font-semibold tracking-tight text-stone-900">
               {profile?.full_name || "Your profile"}
             </h1>
-            <p className="truncate text-sm text-zinc-600">
+            <p className="truncate text-sm text-stone-600">
               {[profile?.title, centreName].filter(Boolean).join(" · ") ||
                 (isVolunteer ? "Rescue volunteer" : "Wildlife centre staff")}
             </p>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-600">
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-stone-600">
             {user.email && (
               <span className="inline-flex min-w-0 items-center gap-1.5">
-                <Mail className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+                <Mail className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
                 <span className="truncate">{user.email}</span>
               </span>
             )}
             {profile?.phone && (
               <span className="inline-flex items-center gap-1.5">
-                <Phone className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+                <Phone className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
                 {profile.phone}
               </span>
             )}
             {centreName && (
               <span className="inline-flex items-center gap-1.5">
-                <Building2 className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+                <Building2 className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
                 {centreName}
               </span>
             )}
             {joined && (
               <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+                <CalendarDays className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
                 Joined {joined}
               </span>
             )}
@@ -142,7 +142,7 @@ export default async function ProfilePage() {
               className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 s.danger
                   ? "text-rose-700 hover:bg-rose-50"
-                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                  : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
               }`}
             >
               {s.label}

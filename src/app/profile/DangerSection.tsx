@@ -45,17 +45,17 @@ export default function DangerSection() {
       <div className="mt-4 flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-zinc-800">
+            <p className="text-sm font-medium text-stone-800">
               Sign out everywhere
             </p>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-stone-500">
               Ends your session on all devices.
             </p>
           </div>
           <button
             onClick={signOutEverywhere}
             disabled={busy !== null}
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
           >
             {busy === "out" ? <Spinner label="Signing out…" /> : "Sign out all"}
           </button>
@@ -64,8 +64,8 @@ export default function DangerSection() {
         <hr className="border-rose-200" />
 
         <div>
-          <p className="text-sm font-medium text-zinc-800">Delete account</p>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm font-medium text-stone-800">Delete account</p>
+          <p className="text-sm text-stone-500">
             Permanently removes your account and profile. This cannot be undone.
           </p>
 
@@ -78,14 +78,14 @@ export default function DangerSection() {
             </button>
           ) : (
             <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-rose-200 bg-white p-4">
-              <p className="text-sm text-zinc-700">
+              <p className="text-sm text-stone-700">
                 Type <span className="font-semibold">DELETE</span> to confirm.
               </p>
               <input
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className="h-10 rounded-xl border border-zinc-200 px-3 outline-none focus:border-rose-400"
+                className="h-10 rounded-xl border border-stone-200 px-3 outline-none focus:border-rose-400"
               />
               {error && <p className="text-sm text-rose-700">{error}</p>}
               <div className="flex gap-2">
@@ -106,7 +106,7 @@ export default function DangerSection() {
                     setConfirmText("");
                     setError(null);
                   }}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 px-5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 px-5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
                 >
                   Cancel
                 </button>
