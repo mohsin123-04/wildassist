@@ -6,15 +6,43 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import Avatar from "@/components/Avatar";
 
-export default function AccountMenu({ light = false }: { light?: boolean }) {
+export type HeaderProfile = {
+  full_name: string | null;
+  role: string | null;
+  avatar_url: string | null;
+  avatar_color: string | null;
+  centreName: string | null;
+};
+
+export default function AccountMenu({
+  light = false,
+  initialUser,
+  initialProfile = null,
+}: {
+  light?: boolean;
+  // Seeded from the server so the pill paints correct on first render (no
+  // placeholder-to-pill jump). undefined = not provided, null = logged out.
+  initialUser?: { id: string; email: string | null } | null;
+  initialProfile?: HeaderProfile | null;
+}) {
   // undefined = still checking, null = logged out, User = logged in
-  const [user, setUser] = useState<User | null | undefined>(undefined);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [centreName, setCentreName] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(
+    initialUser === undefined ? undefined : (initialUser as unknown as User | null)
+  );
+  const [displayName, setDisplayName] = useState<string | null>(
+    initialProfile?.full_name ?? null
+  );
+  const [centreName, setCentreName] = useState<string | null>(
+    initialProfile?.centreName ?? null
+  );
+  const [role, setRole] = useState<string | null>(initialProfile?.role ?? null);
   const [msgUnread, setMsgUnread] = useState(0);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarColor, setAvatarColor] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    initialProfile?.avatar_url ?? null
+  );
+  const [avatarColor, setAvatarColor] = useState<string | null>(
+    initialProfile?.avatar_color ?? null
+  );
   const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

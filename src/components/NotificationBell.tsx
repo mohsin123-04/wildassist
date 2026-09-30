@@ -12,9 +12,19 @@ const CENTRE_ROLES = ["staff", "manager", "admin"];
  * visible set, via RLS) since they last viewed the dashboard. Updates live
  * through Supabase Realtime.
  */
-export default function NotificationBell() {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
-  const [show, setShow] = useState(false);
+export default function NotificationBell({
+  initialUser,
+  initialShow = false,
+}: {
+  // Seeded from the server so the bell doesn't pop in after mount and shift the
+  // account pill beside it.
+  initialUser?: { id: string } | null;
+  initialShow?: boolean;
+} = {}) {
+  const [user, setUser] = useState<User | null | undefined>(
+    initialUser === undefined ? undefined : (initialUser as unknown as User | null)
+  );
+  const [show, setShow] = useState(initialShow);
   const [count, setCount] = useState(0);
 
   useEffect(() => {

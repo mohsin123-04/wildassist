@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
+import { createClient } from "@/lib/supabase/server";
 import Toast from "@/components/Toast";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
@@ -64,14 +65,48 @@ export const viewport: Viewport = {
   themeColor: "#faf9f6",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Resolve the header's auth state on the server so the account pill and bell
+  // paint correct on first render, with no placeholder-to-pill jump or name
+  // pop-in after hydration (the flicker seen when signing in/out).
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let headerProfile = null;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("full_name, role, avatar_url, avatar_color, centres(name)")
+      .eq("id", user.id)
+      .single();
+    const centres = data?.centres as
+      | { name: string }
+      | { name: string }[]
+      | null;
+    headerProfile = data
+      ? {
+          full_name: data.full_name,
+          role: data.role,
+          avatar_url: data.avatar_url,
+          avatar_color: data.avatar_color,
+          centreName:
+            (Array.isArray(centres) ? centres[0]?.name : centres?.name) ?? null,
+        }
+      : null;
+  }
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
+        <SiteHeader
+          initialUser={user ? { id: user.id, email: user.email ?? null } : null}
+          initialProfile={headerProfile}
+        />
 
         <div className="flex flex-1 flex-col">{children}</div>
         <Toast />

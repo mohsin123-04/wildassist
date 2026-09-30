@@ -4,14 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bird, Siren } from "lucide-react";
-import AccountMenu from "@/components/AccountMenu";
+import AccountMenu, { type HeaderProfile } from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
 
 // Routes whose top section is a dark hero, the header floats transparent over
 // them at the top of the page, then turns solid once you scroll past the hero.
 const DARK_HERO_ROUTES = new Set(["/"]);
+const CENTRE_ROLES = ["staff", "manager", "admin"];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  initialUser = null,
+  initialProfile = null,
+}: {
+  initialUser?: { id: string; email: string | null } | null;
+  initialProfile?: HeaderProfile | null;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -64,8 +71,17 @@ export default function SiteHeader() {
             <Siren className="h-4 w-4" aria-hidden />
             Emergency
           </Link>
-          <NotificationBell />
-          <AccountMenu light={overDark} />
+          <NotificationBell
+            initialUser={initialUser}
+            initialShow={
+              !!initialUser && CENTRE_ROLES.includes(initialProfile?.role ?? "")
+            }
+          />
+          <AccountMenu
+            light={overDark}
+            initialUser={initialUser}
+            initialProfile={initialProfile}
+          />
         </div>
       </div>
     </header>
