@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import { Users, Camera } from "lucide-react";
+import { Users, Camera, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 
@@ -76,6 +76,7 @@ export default function MessagesClient({
   const [editText, setEditText] = useState("");
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [convQuery, setConvQuery] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const atBottomRef = useRef(true);
@@ -448,8 +449,38 @@ export default function MessagesClient({
           )}
         </div>
 
+        {conversations.length > 5 && (
+          <div className="border-b border-zinc-200 p-2">
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400"
+                aria-hidden
+              />
+              <input
+                value={convQuery}
+                onChange={(e) => setConvQuery(e.target.value)}
+                placeholder="Search conversations"
+                aria-label="Search conversations"
+                className="w-full rounded-lg border border-zinc-200 bg-white py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:border-zinc-400"
+              />
+            </div>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-2">
-          {conversations.map((c) => {
+          {(() => {
+            const q = convQuery.trim().toLowerCase();
+            const shown = q
+              ? conversations.filter((c) => c.label.toLowerCase().includes(q))
+              : conversations;
+            if (shown.length === 0) {
+              return (
+                <p className="px-2.5 py-6 text-center text-sm text-zinc-500">
+                  No conversations match “{convQuery.trim()}”.
+                </p>
+              );
+            }
+            return shown.map((c) => {
             const n = unread[c.id] ?? 0;
             const isSel = selected === c.id;
             return (
@@ -471,7 +502,8 @@ export default function MessagesClient({
                 )}
               </button>
             );
-          })}
+            });
+          })()}
         </div>
       </aside>
 

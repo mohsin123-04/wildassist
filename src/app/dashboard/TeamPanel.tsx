@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Users, ChevronDown } from "lucide-react";
 
 type Member = {
   id: string;
@@ -60,15 +61,14 @@ export default function TeamPanel() {
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="text-sm font-medium text-zinc-900">
+        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+          <Users className="h-4 w-4 text-zinc-400" aria-hidden />
           Your team ({members.length})
         </span>
-        <span
+        <ChevronDown
           aria-hidden
-          className={`text-xl leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          ▾
-        </span>
+          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (

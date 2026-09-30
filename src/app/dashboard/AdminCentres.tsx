@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Building2, ChevronDown } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { FACILITY_TYPES, type FacilityType } from "@/lib/centres";
 
@@ -87,15 +88,14 @@ export default function AdminCentres() {
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="text-sm font-medium text-zinc-900">
+        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+          <Building2 className="h-4 w-4 text-zinc-400" aria-hidden />
           Centres ({centres.length})
         </span>
-        <span
+        <ChevronDown
           aria-hidden
-          className={`text-xl leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          ▾
-        </span>
+          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (

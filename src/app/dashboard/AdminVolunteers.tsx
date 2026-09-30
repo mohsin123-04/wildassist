@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { HeartHandshake, ChevronDown } from "lucide-react";
 import { flash } from "@/lib/flash";
 
 type Vol = {
@@ -22,7 +23,16 @@ export default function AdminVolunteers() {
   async function load() {
     const r = await fetch("/api/admin/volunteers");
     const d = await r.json();
-    if (Array.isArray(d.volunteers)) setVols(d.volunteers);
+    if (Array.isArray(d.volunteers)) {
+      // Pending approvals first (the only actionable rows), then by name.
+      const sorted = [...d.volunteers].sort((a: Vol, b: Vol) => {
+        if (a.volunteer_approved !== b.volunteer_approved) {
+          return a.volunteer_approved ? 1 : -1;
+        }
+        return (a.full_name ?? "").localeCompare(b.full_name ?? "");
+      });
+      setVols(sorted);
+    }
   }
   useEffect(() => {
     load();
@@ -56,20 +66,19 @@ export default function AdminVolunteers() {
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="text-sm font-medium text-zinc-900">
+        <span className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+          <HeartHandshake className="h-4 w-4 text-zinc-400" aria-hidden />
           Volunteers ({vols.length})
           {pending > 0 && (
-            <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
               {pending} pending
             </span>
           )}
         </span>
-        <span
+        <ChevronDown
           aria-hidden
-          className={`text-xl leading-none text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          ▾
-        </span>
+          className={`h-4 w-4 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (
