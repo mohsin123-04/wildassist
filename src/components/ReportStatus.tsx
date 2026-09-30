@@ -23,7 +23,7 @@ export default function ReportStatus({ centre }: { centre: AssignedCentre }) {
           Report sent to a centre
         </p>
       </div>
-      <p className="mt-2 leading-7 text-zinc-900">
+      <p className="mt-2 leading-7 text-stone-900">
         Based on your location, this report was routed to{" "}
         <span className="font-semibold">{centre.name}</span> in {centre.town}.
         Their staff can see it on their dashboard.

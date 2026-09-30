@@ -52,11 +52,11 @@ export default function ReporterContact({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-zinc-900">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-stone-900">
         Want the centre to reach you?
       </h2>
-      <p className="mt-1 text-sm leading-6 text-zinc-600">
+      <p className="mt-1 text-sm leading-6 text-stone-600">
         Optional. Share your contact so staff can follow up about this animal.
       </p>
       <div className="mt-3 flex flex-col gap-2.5 sm:flex-row">
@@ -65,14 +65,14 @@ export default function ReporterContact({
           onChange={(e) => setName(e.target.value)}
           aria-label="Your name"
           placeholder="Your name"
-          className="h-11 flex-1 rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+          className="h-11 flex-1 rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
         />
         <input
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-label="Your phone or email"
           placeholder="Phone or email"
-          className="h-11 flex-1 rounded-xl border border-zinc-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
+          className="h-11 flex-1 rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20"
         />
       </div>
       <button

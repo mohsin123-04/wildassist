@@ -60,7 +60,7 @@ export default function AutoRefresh({ done }: { done: boolean }) {
   if (done) return null;
 
   return (
-    <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-zinc-400">
+    <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-stone-400">
       <RefreshCw
         className={`h-3 w-3 ${justUpdated ? "animate-spin text-emerald-500" : ""}`}
         aria-hidden

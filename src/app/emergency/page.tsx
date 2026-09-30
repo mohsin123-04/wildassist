@@ -27,13 +27,13 @@ export default function EmergencyPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-5 py-10">
       <div>
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           Quick reference
         </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="mt-2 font-display text-4xl font-medium text-stone-900">
           Wildlife emergency basics
         </h1>
-        <p className="mt-2 text-zinc-500">
+        <p className="mt-2 text-stone-500">
           A fast reference while you get expert help. Not sure what you&apos;re
           dealing with?{" "}
           <Link
@@ -50,13 +50,13 @@ export default function EmergencyPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-emerald-700">
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-700 text-white">
               <Check className="h-3 w-3" />
             </span>
             Do
           </h2>
-          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-zinc-700">
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-stone-700">
             {DOS.map((d, i) => (
               <li key={i} className="flex gap-2">
                 <span aria-hidden className="mt-0.5 text-emerald-500">
@@ -68,13 +68,13 @@ export default function EmergencyPage() {
           </ul>
         </div>
         <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-6">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-wide text-rose-700">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-rose-700">
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-white">
               <X className="h-3 w-3" />
             </span>
             Don&apos;t
           </h2>
-          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-zinc-700">
+          <ul className="flex flex-col gap-2.5 text-sm leading-6 text-stone-700">
             {DONTS.map((d, i) => (
               <li key={i} className="flex gap-2">
                 <span aria-hidden className="mt-0.5 text-rose-400">
@@ -90,19 +90,19 @@ export default function EmergencyPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           Start guided help
         </Link>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-6 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
         >
           Home
         </Link>
       </div>
 
-      <p className="text-xs leading-5 text-zinc-500">
+      <p className="text-xs leading-5 text-stone-500">
         General guidance only, not veterinary advice. Contact details and advice
         should be confirmed with a licensed wildlife rehabilitator.
       </p>

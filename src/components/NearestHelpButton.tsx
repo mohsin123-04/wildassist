@@ -65,11 +65,11 @@ export default function NearestHelpButton() {
         <p className="text-xs font-medium uppercase tracking-widest text-emerald-700">
           Nearest wildlife help
         </p>
-        <p className="mt-1.5 font-display text-lg font-semibold text-zinc-900">
+        <p className="mt-1.5 font-display text-lg font-semibold text-stone-900">
           {centre.name}
         </p>
-        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-zinc-600">
-          <MapPin className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
+        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-stone-600">
+          <MapPin className="h-4 w-4 shrink-0 text-stone-500" aria-hidden />
           {centre.town} · {formatDistance(km, centre.country)} away
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -86,7 +86,7 @@ export default function NearestHelpButton() {
             Re-check my location
           </button>
         </div>
-        <p className="mt-3 text-xs text-zinc-500">
+        <p className="mt-3 text-xs text-stone-500">
           Verified number. Hours vary — if there&apos;s no answer, use the guided
           report and the details still reach nearby help.
         </p>
@@ -96,10 +96,10 @@ export default function NearestHelpButton() {
 
   return (
     <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-      <p className="font-display text-lg font-semibold text-zinc-900">
+      <p className="font-display text-lg font-semibold text-stone-900">
         Need to talk to someone now?
       </p>
-      <p className="mt-1 text-sm leading-6 text-zinc-600">
+      <p className="mt-1 text-sm leading-6 text-stone-600">
         We&apos;ll find the closest verified wildlife centre with a phone line, based
         on your location.
       </p>

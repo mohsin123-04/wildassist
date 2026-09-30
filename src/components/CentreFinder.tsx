@@ -91,14 +91,14 @@ export default function CentreFinder({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg font-semibold text-zinc-900">
+    <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <h2 className="font-display text-lg font-semibold text-stone-900">
         Find help near you
       </h2>
 
       {status === "idle" && (
         <>
-          <p className="mt-1 text-sm leading-6 text-zinc-600">
+          <p className="mt-1 text-sm leading-6 text-stone-600">
             Share your location and we&apos;ll sort nearby wildlife centres,
             vets, and hotlines by how close they are to you.
           </p>
@@ -112,7 +112,7 @@ export default function CentreFinder({
       )}
 
       {status === "locating" && (
-        <p className="mt-3 text-sm text-zinc-600">Getting your location…</p>
+        <p className="mt-3 text-sm text-stone-600">Getting your location…</p>
       )}
 
       {status === "denied" && (
@@ -127,14 +127,14 @@ export default function CentreFinder({
           {centres.map((c) => (
             <li
               key={c.id}
-              className="rounded-2xl border border-zinc-200 bg-[var(--background)] p-3.5"
+              className="rounded-2xl border border-stone-200 bg-[var(--background)] p-3.5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-zinc-900">{c.name}</p>
-                  <p className="text-sm text-zinc-500">{c.town}</p>
+                  <p className="font-medium text-stone-900">{c.name}</p>
+                  <p className="text-sm text-stone-500">{c.town}</p>
                   {c.type && c.type !== "rehab_centre" && (
-                    <span className="mt-1 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
+                    <span className="mt-1 inline-block rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600">
                       {FACILITY_TYPES[c.type]}
                     </span>
                   )}
@@ -170,7 +170,7 @@ export default function CentreFinder({
         </ul>
       )}
 
-      <p className="mt-4 text-xs leading-5 text-zinc-500">
+      <p className="mt-4 text-xs leading-5 text-stone-500">
         Distances are approximate (straight-line) and this list may be
         incomplete. Always call ahead before transporting an animal.
       </p>

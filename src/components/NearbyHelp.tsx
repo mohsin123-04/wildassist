@@ -42,11 +42,11 @@ export default function NearbyHelp({
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h2 className="font-display text-lg font-semibold tracking-tight text-zinc-900">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+      <h2 className="font-display text-lg font-semibold tracking-tight text-stone-900">
         Help near you
       </h2>
-      <p className="mt-1 text-sm leading-6 text-zinc-500">
+      <p className="mt-1 text-sm leading-6 text-stone-500">
         For immediate help you can also contact one of the closest places below.
         Always call ahead before bringing an animal in.
       </p>
@@ -59,12 +59,12 @@ export default function NearbyHelp({
           return (
             <li
               key={c.id}
-              className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-3"
+              className="rounded-xl border border-stone-200 bg-stone-50/60 p-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-zinc-900">{c.name}</p>
-                  <p className="text-sm text-zinc-500">{c.town}</p>
+                  <p className="font-medium text-stone-900">{c.name}</p>
+                  <p className="text-sm text-stone-500">{c.town}</p>
                   <div className="mt-1 flex flex-wrap gap-1.5">
                     {isAssigned && (
                       <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
@@ -72,13 +72,13 @@ export default function NearbyHelp({
                       </span>
                     )}
                     {typeLabel && (
-                      <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-medium text-zinc-600">
+                      <span className="rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
                         {typeLabel}
                       </span>
                     )}
                   </div>
                 </div>
-                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-stone-600 ring-1 ring-stone-200">
                   {formatDistance(c.distanceKm, c.country)}
                 </span>
               </div>

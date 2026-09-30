@@ -9,13 +9,13 @@ export default function DomesticRedirect({ onBack }: { onBack: () => void }) {
   return (
     <div className="animate-in flex flex-col gap-5">
       <div>
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
           Not a wild animal
         </p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-stone-900">
           This sounds like a pet
         </h1>
-        <p className="mt-1.5 leading-7 text-zinc-600">
+        <p className="mt-1.5 leading-7 text-stone-600">
           WildAssist helps with <span className="font-medium">wild</span>{" "}
           animals. A dog, cat, or other pet needs different help, and a wildlife
           rehabilitator can&apos;t take a domestic animal. Here&apos;s who to
@@ -23,22 +23,22 @@ export default function DomesticRedirect({ onBack }: { onBack: () => void }) {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h2 className="font-display text-lg font-semibold text-zinc-900">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <h2 className="font-display text-lg font-semibold text-stone-900">
           A sick or injured pet
         </h2>
-        <p className="mt-1 text-sm leading-6 text-zinc-600">
+        <p className="mt-1 text-sm leading-6 text-stone-600">
           Call your veterinarian. If it&apos;s urgent or after hours, go to the
           nearest 24-hour emergency animal hospital. Keep the animal warm and
           calm on the way.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h2 className="font-display text-lg font-semibold text-zinc-900">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <h2 className="font-display text-lg font-semibold text-stone-900">
           A stray, lost, or loose dog or cat
         </h2>
-        <p className="mt-1 text-sm leading-6 text-zinc-600">
+        <p className="mt-1 text-sm leading-6 text-stone-600">
           Contact your local animal control or humane society / SPCA. In many
           areas you can reach them through 311 or your city&apos;s non-emergency
           line. Don&apos;t chase or corner a frightened animal, and don&apos;t
@@ -54,13 +54,13 @@ export default function DomesticRedirect({ onBack }: { onBack: () => void }) {
       <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onBack}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           It is a wild animal
         </button>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-6 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
         >
           Home
         </Link>

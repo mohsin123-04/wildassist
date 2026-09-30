@@ -40,8 +40,8 @@ const STATUS_META: Record<
   closed: {
     label: "Resolved",
     blurb: "This report has been closed. Thank you for helping.",
-    dot: "bg-zinc-400",
-    card: "border-zinc-200 bg-zinc-50",
+    dot: "bg-stone-400",
+    card: "border-stone-200 bg-stone-50",
   },
 };
 
@@ -80,16 +80,16 @@ export default async function TrackPage({
   if (!c) {
     return (
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-5 py-16 text-center">
-        <h1 className="font-display text-2xl font-semibold text-zinc-900">
+        <h1 className="font-display text-2xl font-semibold text-stone-900">
           Report not found
         </h1>
-        <p className="mt-2 text-zinc-600">
+        <p className="mt-2 text-stone-600">
           This tracking link doesn&apos;t match a report. Check that you copied
           the whole link.
         </p>
         <Link
           href="/triage"
-          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           Report an animal
         </Link>
@@ -133,22 +133,22 @@ export default async function TrackPage({
 
   return (
     <main className="animate-in mx-auto flex w-full max-w-lg flex-1 flex-col px-5 py-8">
-      <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
         Report status
       </p>
-      <h1 className="mt-2 font-display text-2xl font-semibold capitalize tracking-tight text-zinc-900">
+      <h1 className="mt-2 font-display text-3xl font-medium capitalize text-stone-900">
         {c.animal}
         {c.title ? ` · ${c.title}` : ""}
       </h1>
 
       <div className={`mt-5 rounded-2xl border p-5 ${meta.card}`}>
-        <span className="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-700 ring-1 ring-black/5">
+        <span className="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-stone-700 ring-1 ring-black/5">
           <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
           {meta.label}
         </span>
-        <p className="mt-3 leading-7 text-zinc-700">{meta.blurb}</p>
+        <p className="mt-3 leading-7 text-stone-700">{meta.blurb}</p>
         {centre && (
-          <p className="mt-2 text-sm text-zinc-600">
+          <p className="mt-2 text-sm text-stone-600">
             Routed to <span className="font-medium">{centre.name}</span> in{" "}
             {centre.town}.
           </p>
@@ -158,11 +158,11 @@ export default async function TrackPage({
 
       {/* Reach the centre handling this animal, for status questions. */}
       {centre && (centre.phone || centre.website) && (
-        <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5">
-          <h2 className="font-display text-base font-semibold text-zinc-900">
+        <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-5">
+          <h2 className="font-display text-base font-semibold text-stone-900">
             Questions about this animal?
           </h2>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm text-stone-600">
             Contact {centre.name} directly. Please don&apos;t call for routine
             updates during busy intake hours.
           </p>
@@ -180,7 +180,7 @@ export default async function TrackPage({
                 href={centre.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
               >
                 <Globe className="h-4 w-4" aria-hidden /> Visit website
               </a>
@@ -190,7 +190,7 @@ export default async function TrackPage({
       )}
 
       <div className="mt-6">
-        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
+        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
           Progress
         </h2>
         <ol className="flex flex-col gap-3">
@@ -199,23 +199,23 @@ export default async function TrackPage({
               <div className="flex flex-col items-center">
                 <span
                   className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                    i === timeline.length - 1 ? "bg-emerald-500" : "bg-zinc-300"
+                    i === timeline.length - 1 ? "bg-emerald-500" : "bg-stone-300"
                   }`}
                 />
                 {i < timeline.length - 1 && (
-                  <span className="w-px flex-1 bg-zinc-200" />
+                  <span className="w-px flex-1 bg-stone-200" />
                 )}
               </div>
               <div className="pb-0.5 text-sm">
-                <span className="font-medium text-zinc-800">{p.label}</span>
-                <span className="text-zinc-500"> · {when(p.at)}</span>
+                <span className="font-medium text-stone-800">{p.label}</span>
+                <span className="text-stone-500"> · {when(p.at)}</span>
               </div>
             </li>
           ))}
         </ol>
       </div>
 
-      <p className="mt-6 text-xs leading-5 text-zinc-500">
+      <p className="mt-6 text-xs leading-5 text-stone-500">
         This page updates on its own as the animal is helped — bookmark it to
         check back. For an urgent, life-threatening situation, call a wildlife
         rehabilitator or vet directly rather than waiting.
@@ -224,13 +224,13 @@ export default async function TrackPage({
       <div className="mt-8 flex flex-wrap gap-2.5">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           Report another animal
         </Link>
         <Link
           href="/emergency"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-6 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
         >
           Emergency basics
         </Link>

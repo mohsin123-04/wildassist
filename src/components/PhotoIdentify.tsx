@@ -115,7 +115,7 @@ export default function PhotoIdentify({
   const busy = status === "loading-model" || status === "classifying";
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <input
         ref={inputRef}
         type="file"
@@ -155,7 +155,7 @@ export default function PhotoIdentify({
       ) : status === "done" || status === "error" ? (
         <button
           onClick={() => inputRef.current?.click()}
-          className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-6 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+          className="inline-flex h-11 items-center justify-center rounded-full border border-stone-200 bg-white px-6 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
         >
           Try another photo
         </button>
@@ -170,7 +170,7 @@ export default function PhotoIdentify({
           </button>
           <button
             onClick={() => inputRef.current?.click()}
-            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-zinc-200 bg-white px-5 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-stone-200 bg-white px-5 font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
           >
             <Images className="h-4 w-4" aria-hidden />
             Choose from library
@@ -179,13 +179,13 @@ export default function PhotoIdentify({
       )}
 
       {status === "loading-model" && (
-        <p className="mt-3 text-sm text-zinc-500">
+        <p className="mt-3 text-sm text-stone-500">
           Downloading the vision model (first time only). It runs entirely on
           your device. No photo is uploaded.
         </p>
       )}
 
-      {message && <p className="mt-3 text-sm text-zinc-700">{message}</p>}
+      {message && <p className="mt-3 text-sm text-stone-700">{message}</p>}
 
       {danger && (
         <div className="mt-3">

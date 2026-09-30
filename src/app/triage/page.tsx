@@ -286,7 +286,7 @@ export default function TriagePage() {
           <div
             key={s}
             className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i <= stepIndex ? "bg-zinc-900" : "bg-zinc-200"
+              i <= stepIndex ? "bg-stone-900" : "bg-stone-200"
             }`}
           />
         ))}
@@ -294,22 +294,22 @@ export default function TriagePage() {
 
       {animalOption &&
         (step === "situation" || step === "details") && (
-          <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5">
-            <span className="flex items-center gap-2 text-sm text-zinc-700">
+          <div className="mb-5 flex items-center justify-between gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5">
+            <span className="flex items-center gap-2 text-sm text-stone-700">
               <AnimalIcon
                 name={animalOption.value}
                 className="h-4 w-4 text-emerald-700"
               />
-              <span className="font-medium text-zinc-900">
+              <span className="font-medium text-stone-900">
                 {animalOption.label}
               </span>
               {photoHint && (
-                <span className="text-zinc-500">(looks like a {photoHint})</span>
+                <span className="text-stone-500">(looks like a {photoHint})</span>
               )}
             </span>
             <button
               onClick={() => setStep("animal")}
-              className="shrink-0 text-sm font-medium text-zinc-500 hover:text-zinc-900"
+              className="shrink-0 text-sm font-medium text-stone-500 hover:text-stone-900"
             >
               Change
             </button>
@@ -331,17 +331,17 @@ export default function TriagePage() {
                   setAnimalOption(a);
                   setStep("situation");
                 }}
-                className={`group flex flex-col items-start gap-2.5 rounded-xl border bg-white p-4 text-left transition-all hover:border-zinc-300 hover:shadow-sm ${
+                className={`group flex flex-col items-start gap-2.5 rounded-xl border bg-white p-4 text-left transition-all hover:border-stone-300 hover:shadow-sm ${
                   animalOption?.value === a.value
-                    ? "border-zinc-900 ring-1 ring-zinc-900"
-                    : "border-zinc-200"
+                    ? "border-stone-900 ring-1 ring-stone-900"
+                    : "border-stone-200"
                 }`}
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                   <AnimalIcon name={a.value} className="h-5 w-5" />
                 </span>
-                <span className="font-medium text-zinc-900">{a.label}</span>
-                <span className="text-xs leading-snug text-zinc-500">
+                <span className="font-medium text-stone-900">{a.label}</span>
+                <span className="text-xs leading-snug text-stone-500">
                   {a.description}
                 </span>
               </button>
@@ -375,7 +375,7 @@ export default function TriagePage() {
             )}
           </div>
 
-          <p className="mt-4 border-t border-zinc-100 pt-4 text-sm text-zinc-500">
+          <p className="mt-4 border-t border-stone-100 pt-4 text-sm text-stone-500">
             Not a wild animal?{" "}
             <button
               onClick={() => setDomestic(true)}
@@ -403,12 +403,12 @@ export default function TriagePage() {
                   setSituation(s.value);
                   setStep("details");
                 }}
-                className="group flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-left transition-all hover:border-zinc-300 hover:bg-zinc-50"
+                className="group flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition-all hover:border-stone-300 hover:bg-stone-50"
               >
-                <span className="text-zinc-800">{s.label}</span>
+                <span className="text-stone-800">{s.label}</span>
                 <span
                   aria-hidden
-                  className="text-zinc-300 transition-all group-hover:translate-x-0.5 group-hover:text-zinc-500"
+                  className="text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
                 >
                   →
                 </span>
@@ -428,7 +428,7 @@ export default function TriagePage() {
         >
           {/* Description */}
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-zinc-700">
+            <span className="text-sm font-medium text-stone-700">
               Describe what you see
             </span>
             <textarea
@@ -436,16 +436,16 @@ export default function TriagePage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. A small bird has been under a tree for an hour, hopping but not flying. There's a cat in the yard."
               rows={4}
-              className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-4 text-zinc-800 outline-none transition-colors placeholder:text-zinc-500 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5"
+              className="w-full resize-none rounded-xl border border-stone-200 bg-white p-4 text-stone-800 outline-none transition-colors placeholder:text-stone-500 focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
             />
           </label>
 
           {/* Photo of the animal */}
           <div className="mt-4">
-            <p className="text-sm font-medium text-zinc-700">
+            <p className="text-sm font-medium text-stone-700">
               Add a photo of the animal
             </p>
-            <p className="mb-2 text-xs text-zinc-500">
+            <p className="mb-2 text-xs text-stone-500">
               A photo helps responders understand its condition.
             </p>
             <input
@@ -482,7 +482,7 @@ export default function TriagePage() {
                     setPhotoFile(null);
                     setPhotoPreview(null);
                   }}
-                  className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+                  className="text-sm font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
                 >
                   Remove
                 </button>
@@ -491,14 +491,14 @@ export default function TriagePage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => cameraInputRef.current?.click()}
-                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
                 >
                   <Camera className="h-4 w-4" aria-hidden />
                   Take photo
                 </button>
                 <button
                   onClick={() => photoInputRef.current?.click()}
-                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
                 >
                   <Images className="h-4 w-4" aria-hidden />
                   Choose from library
@@ -509,10 +509,10 @@ export default function TriagePage() {
 
           {/* Location */}
           <div className="mt-4">
-            <p className="text-sm font-medium text-zinc-700">
+            <p className="text-sm font-medium text-stone-700">
               Where is the animal?
             </p>
-            <p className="mb-2 text-xs text-zinc-500">
+            <p className="mb-2 text-xs text-stone-500">
               Sharing your location routes this report and shows the closest
               help.
             </p>
@@ -520,7 +520,7 @@ export default function TriagePage() {
               <div
                 role="status"
                 aria-live="polite"
-                className="flex items-center gap-2 text-sm text-zinc-700"
+                className="flex items-center gap-2 text-sm text-stone-700"
               >
                 <MapPin className="h-4 w-4 text-emerald-700" aria-hidden />
                 <span className="font-medium">Location captured.</span>
@@ -529,7 +529,7 @@ export default function TriagePage() {
                     setCoords(null);
                     setLocStatus("idle");
                   }}
-                  className="text-zinc-500 underline underline-offset-2 hover:text-zinc-800"
+                  className="text-stone-500 underline underline-offset-2 hover:text-stone-800"
                 >
                   Clear
                 </button>
@@ -538,7 +538,7 @@ export default function TriagePage() {
               <button
                 onClick={useMyLocation}
                 disabled={locStatus === "locating"}
-                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+                className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-60"
               >
                 {locStatus === "locating" ? (
                   <Spinner label="Locating…" />
@@ -561,7 +561,7 @@ export default function TriagePage() {
           <button
             onClick={submit}
             disabled={loading}
-            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-zinc-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-stone-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? <Spinner label="Submitting…" /> : "Get help & send report"}
           </button>
@@ -605,18 +605,18 @@ function Section({
         {onBack && (
           <button
             onClick={onBack}
-            className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+            className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-900"
           >
             <span aria-hidden>←</span> Back
           </button>
         )}
-        <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           {eyebrow}
         </p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="mt-2 font-display text-3xl font-medium text-stone-900">
           {title}
         </h1>
-        <p className="mt-1.5 text-zinc-500">{subtitle}</p>
+        <p className="mt-1.5 text-stone-500">{subtitle}</p>
       </div>
       {children}
     </div>
@@ -708,13 +708,13 @@ function ResultView({
             <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
             {style.label}
           </span>
-          <span className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600">
+          <span className="inline-flex items-center gap-2 text-xs font-medium text-stone-600">
             <span className="flex items-center gap-1" aria-hidden>
               {[1, 2, 3].map((n) => (
                 <span
                   key={n}
                   className={`h-3.5 w-1.5 rounded-full ${
-                    n <= style.level ? style.bar : "bg-zinc-200"
+                    n <= style.level ? style.bar : "bg-stone-200"
                   }`}
                 />
               ))}
@@ -722,10 +722,10 @@ function ResultView({
             {style.urgency}
           </span>
         </div>
-        <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-stone-900">
           {result.title}
         </h1>
-        <p className="mt-2 leading-7 text-zinc-700">{result.reasoning}</p>
+        <p className="mt-2 leading-7 text-stone-700">{result.reasoning}</p>
       </div>
 
       {result.verdict === "help" && (
@@ -740,30 +740,30 @@ function ResultView({
       )}
 
       <div>
-        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
+        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
           What to do
         </h2>
         <ol className="flex flex-col gap-2">
           {result.steps.map((s, i) => (
             <li
               key={i}
-              className="flex gap-3 rounded-xl border border-zinc-200 bg-white p-3.5"
+              className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-xs font-semibold text-white">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-xs font-semibold text-white">
                 {i + 1}
               </span>
-              <span className="leading-6 text-zinc-700">{s}</span>
+              <span className="leading-6 text-stone-700">{s}</span>
             </li>
           ))}
         </ol>
       </div>
 
       {trackToken && (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="font-display text-lg font-semibold text-zinc-900">
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <h2 className="font-display text-lg font-semibold text-stone-900">
             Follow your report
           </h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-600">
+          <p className="mt-1 text-sm leading-6 text-stone-600">
             Check its status any time, from reported to in care. No account
             needed, just keep this link.
           </p>
@@ -776,7 +776,7 @@ function ResultView({
             </Link>
             <button
               onClick={copyTrackLink}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
             >
               Copy link
             </button>
@@ -790,8 +790,8 @@ function ResultView({
             <>
               <ReportStatus centre={assignedCentre} />
               {routingNote && (
-                <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600">
-                  <span className="font-medium text-zinc-800">Why here:</span>{" "}
+                <div className="rounded-2xl border border-stone-200 bg-white p-4 text-sm leading-6 text-stone-600">
+                  <span className="font-medium text-stone-800">Why here:</span>{" "}
                   {routingNote}
                 </div>
               )}
@@ -814,19 +814,19 @@ function ResultView({
       <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onRestart}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
         >
           Start over
         </button>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-6 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-6 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
         >
           Home
         </Link>
       </div>
 
-      <p className="text-xs leading-5 text-zinc-500">
+      <p className="text-xs leading-5 text-stone-500">
         General guidance from an early prototype, not veterinary advice. When in
         doubt, always contact a licensed wildlife rehabilitator.
         {result.source === "rules" && " (Offline guidance mode.)"}
