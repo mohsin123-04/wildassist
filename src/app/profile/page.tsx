@@ -68,7 +68,12 @@ export default async function ProfilePage() {
 
       {/* Identity header: banner band + overlapping avatar + meta */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-        <div className="h-24 bg-emerald-700 sm:h-28" aria-hidden />
+        {/* Banner takes the member's chosen avatar color (emerald by default). */}
+        <div
+          className="h-24 sm:h-28"
+          style={{ backgroundColor: profile?.avatar_color || "#047857" }}
+          aria-hidden
+        />
         <div className="px-5 pb-5 sm:px-8 sm:pb-6">
           <div className="-mt-11 flex items-end justify-between gap-4 sm:-mt-12">
             <div className="h-fit w-fit shrink-0 rounded-full bg-white ring-4 ring-white">
