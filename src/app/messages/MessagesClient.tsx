@@ -822,7 +822,7 @@ function GroupCreator({
             onClick={() => toggle(m.id)}
             className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
               picked.includes(m.id)
-                ? "border-stone-900 bg-stone-900 text-white"
+                ? "border-forest-900 bg-forest-900 text-white"
                 : "border-stone-200 text-stone-600 hover:bg-stone-50"
             }`}
           >
@@ -834,7 +834,7 @@ function GroupCreator({
         <button
           onClick={() => onCreate(title, picked)}
           disabled={picked.length < 2}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl bg-forest-900 px-5 text-sm font-semibold text-white hover:bg-forest-800 disabled:opacity-50"
         >
           Create group
         </button>

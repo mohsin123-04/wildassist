@@ -170,7 +170,7 @@ export default function TransportList({
                   <button
                     onClick={() => act(j.id, "deliver")}
                     disabled={busyId === j.id}
-                    className="inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-4 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+                    className="inline-flex h-9 items-center justify-center rounded-xl bg-forest-900 px-4 text-sm font-medium text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
                   >
                     Mark delivered
                   </button>
@@ -201,7 +201,7 @@ export default function TransportList({
                 <button
                   onClick={() => act(j.id, "claim")}
                   disabled={busyId === j.id}
-                  className="inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+                  className="inline-flex h-9 items-center justify-center rounded-xl bg-forest-900 px-5 text-sm font-medium text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
                 >
                   {busyId === j.id ? "Claiming…" : "Claim pickup"}
                 </button>

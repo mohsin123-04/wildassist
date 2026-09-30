@@ -87,7 +87,7 @@ export default function AppearanceSection({
           <button
             onClick={() => inputRef.current?.click()}
             disabled={busy}
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-forest-900 px-5 text-sm font-medium text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
           >
             {busy ? <Spinner label="Working…" /> : "Upload photo"}
           </button>

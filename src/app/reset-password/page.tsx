@@ -134,7 +134,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={busy}
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-forest-800 active:scale-[0.98] disabled:opacity-60"
             >
               {busy ? <Spinner label="Updating…" /> : "Update password"}
             </button>

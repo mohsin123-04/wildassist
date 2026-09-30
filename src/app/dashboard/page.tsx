@@ -87,7 +87,7 @@ export default async function DashboardPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           {isAdmin
             ? "Admin overview"
             : firstName

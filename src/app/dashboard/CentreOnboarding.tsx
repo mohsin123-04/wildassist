@@ -80,7 +80,7 @@ export default function CentreOnboarding({
       <button
         onClick={join}
         disabled={!selected || !code.trim() || loading}
-        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-50"
+        className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 font-medium text-white shadow-sm transition-all hover:bg-forest-800 active:scale-[0.98] disabled:opacity-50"
       >
         {loading ? <Spinner label="Joining…" /> : "Join centre"}
       </button>

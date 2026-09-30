@@ -89,7 +89,7 @@ export default async function TrackPage({
         </p>
         <Link
           href="/triage"
-          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
+          className="mx-auto mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
         >
           Report an animal
         </Link>
@@ -224,7 +224,7 @@ export default async function TrackPage({
       <div className="mt-8 flex flex-wrap gap-2.5">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
         >
           Report another animal
         </Link>

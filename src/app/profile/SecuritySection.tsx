@@ -92,7 +92,7 @@ export default function SecuritySection({ email }: { email: string }) {
         <button
           onClick={changePassword}
           disabled={pwBusy || !password}
-          className="inline-flex h-10 w-fit items-center justify-center rounded-xl bg-stone-900 px-5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+          className="inline-flex h-10 w-fit items-center justify-center rounded-xl bg-forest-900 px-5 text-sm font-medium text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
         >
           {pwBusy ? <Spinner label="Updating…" /> : "Update password"}
         </button>

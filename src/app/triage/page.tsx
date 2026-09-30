@@ -286,7 +286,7 @@ export default function TriagePage() {
           <div
             key={s}
             className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i <= stepIndex ? "bg-stone-900" : "bg-stone-200"
+              i <= stepIndex ? "bg-forest-900" : "bg-stone-200"
             }`}
           />
         ))}
@@ -333,7 +333,7 @@ export default function TriagePage() {
                 }}
                 className={`group flex flex-col items-start gap-2.5 rounded-xl border bg-white p-4 text-left transition-all hover:border-stone-300 hover:shadow-sm ${
                   animalOption?.value === a.value
-                    ? "border-stone-900 ring-1 ring-stone-900"
+                    ? "border-forest-900 ring-1 ring-stone-900"
                     : "border-stone-200"
                 }`}
               >
@@ -561,7 +561,7 @@ export default function TriagePage() {
           <button
             onClick={submit}
             disabled={loading}
-            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-stone-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-forest-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-forest-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? <Spinner label="Submitting…" /> : "Get help & send report"}
           </button>
@@ -749,7 +749,7 @@ function ResultView({
               key={i}
               className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-xs font-semibold text-white">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-forest-900 text-xs font-semibold text-white">
                 {i + 1}
               </span>
               <span className="leading-6 text-stone-700">{s}</span>
@@ -814,7 +814,7 @@ function ResultView({
       <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onRestart}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
         >
           Start over
         </button>

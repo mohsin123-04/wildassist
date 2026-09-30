@@ -403,7 +403,7 @@ export default function AnalyticsClient({
       </Link>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
             {isAdmin ? "Nationwide" : "Your area"}
           </p>
           <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-stone-900">
@@ -424,7 +424,7 @@ export default function AnalyticsClient({
             onClick={() => setRangeKey(r.key)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               r.key === rangeKey
-                ? "bg-stone-900 text-white"
+                ? "bg-forest-900 text-white"
                 : "text-stone-600 hover:bg-stone-50"
             }`}
           >

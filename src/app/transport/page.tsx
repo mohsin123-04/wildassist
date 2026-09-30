@@ -29,7 +29,7 @@ export default async function TransportPage() {
   return (
     <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           {firstName ? `Hi ${firstName}` : "Rescue volunteer"}
         </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-stone-900">
@@ -61,7 +61,7 @@ export default async function TransportPage() {
           </div>
 
           <div className="mx-auto mt-6 max-w-md">
-            <p className="text-xs font-medium uppercase tracking-widest text-stone-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
               What happens next
             </p>
             <ol className="mt-2 flex flex-col gap-2 text-sm text-stone-700">

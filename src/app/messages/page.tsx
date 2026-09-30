@@ -31,7 +31,7 @@ export default async function MessagesPage() {
         </p>
         <Link
           href="/dashboard"
-          className="mt-5 inline-flex h-11 w-fit items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white hover:bg-stone-800"
+          className="mt-5 inline-flex h-11 w-fit items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white hover:bg-forest-800"
         >
           Go to dashboard
         </Link>

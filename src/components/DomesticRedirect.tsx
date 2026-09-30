@@ -54,7 +54,7 @@ export default function DomesticRedirect({ onBack }: { onBack: () => void }) {
       <div className="flex flex-wrap gap-3 pt-1">
         <button
           onClick={onBack}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
         >
           It is a wild animal
         </button>

@@ -151,7 +151,7 @@ export default function LoginPage() {
                     onClick={() => setRole(r.value)}
                     className={`flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-all ${
                       role === r.value
-                        ? "border-stone-900 bg-stone-50 ring-1 ring-stone-900"
+                        ? "border-forest-900 bg-stone-50 ring-1 ring-stone-900"
                         : "border-stone-200 bg-white hover:border-stone-300"
                     }`}
                   >
@@ -263,7 +263,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-60"
+            className="mt-1 inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-forest-800 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? (
               <Spinner label="Please wait…" />

@@ -90,7 +90,7 @@ export default function EmergencyPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/triage"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-stone-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-stone-800"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
         >
           Start guided help
         </Link>

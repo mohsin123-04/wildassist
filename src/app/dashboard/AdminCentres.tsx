@@ -203,7 +203,7 @@ export default function AdminCentres() {
               <button
                 onClick={submit}
                 disabled={busy || !name.trim() || !address.trim()}
-                className="inline-flex h-11 w-fit items-center justify-center rounded-xl bg-stone-900 px-6 font-medium text-white shadow-sm transition-colors hover:bg-stone-800 disabled:opacity-50"
+                className="inline-flex h-11 w-fit items-center justify-center rounded-xl bg-forest-900 px-6 font-medium text-white shadow-sm transition-colors hover:bg-forest-800 disabled:opacity-50"
               >
                 {busy ? <Spinner label="Creating…" /> : "Create centre"}
               </button>

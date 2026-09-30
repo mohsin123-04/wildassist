@@ -142,7 +142,7 @@ export default function AdminVolunteers() {
                     <button
                       onClick={() => setApproved(v.id, true)}
                       disabled={busyId === v.id}
-                      className="rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+                      className="rounded-full bg-forest-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
                     >
                       Approve
                     </button>

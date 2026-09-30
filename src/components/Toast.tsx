@@ -42,7 +42,7 @@ export default function Toast() {
       aria-live="polite"
       className="pointer-events-none fixed inset-x-0 bottom-5 z-50 flex justify-center px-4"
     >
-      <div className="animate-in flex items-center gap-2.5 rounded-full border border-stone-800 bg-stone-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
+      <div className="animate-in flex items-center gap-2.5 rounded-full border border-stone-800 bg-forest-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg">
         <span
           aria-hidden
           className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white"

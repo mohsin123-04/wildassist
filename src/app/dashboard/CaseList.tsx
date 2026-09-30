@@ -496,7 +496,7 @@ export default function CaseList({
               onClick={() => setView(v)}
               className={`px-3 text-sm font-medium capitalize transition-colors ${
                 view === v
-                  ? "bg-stone-900 text-white"
+                  ? "bg-forest-900 text-white"
                   : "bg-white text-stone-600 hover:bg-stone-50"
               }`}
             >
@@ -845,7 +845,7 @@ export default function CaseList({
                         <button
                           onClick={() => claim(c.id)}
                           disabled={claimingId === c.id}
-                          className="ml-auto inline-flex h-9 items-center justify-center rounded-xl bg-stone-900 px-4 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:opacity-50"
+                          className="ml-auto inline-flex h-9 items-center justify-center rounded-xl bg-forest-900 px-4 text-sm font-medium text-white transition-colors hover:bg-forest-800 disabled:opacity-50"
                         >
                           {claimingId === c.id ? "Claiming…" : "Claim for my centre"}
                         </button>
@@ -1014,7 +1014,7 @@ function Stat({
       aria-pressed={active}
       className={`${base} ${
         active
-          ? "border-stone-900 bg-white ring-1 ring-stone-900"
+          ? "border-forest-900 bg-white ring-1 ring-stone-900"
           : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
       }`}
     >
@@ -1037,7 +1037,7 @@ function Chip({
       onClick={onClick}
       className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "bg-stone-900 text-white"
+          ? "bg-forest-900 text-white"
           : "border border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
       }`}
     >
