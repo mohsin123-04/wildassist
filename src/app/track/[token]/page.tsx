@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Phone, Globe } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/server";
+import AutoRefresh from "./AutoRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -95,13 +97,20 @@ export default async function TrackPage({
     );
   }
 
-  let centre: { name: string; town: string } | null = null;
+  let centre:
+    | { name: string; town: string; phone: string | null; website: string | null }
+    | null = null;
   if (c.centre_id) {
     const { data } = await admin
       .from("centres")
-      .select("name, town")
+      .select("name, town, phone, website")
       .eq("id", c.centre_id)
-      .single<{ name: string; town: string }>();
+      .single<{
+        name: string;
+        town: string;
+        phone: string | null;
+        website: string | null;
+      }>();
     centre = data ?? null;
   }
 
@@ -144,7 +153,41 @@ export default async function TrackPage({
             {centre.town}.
           </p>
         )}
+        <AutoRefresh done={c.status === "closed"} />
       </div>
+
+      {/* Reach the centre handling this animal, for status questions. */}
+      {centre && (centre.phone || centre.website) && (
+        <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5">
+          <h2 className="font-display text-base font-semibold text-zinc-900">
+            Questions about this animal?
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600">
+            Contact {centre.name} directly. Please don&apos;t call for routine
+            updates during busy intake hours.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2.5">
+            {centre.phone && (
+              <a
+                href={`tel:${centre.phone.replace(/[^0-9+]/g, "")}`}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+              >
+                <Phone className="h-4 w-4" aria-hidden /> Call {centre.phone}
+              </a>
+            )}
+            {centre.website && (
+              <a
+                href={centre.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                <Globe className="h-4 w-4" aria-hidden /> Visit website
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-zinc-900">
@@ -173,9 +216,9 @@ export default async function TrackPage({
       </div>
 
       <p className="mt-6 text-xs leading-5 text-zinc-500">
-        This page updates as the animal is helped. Bookmark it to check back. For
-        an urgent, life-threatening situation, call a wildlife rehabilitator or
-        vet directly rather than waiting.
+        This page updates on its own as the animal is helped — bookmark it to
+        check back. For an urgent, life-threatening situation, call a wildlife
+        rehabilitator or vet directly rather than waiting.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-2.5">

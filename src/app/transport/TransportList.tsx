@@ -2,8 +2,27 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { MapPin, Inbox } from "lucide-react";
+import { Inbox, Navigation, CheckCircle2 } from "lucide-react";
 import { flash } from "@/lib/flash";
+
+/**
+ * Turn-by-turn directions link that opens the device's native maps app
+ * (Google Maps on Android/web, Apple Maps on iOS) with navigation to the
+ * pickup, starting from the driver's current location.
+ */
+function directionsUrl(lat: number, lng: number): string {
+  if (typeof navigator !== "undefined" && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    return `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+}
+
+function shortWhen(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
 
 const TransportMap = dynamic(() => import("./TransportMap"), {
   ssr: false,
@@ -36,6 +55,8 @@ export default function TransportList({
 }) {
   const [available, setAvailable] = useState<Job[]>([]);
   const [mine, setMine] = useState<Job[]>([]);
+  const [completed, setCompleted] = useState<Job[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -75,6 +96,7 @@ export default function TransportList({
       const d = await r.json();
       setAvailable(d.available ?? []);
       setMine(d.mine ?? []);
+      setCompleted(d.completed ?? []);
     } catch {
       // leave empty
     } finally {
@@ -188,6 +210,45 @@ export default function TransportList({
           ))
         )}
       </Section>
+
+      {completed.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowHistory((v) => !v)}
+            className="flex items-center gap-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
+          >
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden />
+            {completed.length} pickup{completed.length === 1 ? "" : "s"}{" "}
+            delivered
+            <span className="text-zinc-400">{showHistory ? "▲" : "▼"}</span>
+          </button>
+          {showHistory && (
+            <ul className="mt-3 flex flex-col gap-2">
+              {completed.map((j) => (
+                <li
+                  key={j.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm"
+                >
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium capitalize text-zinc-800">
+                      {j.animal}
+                    </span>
+                    {j.centre_id && centreNames[j.centre_id] && (
+                      <span className="text-zinc-500">
+                        {" "}
+                        → {centreNames[j.centre_id]}
+                      </span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-xs text-zinc-400">
+                    {shortWhen(j.created_at)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -254,12 +315,12 @@ function JobCard({
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
         {job.lat != null && job.lng != null && (
           <a
-            href={`https://www.openstreetmap.org/?mlat=${job.lat}&mlon=${job.lng}#map=15/${job.lat}/${job.lng}`}
+            href={directionsUrl(job.lat, job.lng)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 font-medium text-emerald-700 underline underline-offset-2"
           >
-            <MapPin className="h-3.5 w-3.5" aria-hidden /> Pickup location
+            <Navigation className="h-3.5 w-3.5" aria-hidden /> Directions
           </a>
         )}
         {centreName && <span className="text-zinc-500">→ {centreName}</span>}

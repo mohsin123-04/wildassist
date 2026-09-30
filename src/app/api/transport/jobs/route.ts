@@ -43,6 +43,16 @@ export async function GET(req: NextRequest) {
     .in("status", ["in_transit"])
     .order("created_at", { ascending: false });
 
+  // The volunteer's completed deliveries — a record of their contribution
+  // (no reporter PII; the handoff is done).
+  const { data: doneRaw } = await admin
+    .from("cases")
+    .select("id, created_at, animal, title, status, centre_id")
+    .eq("driver_id", user.id)
+    .in("status", ["at_centre", "closed"])
+    .order("created_at", { ascending: false })
+    .limit(30);
+
   // Available unclaimed jobs (NO reporter PII in the browse feed).
   const { data: availRaw } = await admin
     .from("cases")
@@ -77,5 +87,7 @@ export async function GET(req: NextRequest) {
         : null,
   }));
 
-  return Response.json({ approved: true, available, mine });
+  const completed = (doneRaw ?? []).map((c) => ({ ...c, distanceKm: null }));
+
+  return Response.json({ approved: true, available, mine, completed });
 }
