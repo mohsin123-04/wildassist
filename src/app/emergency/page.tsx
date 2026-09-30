@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Check, X } from "lucide-react";
+import NearestHelpButton from "@/components/NearestHelpButton";
 
 export const metadata: Metadata = {
   title: "Wildlife emergency basics | WildAssist",
@@ -45,22 +46,7 @@ export default function EmergencyPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-        <h2 className="font-display text-lg font-semibold tracking-tight text-zinc-900">
-          Reach a wildlife rehabilitator
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-zinc-600">
-          The fastest help comes from a licensed wildlife rehabilitator or vet
-          near you. Use the guided tool to find and reach the nearest one for
-          your situation.
-        </p>
-        <Link
-          href="/triage"
-          className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98]"
-        >
-          Find the nearest help
-        </Link>
-      </div>
+      <NearestHelpButton />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">

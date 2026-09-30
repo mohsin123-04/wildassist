@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Bird, MapPin, Car, Phone, MessageSquare } from "lucide-react";
+import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
@@ -819,6 +819,13 @@ export default function CaseList({
                     )}
 
                     <div className="flex flex-wrap items-center gap-4">
+                      <a
+                        href={`/case/${c.id}`}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 underline underline-offset-2"
+                      >
+                        <SquareArrowOutUpRight className="h-4 w-4" aria-hidden />{" "}
+                        Open case page
+                      </a>
                       {c.lat != null && c.lng != null ? (
                         <a
                           href={`https://www.openstreetmap.org/?mlat=${c.lat}&mlon=${c.lng}#map=14/${c.lat}/${c.lng}`}

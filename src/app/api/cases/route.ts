@@ -54,7 +54,7 @@ async function notifyCentreStaff(
     await sendPushToUsers(staffIds, {
       title: `New ${info.verdict === "help" ? "urgent " : ""}case: ${info.animal}`,
       body: `${info.title ?? "A new report"} — routed to ${centre.name}. Tap to open.`,
-      url: `/dashboard?case=${info.caseId}`,
+      url: `/case/${info.caseId}`,
     });
 
     const emails = (

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CentreFinder from "@/components/CentreFinder";
 import PhotoIdentify from "@/components/PhotoIdentify";
 import ReporterContact from "@/components/ReporterContact";
@@ -64,6 +64,57 @@ export default function TriagePage() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const stepIndex = STEP_ORDER.indexOf(step);
+
+
+  // ---- Draft persistence: an interrupted report survives a refresh. --------
+  // Restores animal/situation/description/step (1-hour TTL); cleared once the
+  // report reaches the result step. Photo and location are re-collected.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("wa_triage_draft");
+      if (!raw) return;
+      const d = JSON.parse(raw) as {
+        at: number; step?: Step; animal?: string | null;
+        situation?: Situation | null; description?: string;
+      };
+      if (!d.at || Date.now() - d.at > 60 * 60 * 1000) return;
+      const opt = d.animal
+        ? ANIMAL_OPTIONS.find((o) => o.value === d.animal) ?? null
+        : null;
+      if (opt) setAnimalOption(opt);
+      if (d.situation) setSituation(d.situation);
+      if (d.description) setDescription(d.description);
+      if (d.step && d.step !== "result" && (d.step === "animal" || opt)) {
+        setStep(d.step);
+      }
+    } catch {
+      // ignore a corrupt draft
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (step === "result") {
+        sessionStorage.removeItem("wa_triage_draft");
+        return;
+      }
+      // Nothing chosen yet (e.g. the very first render) -> nothing to save,
+      // and skipping also avoids clobbering a draft before it's restored.
+      if (!animalOption && !situation && !description) return;
+      sessionStorage.setItem(
+        "wa_triage_draft",
+        JSON.stringify({
+          at: Date.now(),
+          step,
+          animal: animalOption?.value ?? null,
+          situation,
+          description,
+        })
+      );
+    } catch {
+      // storage unavailable — fine
+    }
+  }, [step, animalOption, situation, description]);
 
   function reset() {
     setAnimalOption(null);
