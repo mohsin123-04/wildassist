@@ -789,7 +789,6 @@ export default function CaseList({
             const isMine = c.centre_id === myCentreId;
             const otherCentre =
               c.centre_id && !isMine ? centreNames[c.centre_id] : null;
-            const urgent = c.verdict === "help" && c.status !== "closed";
             const hasMeta =
               c.centre_id === null ||
               !!otherCentre ||
@@ -799,16 +798,14 @@ export default function CaseList({
               <li
                 key={c.id}
                 id={`case-${c.id}`}
-                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""} ${
-                  urgent ? "border-l-2 border-l-rose-400" : ""
-                }`}
+                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""}`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : c.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
                 >
                   <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${VERDICT_BADGE[c.verdict]}`}
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
                   >
                     {c.verdict}
                   </span>
@@ -847,12 +844,12 @@ export default function CaseList({
                       </div>
                     )}
                   </div>
-                  <span className="hidden shrink-0 text-xs text-stone-400 sm:block">
+                  <span className="hidden shrink-0 text-xs leading-5 text-stone-400 sm:block">
                     <LocalTime iso={c.created_at} />
                   </span>
                   <span
                     aria-hidden
-                    className={`shrink-0 text-sm leading-none text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-sm leading-5 text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
                   >
                     ▾
                   </span>
