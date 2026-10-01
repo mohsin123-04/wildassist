@@ -11,6 +11,8 @@ import NotificationBell from "@/components/NotificationBell";
 // them at the top of the page, then turns solid once you scroll past the hero.
 const DARK_HERO_ROUTES = new Set(["/"]);
 const CENTRE_ROLES = ["staff", "manager", "admin"];
+// Data-dense app pages get a wider shell so they don't float in dead margins.
+const WIDE_ROUTES = ["/dashboard", "/analytics"];
 
 export default function SiteHeader({
   initialUser = null,
@@ -30,16 +32,21 @@ export default function SiteHeader({
   }, []);
 
   const overDark = DARK_HERO_ROUTES.has(pathname) && !scrolled;
+  const wide = WIDE_ROUTES.some((r) => pathname.startsWith(r));
 
   return (
     <header
       className={`sticky top-0 z-30 transition-colors duration-300 ${
         overDark
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-black/5 bg-white/85 shadow-sm shadow-black/[0.03] backdrop-blur-xl"
+          : "border-b border-stone-200 bg-white shadow-sm shadow-stone-900/[0.04]"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3.5">
+      <div
+        className={`mx-auto flex w-full items-center justify-between px-5 py-3.5 ${
+          wide ? "max-w-7xl" : "max-w-6xl"
+        }`}
+      >
         <Link
           href="/"
           className={`group flex items-center gap-2.5 font-display text-lg font-medium tracking-tight transition-colors ${

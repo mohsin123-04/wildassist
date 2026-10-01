@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight } from "lucide-react";
+import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
@@ -392,75 +392,63 @@ export default function CaseList({
   }
 
   return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start lg:gap-8">
-      {/* LEFT rail: quick views + centre panels, sticky on desktop so the case
-          list on the right scrolls independently. */}
-      <aside className="flex flex-col gap-5 lg:sticky lg:top-20">
-        {/* Quick views, two independent axes, grouped and labeled so it's clear
-            they answer different questions (who owns it vs what state it's in). */}
+    <div className="dashboard-grid">
+      {/* Quick-view stats: pinned left rail on desktop, top of the stack on
+          mobile (they drive the list below, so they belong first). */}
+      <div className="area-stats">
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-widest text-stone-400">
             Quick views · tap to filter
           </p>
-          <div className="flex flex-col gap-4">
-            <div>
-              <div className="grid grid-cols-2 gap-3">
-                <Stat
-                  label={isAdmin ? "All cases" : "In your area"}
-                  value={areaCases.length}
-                  active={scope === "area"}
-                  onClick={() => selectScope("area")}
-                />
-                <Stat
-                  label="Unassigned"
-                  value={stats.unassigned}
-                  accent="text-amber-600"
-                  active={scope === "unassigned"}
-                  onClick={() => selectScope("unassigned")}
-                />
-              </div>
-              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-stone-400">
-                By assignment
-              </p>
-            </div>
-            <div>
-              <div className="grid grid-cols-2 gap-3">
-                <Stat
-                  label="Open"
-                  value={stats.open}
-                  accent="text-emerald-700"
-                  active={scope === "open"}
-                  onClick={() => selectScope("open")}
-                />
-                <Stat
-                  label="Needs help"
-                  value={stats.needsHelp}
-                  accent="text-rose-700"
-                  active={scope === "needs-help"}
-                  onClick={() => selectScope("needs-help")}
-                />
-              </div>
-              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-stone-400">
-                By status
-              </p>
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Stat
+              label={isAdmin ? "All cases" : "In your area"}
+              value={areaCases.length}
+              active={scope === "area"}
+              onClick={() => selectScope("area")}
+            />
+            <Stat
+              label="Unassigned"
+              value={stats.unassigned}
+              accent="text-amber-600"
+              active={scope === "unassigned"}
+              onClick={() => selectScope("unassigned")}
+            />
+            <Stat
+              label="Open"
+              value={stats.open}
+              accent="text-emerald-700"
+              active={scope === "open"}
+              onClick={() => selectScope("open")}
+            />
+            <Stat
+              label="Needs help"
+              value={stats.needsHelp}
+              accent="text-rose-700"
+              active={scope === "needs-help"}
+              onClick={() => selectScope("needs-help")}
+            />
           </div>
         </div>
+      </div>
 
-        {sidebar}
-      </aside>
-
-      {/* RIGHT: search, filters, and the cases */}
-      <div className="flex min-w-0 flex-col gap-5">
+      {/* Search, filters, and the cases */}
+      <div className="area-list flex min-w-0 flex-col gap-5">
       {/* Search / sort / export */}
       <div className="flex flex-wrap items-center gap-2">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search cases"
-          placeholder="Search animal, title, description, reporter…"
-          className="h-10 min-w-0 flex-1 rounded-xl border border-stone-200 bg-white px-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
-        />
+        <div className="relative min-w-0 flex-1">
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+            aria-hidden
+          />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search cases"
+            placeholder="Search animal, title, description, reporter…"
+            className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
+          />
+        </div>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
@@ -665,69 +653,76 @@ export default function CaseList({
           </p>
         </div>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200 bg-white">
           {filtered.map((c) => {
             const expanded = expandedId === c.id;
             const isMine = c.centre_id === myCentreId;
             const otherCentre =
               c.centre_id && !isMine ? centreNames[c.centre_id] : null;
+            const urgent = c.verdict === "help" && c.status !== "closed";
+            const hasMeta =
+              c.centre_id === null ||
+              !!otherCentre ||
+              !!c.duplicate_of ||
+              !!c.assigned_to;
             return (
               <li
                 key={c.id}
                 id={`case-${c.id}`}
-                className={`rounded-2xl border bg-white shadow-sm scroll-mt-24 ${
-                  c.verdict === "help" && c.status !== "closed"
-                    ? "border-stone-200 border-l-4 border-l-rose-400"
-                    : "border-stone-200"
+                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""} ${
+                  urgent ? "border-l-2 border-l-rose-400" : ""
                 }`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : c.id)}
-                  className="flex w-full items-start justify-between gap-3 p-4 text-left"
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
                 >
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${VERDICT_BADGE[c.verdict]}`}
-                      >
-                        {c.verdict}
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${VERDICT_BADGE[c.verdict]}`}
+                  >
+                    {c.verdict}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-stone-900">
+                      <span className="font-medium capitalize">{c.animal}</span>
+                      <span className="text-stone-300"> · </span>
+                      <span className="text-stone-600">
+                        {c.title ?? c.situation.replace(/-/g, " ")}
                       </span>
-                      <span className="text-sm font-medium capitalize text-stone-900">
-                        {c.animal}
-                      </span>
-                      {otherCentre && (
-                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">
-                          {otherCentre}
-                        </span>
-                      )}
-                      {c.centre_id === null && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                          unassigned
-                        </span>
-                      )}
-                      {c.duplicate_of && (
-                        <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
-                          possible duplicate
-                        </span>
-                      )}
-                      {c.assigned_to && (
-                        <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
-                          {c.assigned_to === myId
-                            ? "you"
-                            : teammateName[c.assigned_to] ?? "assigned"}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1.5 text-sm text-stone-700">
-                      {c.title ?? c.situation.replace(/-/g, " ")}
                     </p>
-                    <p className="mt-1 text-xs text-stone-500">
-                      <LocalTime iso={c.created_at} />
-                    </p>
+                    {hasMeta && (
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                        {c.centre_id === null && (
+                          <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">
+                            unassigned
+                          </span>
+                        )}
+                        {otherCentre && (
+                          <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-[11px] text-stone-600">
+                            {otherCentre}
+                          </span>
+                        )}
+                        {c.duplicate_of && (
+                          <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-[11px] font-medium text-orange-700">
+                            possible duplicate
+                          </span>
+                        )}
+                        {c.assigned_to && (
+                          <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[11px] font-medium text-sky-700">
+                            {c.assigned_to === myId
+                              ? "you"
+                              : teammateName[c.assigned_to] ?? "assigned"}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
+                  <span className="hidden shrink-0 text-xs text-stone-400 sm:block">
+                    <LocalTime iso={c.created_at} />
+                  </span>
                   <span
                     aria-hidden
-                    className={`mt-1 shrink-0 text-lg leading-none text-stone-500 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-sm leading-none text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
                   >
                     ▾
                   </span>
@@ -991,6 +986,10 @@ export default function CaseList({
         </ul>
       )}
       </div>
+
+      {/* Centre-management panels: under the stats in the left rail on desktop,
+          below the case list on mobile so cases aren't buried beneath them. */}
+      {sidebar && <div className="area-panels flex flex-col gap-5">{sidebar}</div>}
     </div>
   );
 }
@@ -1010,11 +1009,13 @@ function Stat({
 }) {
   const content = (
     <>
-      <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
-      <p className="mt-0.5 text-xs text-stone-500">{label}</p>
+      <p className={`font-display text-xl font-semibold leading-none ${accent}`}>
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-stone-500">{label}</p>
     </>
   );
-  const base = "rounded-2xl border p-4 text-left shadow-sm transition-all";
+  const base = "rounded-xl border p-3 text-left transition-colors";
   if (!onClick) {
     return <div className={`${base} border-stone-200 bg-white`}>{content}</div>;
   }
@@ -1024,7 +1025,7 @@ function Stat({
       aria-pressed={active}
       className={`${base} ${
         active
-          ? "border-forest-900 bg-white ring-1 ring-stone-900"
+          ? "border-forest-900 bg-white ring-1 ring-forest-900"
           : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
       }`}
     >

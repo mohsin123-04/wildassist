@@ -67,6 +67,39 @@ body {
   animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Dashboard layout: on phones it's a simple stack — quick-view stats, then the
+   case list, then the centre-management panels — so cases aren't buried under
+   the panels. On wider screens the stats and panels share a pinned left rail
+   while the case list fills the rest. */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-areas:
+      "stats list"
+      "panels list";
+    column-gap: 2rem;
+    row-gap: 1.25rem;
+    align-items: start;
+  }
+  .dashboard-grid > .area-stats {
+    grid-area: stats;
+    position: sticky;
+    top: 5rem;
+  }
+  .dashboard-grid > .area-list {
+    grid-area: list;
+  }
+  .dashboard-grid > .area-panels {
+    grid-area: panels;
+  }
+}
+
 /* Print: drop the app chrome and interactive controls so reports come out clean. */
 @media print {
   header,

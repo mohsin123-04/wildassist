@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   const centre = allCentres?.find((c) => c.id === profile.centre_id);
 
   return (
-    <main className="animate-in mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-8">
+    <main className="animate-in mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           {isAdmin
