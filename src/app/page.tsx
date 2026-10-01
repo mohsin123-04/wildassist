@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin, Car, Building2 } from "lucide-react";
 
 const STEPS = [
   {
@@ -121,38 +121,102 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- Volunteer: forest card floating on cream --------------- */}
+      {/* ---------- Volunteer: forest card showing the rescue route -------- */}
       <section className="bg-cream px-5 pb-24">
-        <div className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] bg-forest-900 px-8 py-14 text-cream shadow-xl shadow-forest-900/20 sm:px-12">
+        <div className="relative mx-auto grid w-full max-w-6xl overflow-hidden rounded-[2rem] bg-forest-900 text-cream shadow-xl shadow-forest-900/20 lg:grid-cols-[1.05fr_0.95fr]">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_120%_at_100%_0%,rgba(139,189,156,0.16),transparent_60%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_120%_at_0%_0%,rgba(139,189,156,0.16),transparent_55%)]"
           />
-          <div className="relative flex flex-col items-center gap-8 text-center sm:flex-row sm:justify-between sm:text-left">
-            <div className="max-w-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-moss-300">
-                Get involved
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-medium text-cream sm:text-4xl">
-                Can you drive an animal to a centre?
-              </h2>
-              <p className="mt-3 leading-7 text-cream/75">
-                Volunteer drivers are the link between a finder and a
-                rehabilitation centre. Sign up, get approved by a centre near
-                you, and claim pickups when you are free.
-              </p>
-            </div>
+
+          {/* copy */}
+          <div className="relative px-8 py-14 sm:px-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-moss-300">
+              Get involved
+            </p>
+            <h2 className="mt-3 max-w-md font-display text-3xl font-medium text-cream sm:text-4xl">
+              Can you drive an animal to a centre?
+            </h2>
+            <p className="mt-4 max-w-md leading-7 text-cream/75">
+              Volunteer drivers are the missing link between a finder and a
+              rehabilitation centre. Sign up, get approved by a centre near you,
+              and claim pickups when the timing works for you.
+            </p>
             <Link
               href="/login?signup=volunteer"
-              className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-cream px-7 text-sm font-semibold text-forest-900 shadow-lg shadow-black/20 transition-all hover:bg-white active:scale-[0.98]"
+              className="group mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-cream px-7 text-sm font-semibold text-forest-900 shadow-lg shadow-black/20 transition-all hover:bg-white active:scale-[0.98]"
             >
               Become a volunteer
-              <ArrowRight className="h-4 w-4" aria-hidden />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
+          </div>
+
+          {/* the route a volunteer completes */}
+          <div className="relative border-t border-white/10 px-8 py-12 sm:px-12 lg:border-l lg:border-t-0">
+            <p className="mb-7 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-cream/40">
+              One pickup, start to finish
+            </p>
+            <ol className="relative">
+              <RouteStop
+                icon={MapPin}
+                label="A finder reports it"
+                sub="An injured animal, pinned on the map."
+              />
+              <RouteStop
+                icon={Car}
+                label="You claim the pickup"
+                sub="Drive it over whenever you are free."
+                highlight
+              />
+              <RouteStop
+                icon={Building2}
+                label="Safe at a centre"
+                sub="Rehabbers take over the care."
+                last
+              />
+            </ol>
           </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function RouteStop({
+  icon: Icon,
+  label,
+  sub,
+  highlight = false,
+  last = false,
+}: {
+  icon: typeof MapPin;
+  label: string;
+  sub: string;
+  highlight?: boolean;
+  last?: boolean;
+}) {
+  return (
+    <li className="relative flex items-start gap-4 pb-7 last:pb-0">
+      {!last && (
+        <span
+          aria-hidden
+          className="absolute left-[1.375rem] top-[2.9rem] bottom-1 w-px -translate-x-1/2 border-l border-dashed border-cream/25"
+        />
+      )}
+      <span
+        className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${
+          highlight
+            ? "border-amber-300/70 bg-amber-300/15 text-amber-200"
+            : "border-white/20 bg-white/5 text-cream"
+        }`}
+      >
+        <Icon className="h-5 w-5" aria-hidden />
+      </span>
+      <div className="pt-1.5">
+        <p className="font-display text-base font-medium text-cream">{label}</p>
+        <p className="mt-0.5 text-sm text-cream/60">{sub}</p>
+      </div>
+    </li>
   );
 }
 
