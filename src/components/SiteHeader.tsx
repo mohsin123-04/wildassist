@@ -36,7 +36,7 @@ export default function SiteHeader({
       className={`sticky top-0 z-30 transition-colors duration-300 ${
         overDark
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-black/5 bg-cream/80 backdrop-blur-xl"
+          : "border-b border-black/5 bg-white/85 shadow-sm shadow-black/[0.03] backdrop-blur-xl"
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3.5">

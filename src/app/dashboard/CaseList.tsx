@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -90,6 +90,7 @@ export default function CaseList({
   centreNames,
   centre,
   isAdmin = false,
+  sidebar,
 }: {
   initialCases: CaseRow[];
   myCentreId: string;
@@ -98,6 +99,7 @@ export default function CaseList({
   centreNames: Record<string, string>;
   centre: [number, number];
   isAdmin?: boolean;
+  sidebar?: ReactNode;
 }) {
   const [cases, setCases] = useState<CaseRow[]>(initialCases);
   const [scope, setScope] = useState<Scope>("area");
@@ -390,59 +392,66 @@ export default function CaseList({
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Quick views, two independent axes, grouped and labeled so it's clear
-          they answer different questions (who owns it vs what state it's in). */}
-      <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-widest text-stone-400">
-          Quick views · tap to filter
-        </p>
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
-          <div className="flex-1">
-            <div className="grid grid-cols-2 gap-3">
-              <Stat
-                label={isAdmin ? "All cases" : "In your area"}
-                value={areaCases.length}
-                active={scope === "area"}
-                onClick={() => selectScope("area")}
-              />
-              <Stat
-                label="Unassigned"
-                value={stats.unassigned}
-                accent="text-amber-600"
-                active={scope === "unassigned"}
-                onClick={() => selectScope("unassigned")}
-              />
+    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start lg:gap-8">
+      {/* LEFT rail: quick views + centre panels, sticky on desktop so the case
+          list on the right scrolls independently. */}
+      <aside className="flex flex-col gap-5 lg:sticky lg:top-20">
+        {/* Quick views, two independent axes, grouped and labeled so it's clear
+            they answer different questions (who owns it vs what state it's in). */}
+        <div>
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-stone-400">
+            Quick views · tap to filter
+          </p>
+          <div className="flex flex-col gap-4">
+            <div>
+              <div className="grid grid-cols-2 gap-3">
+                <Stat
+                  label={isAdmin ? "All cases" : "In your area"}
+                  value={areaCases.length}
+                  active={scope === "area"}
+                  onClick={() => selectScope("area")}
+                />
+                <Stat
+                  label="Unassigned"
+                  value={stats.unassigned}
+                  accent="text-amber-600"
+                  active={scope === "unassigned"}
+                  onClick={() => selectScope("unassigned")}
+                />
+              </div>
+              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-stone-400">
+                By assignment
+              </p>
             </div>
-            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-stone-400">
-              By assignment
-            </p>
-          </div>
-          <div className="hidden w-px self-stretch bg-stone-200 sm:block" />
-          <div className="flex-1">
-            <div className="grid grid-cols-2 gap-3">
-              <Stat
-                label="Open"
-                value={stats.open}
-                accent="text-emerald-700"
-                active={scope === "open"}
-                onClick={() => selectScope("open")}
-              />
-              <Stat
-                label="Needs help"
-                value={stats.needsHelp}
-                accent="text-rose-700"
-                active={scope === "needs-help"}
-                onClick={() => selectScope("needs-help")}
-              />
+            <div>
+              <div className="grid grid-cols-2 gap-3">
+                <Stat
+                  label="Open"
+                  value={stats.open}
+                  accent="text-emerald-700"
+                  active={scope === "open"}
+                  onClick={() => selectScope("open")}
+                />
+                <Stat
+                  label="Needs help"
+                  value={stats.needsHelp}
+                  accent="text-rose-700"
+                  active={scope === "needs-help"}
+                  onClick={() => selectScope("needs-help")}
+                />
+              </div>
+              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-stone-400">
+                By status
+              </p>
             </div>
-            <p className="mt-1.5 text-center text-[11px] font-medium uppercase tracking-wide text-stone-400">
-              By status
-            </p>
           </div>
         </div>
-      </div>
 
+        {sidebar}
+      </aside>
+
+      {/* RIGHT: search, filters, and the cases */}
+      <div className="flex min-w-0 flex-col gap-5">
       {/* Search / sort / export */}
       <div className="flex flex-wrap items-center gap-2">
         <input
@@ -981,6 +990,7 @@ export default function CaseList({
           })}
         </ul>
       )}
+      </div>
     </div>
   );
 }

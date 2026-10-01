@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   const centre = allCentres?.find((c) => c.id === profile.centre_id);
 
   return (
-    <main className="animate-in mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
+    <main className="animate-in mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-8">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           {isAdmin
@@ -117,10 +117,6 @@ export default async function DashboardPage() {
         </p>
       </div>
       <EnablePushCard />
-      {isAdmin && <AdminCentres />}
-      {(isAdmin || isManager) && <AdminVolunteers />}
-      {isManager && <CentreCodePanel />}
-      {!isAdmin && <TeamPanel />}
       <CaseList
         initialCases={(cases ?? []) as CaseRow[]}
         myCentreId={profile.centre_id ?? ""}
@@ -132,6 +128,14 @@ export default async function DashboardPage() {
           centre?.lat != null && centre?.lng != null
             ? [centre.lat, centre.lng]
             : [44.0, -79.4]
+        }
+        sidebar={
+          <>
+            {isAdmin && <AdminCentres />}
+            {(isAdmin || isManager) && <AdminVolunteers />}
+            {isManager && <CentreCodePanel />}
+            {!isAdmin && <TeamPanel />}
+          </>
         }
       />
     </main>
