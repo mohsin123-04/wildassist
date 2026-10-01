@@ -11,7 +11,7 @@ import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
-import { Camera, Images, MapPin } from "lucide-react";
+import { Camera, Images, MapPin, ChevronRight } from "lucide-react";
 import { flash } from "@/lib/flash";
 import { detectDanger, type DangerInfo } from "@/lib/safety";
 import {
@@ -323,27 +323,38 @@ export default function TriagePage() {
           title="What did you find?"
           subtitle="Pick the closest match. It's okay to guess."
         >
-          <div className="grid grid-cols-2 gap-3">
-            {ANIMAL_OPTIONS.map((a) => (
+          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+            {ANIMAL_OPTIONS.map((a, i) => (
               <button
                 key={a.value}
                 onClick={() => {
                   setAnimalOption(a);
                   setStep("situation");
                 }}
-                className={`group flex flex-col items-start gap-2.5 rounded-xl border bg-white p-4 text-left transition-all hover:border-stone-300 hover:shadow-sm ${
+                className={`group flex w-full items-center gap-4 px-4 py-4 text-left transition-colors ${
+                  i > 0 ? "border-t border-stone-100" : ""
+                } ${
                   animalOption?.value === a.value
-                    ? "border-forest-900 ring-1 ring-stone-900"
-                    : "border-stone-200"
+                    ? "bg-emerald-50/60"
+                    : "hover:bg-stone-50"
                 }`}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                  <AnimalIcon name={a.value} className="h-5 w-5" />
+                <AnimalIcon
+                  name={a.value}
+                  className="h-6 w-6 shrink-0 text-emerald-700"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium text-stone-900">
+                    {a.label}
+                  </span>
+                  <span className="block text-sm leading-snug text-stone-500">
+                    {a.description}
+                  </span>
                 </span>
-                <span className="font-medium text-stone-900">{a.label}</span>
-                <span className="text-xs leading-snug text-stone-500">
-                  {a.description}
-                </span>
+                <ChevronRight
+                  aria-hidden
+                  className="h-4 w-4 shrink-0 text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
+                />
               </button>
             ))}
           </div>
@@ -395,23 +406,23 @@ export default function TriagePage() {
           subtitle="Choose the option that best fits what you're seeing."
           onBack={() => setStep("animal")}
         >
-          <div className="flex flex-col gap-2.5">
-            {SITUATIONS.map((s) => (
+          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+            {SITUATIONS.map((s, i) => (
               <button
                 key={s.value}
                 onClick={() => {
                   setSituation(s.value);
                   setStep("details");
                 }}
-                className="group flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition-all hover:border-stone-300 hover:bg-stone-50"
+                className={`group flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors hover:bg-stone-50 ${
+                  i > 0 ? "border-t border-stone-100" : ""
+                }`}
               >
                 <span className="text-stone-800">{s.label}</span>
-                <span
+                <ChevronRight
                   aria-hidden
-                  className="text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
-                >
-                  →
-                </span>
+                  className="h-4 w-4 shrink-0 text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
+                />
               </button>
             ))}
           </div>
