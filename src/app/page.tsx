@@ -101,26 +101,22 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-3">
-              {STEPS.map((step, i) => (
-                <div
-                  key={step.n}
-                  className={`rounded-3xl border border-black/5 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1 ${
-                    i === 1 ? "sm:translate-y-6" : i === 2 ? "sm:translate-y-12" : ""
-                  }`}
-                >
-                  <span className="font-display text-4xl font-normal text-clay-600">
-                    {step.n}
-                  </span>
-                  <p className="mt-4 font-display text-xl font-medium text-stone-900">
+            <ol className="relative ml-1 flex flex-col gap-9 border-l-2 border-stone-300/70 pl-8">
+              {STEPS.map((step) => (
+                <li key={step.title} className="relative">
+                  <span
+                    aria-hidden
+                    className="absolute -left-[2.375rem] top-1.5 h-3 w-3 rounded-full border-2 border-clay-600 bg-cream"
+                  />
+                  <h3 className="font-display text-xl font-medium text-stone-900">
                     {step.title}
-                  </p>
-                  <p className="mt-1.5 text-sm leading-6 text-stone-600">
+                  </h3>
+                  <p className="mt-1 max-w-sm leading-7 text-stone-600">
                     {step.label}
                   </p>
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </div>
       </section>
