@@ -101,7 +101,7 @@ export default function EnablePushCard() {
           setShow(false);
         }}
         aria-label="Dismiss"
-        className="shrink-0 rounded-lg p-1.5 text-emerald-700 transition-colors hover:bg-emerald-100"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-emerald-700 transition-colors hover:bg-emerald-100"
       >
         <X className="h-4 w-4" aria-hidden />
       </button>

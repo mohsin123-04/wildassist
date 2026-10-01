@@ -418,7 +418,7 @@ export default function MessagesClient({
           <span className="text-sm font-semibold text-stone-900">Conversations</span>
           <button
             onClick={() => setNewMenu(newMenu ? null : "menu")}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 text-lg text-stone-600 hover:bg-stone-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-lg text-stone-600 hover:bg-stone-50"
             aria-label="New conversation"
           >
             +
@@ -664,7 +664,7 @@ export default function MessagesClient({
                         </div>
                       )}
                       <div className="mt-0.5 flex items-center gap-2 px-1">
-                        <span className="text-[10px] text-stone-500">
+                        <span className="text-[11px] text-stone-500">
                           {new Date(m.created_at).toLocaleTimeString([], {
                             hour: "numeric",
                             minute: "2-digit",
@@ -675,13 +675,13 @@ export default function MessagesClient({
                           <span className="flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                             <button
                               onClick={() => startEdit(m)}
-                              className="text-[10px] font-medium text-stone-500 hover:text-stone-700"
+                              className="text-[11px] font-medium text-stone-500 hover:text-stone-700"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => deleteMessage(m.id)}
-                              className="text-[10px] font-medium text-stone-500 hover:text-rose-700"
+                              className="text-[11px] font-medium text-stone-500 hover:text-rose-700"
                             >
                               Delete
                             </button>
