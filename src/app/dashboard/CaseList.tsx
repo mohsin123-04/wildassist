@@ -473,13 +473,13 @@ export default function CaseList({
               onClick={() => setShowFilters((v) => !v)}
               aria-expanded={showFilters}
               className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
-                showFilters || dateFrom || dateTo || mineOnly || sortBy !== "newest"
+                showFilters || dateFrom || dateTo || mineOnly
                   ? "border-stone-300 bg-stone-50 text-stone-800"
                   : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
               }`}
             >
               Options
-              {(dateFrom || dateTo || mineOnly || sortBy !== "newest") && (
+              {(dateFrom || dateTo || mineOnly) && (
                 <span
                   className="h-1.5 w-1.5 rounded-full bg-emerald-500"
                   aria-hidden
@@ -502,27 +502,6 @@ export default function CaseList({
                 />
                 <div className="absolute right-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
                   <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                    Sort by
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {(
-                      [
-                        ["newest", "Newest"],
-                        ["oldest", "Oldest"],
-                        ["urgent", "Most urgent"],
-                      ] as const
-                    ).map(([val, label]) => (
-                      <Chip
-                        key={val}
-                        active={sortBy === val}
-                        onClick={() => setSortBy(val)}
-                      >
-                        {label}
-                      </Chip>
-                    ))}
-                  </div>
-
-                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
                     Reported between
                   </p>
                   <div className="mt-2 flex items-center gap-2 text-sm">
@@ -583,27 +562,43 @@ export default function CaseList({
         </div>
       </div>
 
-      {/* Status filters. Hide "Closed" when the scope already excludes it, so a
-          contradictory (always-empty) combination can't be selected. */}
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
-          All
-        </Chip>
-        {STATUSES.filter(
-          (s) =>
-            !(
-              s.value === "closed" &&
-              (scope === "open" || scope === "needs-help")
-            )
-        ).map((s) => (
-          <Chip
-            key={s.value}
-            active={statusFilter === s.value}
-            onClick={() => setStatusFilter(s.value)}
-          >
-            {s.label}
+      {/* Status filters on the left (scrollable), sort dropdown pinned right -
+          what to show vs what order, paired on one row so neither clutters.
+          Hide "Closed" when the scope already excludes it, so a contradictory
+          (always-empty) combination can't be selected. */}
+      <div className="flex items-center gap-2">
+        <div className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 pb-1">
+          <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
+            All
           </Chip>
-        ))}
+          {STATUSES.filter(
+            (s) =>
+              !(
+                s.value === "closed" &&
+                (scope === "open" || scope === "needs-help")
+              )
+          ).map((s) => (
+            <Chip
+              key={s.value}
+              active={statusFilter === s.value}
+              onClick={() => setStatusFilter(s.value)}
+            >
+              {s.label}
+            </Chip>
+          ))}
+        </div>
+        <label className="shrink-0">
+          <span className="sr-only">Sort cases</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="h-9 rounded-lg border border-stone-200 bg-white px-2.5 text-sm text-stone-700 outline-none focus:border-emerald-400"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="urgent">Most urgent</option>
+          </select>
+        </label>
       </div>
 
       {/* List, board, or map */}
