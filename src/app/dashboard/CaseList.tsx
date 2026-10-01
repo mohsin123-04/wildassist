@@ -434,8 +434,10 @@ export default function CaseList({
 
       {/* Search, filters, and the cases */}
       <div className="area-list flex min-w-0 flex-col gap-5">
-      {/* Search / sort / export */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Toolbar: search + view toggle + one "Options" menu holding the
+          secondary controls (sort, date range, assignment, export) so the row
+          stays calm, especially on mobile. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative min-w-0 flex-1">
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
@@ -449,99 +451,137 @@ export default function CaseList({
             className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
           />
         </div>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          aria-label="Sort cases"
-          className="h-10 rounded-xl border border-stone-200 bg-white px-3 text-sm text-stone-700 outline-none focus:border-emerald-400"
-        >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="urgent">Most urgent</option>
-        </select>
-        <button
-          onClick={() => setShowFilters((v) => !v)}
-          aria-expanded={showFilters}
-          className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
-            showFilters || dateFrom || dateTo || mineOnly
-              ? "border-stone-300 bg-stone-50 text-stone-800"
-              : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
-          }`}
-        >
-          Filters
-          {(dateFrom || dateTo || mineOnly) && (
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-          )}
-          <span
-            aria-hidden
-            className={`text-xs text-stone-400 transition-transform ${showFilters ? "rotate-180" : ""}`}
-          >
-            ▾
-          </span>
-        </button>
-        <button
-          onClick={exportCsv}
-          disabled={filtered.length === 0}
-          className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
-        >
-          Export CSV
-        </button>
-        <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200">
-          {(["list", "board", "map"] as const).map((v) => (
+        <div className="flex items-center gap-2">
+          <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200">
+            {(["list", "board", "map"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 text-sm font-medium capitalize transition-colors ${
+                  view === v
+                    ? "bg-forest-900 text-white"
+                    : "bg-white text-stone-600 hover:bg-stone-50"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative">
             <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-3 text-sm font-medium capitalize transition-colors ${
-                view === v
-                  ? "bg-forest-900 text-white"
-                  : "bg-white text-stone-600 hover:bg-stone-50"
+              onClick={() => setShowFilters((v) => !v)}
+              aria-expanded={showFilters}
+              className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
+                showFilters || dateFrom || dateTo || mineOnly || sortBy !== "newest"
+                  ? "border-stone-300 bg-stone-50 text-stone-800"
+                  : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
               }`}
             >
-              {v}
+              Options
+              {(dateFrom || dateTo || mineOnly || sortBy !== "newest") && (
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-emerald-500"
+                  aria-hidden
+                />
+              )}
+              <span
+                aria-hidden
+                className={`text-xs text-stone-400 transition-transform ${showFilters ? "rotate-180" : ""}`}
+              >
+                ▾
+              </span>
             </button>
-          ))}
+
+            {showFilters && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  aria-hidden
+                  onClick={() => setShowFilters(false)}
+                />
+                <div className="absolute right-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Sort by
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {(
+                      [
+                        ["newest", "Newest"],
+                        ["oldest", "Oldest"],
+                        ["urgent", "Most urgent"],
+                      ] as const
+                    ).map(([val, label]) => (
+                      <Chip
+                        key={val}
+                        active={sortBy === val}
+                        onClick={() => setSortBy(val)}
+                      >
+                        {label}
+                      </Chip>
+                    ))}
+                  </div>
+
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Reported between
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-sm">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      aria-label="Reported from date"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                    />
+                    <span className="shrink-0 text-stone-400">to</span>
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      aria-label="Reported to date"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                    />
+                  </div>
+                  {(dateFrom || dateTo) && (
+                    <button
+                      onClick={() => {
+                        setDateFrom("");
+                        setDateTo("");
+                      }}
+                      className="mt-1.5 text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
+                    >
+                      Clear dates
+                    </button>
+                  )}
+
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Assignment
+                  </p>
+                  <div className="mt-2">
+                    <Chip
+                      active={mineOnly}
+                      onClick={() => setMineOnly((v) => !v)}
+                    >
+                      Assigned to me
+                    </Chip>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      exportCsv();
+                      setShowFilters(false);
+                    }}
+                    disabled={filtered.length === 0}
+                    className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-xl border border-stone-200 bg-white text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
+                  >
+                    Export CSV
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Date range + assignment filter, collapsed by default to reduce clutter */}
-      {showFilters && (
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <label className="flex items-center gap-1.5 text-stone-500">
-          From
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            aria-label="Reported from date"
-            className="h-9 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-          />
-        </label>
-        <label className="flex items-center gap-1.5 text-stone-500">
-          to
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            aria-label="Reported to date"
-            className="h-9 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-          />
-        </label>
-        {(dateFrom || dateTo) && (
-          <button
-            onClick={() => {
-              setDateFrom("");
-              setDateTo("");
-            }}
-            className="text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
-          >
-            Clear dates
-          </button>
-        )}
-        <Chip active={mineOnly} onClick={() => setMineOnly((v) => !v)}>
-          Assigned to me
-        </Chip>
-      </div>
-      )}
 
       {/* Status filters. Hide "Closed" when the scope already excludes it, so a
           contradictory (always-empty) combination can't be selected. */}
