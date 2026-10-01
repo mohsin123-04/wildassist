@@ -28,19 +28,22 @@ const RANGES = [
 ] as const;
 type RangeKey = (typeof RANGES)[number]["key"];
 
+// Earthy, muted palette that stays in the brand world (no stock rainbow).
+// Status reads as a progression toward "done" (forest); outcome reads by
+// urgency (warm clay = needs help, green = fine to leave).
 const STATUS_META = [
-  { key: "reported", label: "Reported", color: "bg-stone-400" },
-  { key: "in_transit", label: "In transit", color: "bg-amber-400" },
-  { key: "at_centre", label: "At centre", color: "bg-sky-400" },
-  { key: "closed", label: "Closed", color: "bg-emerald-500" },
+  { key: "reported", label: "Reported", hex: "#b4a894" },
+  { key: "in_transit", label: "In transit", hex: "#cf9a46" },
+  { key: "at_centre", label: "At centre", hex: "#6a9e7e" },
+  { key: "closed", label: "Closed", hex: "#1e5140" },
 ];
 const STATUS_LABEL: Record<string, string> = Object.fromEntries(
   STATUS_META.map((s) => [s.key, s.label])
 );
 const VERDICT_META = [
-  { key: "help", label: "Needs help", color: "bg-rose-400" },
-  { key: "uncertain", label: "Uncertain", color: "bg-amber-400" },
-  { key: "leave", label: "Leave it be", color: "bg-emerald-500" },
+  { key: "help", label: "Needs help", hex: "#b4552f" },
+  { key: "uncertain", label: "Uncertain", hex: "#cf9a46" },
+  { key: "leave", label: "Leave it be", hex: "#2f7d57" },
 ];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const SITUATION_LABEL: Record<string, string> = Object.fromEntries(
@@ -385,10 +388,10 @@ export default function AnalyticsClient({
         <div className="mt-2 h-7 w-32 animate-pulse rounded bg-stone-200" />
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl border border-stone-200 bg-white" />
+            <div key={i} className="h-20 animate-pulse rounded-2xl border border-black/5 bg-white shadow-sm" />
           ))}
         </div>
-        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-stone-200 bg-white" />
+        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-black/5 bg-white shadow-sm" />
       </main>
     );
   }
@@ -516,7 +519,7 @@ export default function AnalyticsClient({
             </p>
           )}
 
-          <section className="rounded-2xl border border-stone-200 bg-white p-5">
+          <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
             <h2 className="font-display text-base font-semibold text-stone-900">Open queue</h2>
             <p className="mt-0.5 text-xs text-stone-500">
               How long cases have been waiting right now
@@ -543,20 +546,23 @@ export default function AnalyticsClient({
 
           <div className="grid gap-5 sm:grid-cols-2">
             {!statusFilter && (
-              <section className="rounded-2xl border border-stone-200 bg-white p-5">
-                <h2 className="font-display text-base font-semibold text-stone-900">Case status</h2>
-                <p className="mt-0.5 text-xs text-stone-500">Where cases stand · click to filter</p>
-                <SegBar segments={m.statusSegments} total={m.cases.length} onSelect={setStatusFilter} />
-              </section>
+              <Breakdown
+                title="Case status"
+                subtitle="Where every case stands right now"
+                rows={m.statusSegments}
+                total={m.cases.length}
+                onSelect={setStatusFilter}
+              />
             )}
-            <section className="rounded-2xl border border-stone-200 bg-white p-5">
-              <h2 className="font-display text-base font-semibold text-stone-900">Triage outcome</h2>
-              <p className="mt-0.5 text-xs text-stone-500">What WildAssist advised finders</p>
-              <SegBar segments={m.verdictSegments} total={m.cases.length} />
-            </section>
+            <Breakdown
+              title="Triage outcome"
+              subtitle="What WildAssist advised the people who reported"
+              rows={m.verdictSegments}
+              total={m.cases.length}
+            />
           </div>
 
-          <section className="rounded-2xl border border-stone-200 bg-white p-5">
+          <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
             <h2 className="font-display text-base font-semibold text-stone-900">Response time</h2>
             {m.medianResponse === null ? (
               <p className="mt-2 text-sm text-stone-500">
@@ -581,7 +587,7 @@ export default function AnalyticsClient({
               title="Response time trend"
               subtitle={`Median report to first pickup, per ${m.bucketUnit} · shorter is better`}
               caption={`Peak ${formatDuration(m.maxResp)}`}
-              barClass="bg-sky-400/80"
+              barClass="bg-[#a85c3b]/80"
               bars={m.buckets.map((d, i) => ({
                 heightPct: d.medianResp !== null ? Math.max(6, (d.medianResp / m.maxResp) * 100) : 0,
                 title: d.medianResp !== null ? formatDuration(d.medianResp) : "no pickups",
@@ -594,7 +600,7 @@ export default function AnalyticsClient({
             title={`Intake · ${win.windowLabel}`}
             subtitle={`Reports per ${m.bucketUnit}`}
             caption={`Peak ${m.maxBucket} in a ${m.bucketUnit}`}
-            barClass="bg-emerald-500/80"
+            barClass="bg-emerald-600/80"
             bars={m.buckets.map((d, i) => ({
               heightPct: d.count ? Math.max(6, (d.count / m.maxBucket) * 100) : 0,
               title: `${d.count}`,
@@ -644,7 +650,7 @@ function Stat({
   accent?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-4">
+    <div className="rounded-2xl border border-black/5 bg-white shadow-sm p-4">
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-0.5 text-xs text-stone-500">{label}</p>
       {sub && (
@@ -675,54 +681,67 @@ function Metric({
   );
 }
 
-function SegBar({
-  segments,
+function Breakdown({
+  title,
+  subtitle,
+  rows,
   total,
   onSelect,
 }: {
-  segments: { key: string; label: string; value: number; color: string }[];
+  title: string;
+  subtitle?: string;
+  rows: { key: string; label: string; value: number; hex: string }[];
   total: number;
   onSelect?: (key: string) => void;
 }) {
   return (
-    <div className="mt-4">
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-stone-100">
-        {segments.map(
-          (s) =>
-            s.value > 0 && (
-              <div
-                key={s.key}
-                className={s.color}
-                style={{ width: `${(s.value / total) * 100}%` }}
-                title={`${s.label}: ${s.value}`}
-              />
-            )
-        )}
-      </div>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-        {segments.map((s) => {
+    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+      <h2 className="font-display text-base font-medium text-stone-900">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-sm text-stone-500">{subtitle}</p>}
+      <div className="mt-4 flex flex-col gap-3.5">
+        {rows.map((r) => {
+          const pct = total ? Math.round((r.value / total) * 100) : 0;
           const inner = (
             <>
-              <span className={`h-2 w-2 rounded-full ${s.color}`} />
-              {s.label} <span className="font-medium text-stone-900">{s.value}</span>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="flex items-center gap-2 text-sm text-stone-700">
+                  <span
+                    aria-hidden
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: r.hex }}
+                  />
+                  {r.label}
+                </span>
+                <span className="text-sm text-stone-500">
+                  <span className="font-semibold text-stone-900">{r.value}</span>
+                  <span className="ml-1.5 tabular-nums text-stone-400">{pct}%</span>
+                </span>
+              </div>
+              <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-stone-100">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pct}%`, backgroundColor: r.hex }}
+                />
+              </div>
             </>
           );
           return onSelect ? (
             <button
-              key={s.key}
-              onClick={() => onSelect(s.key)}
-              className="flex items-center gap-1.5 rounded-md px-1 text-xs text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+              key={r.key}
+              onClick={() => onSelect(r.key)}
+              className="-mx-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-stone-50"
             >
               {inner}
             </button>
           ) : (
-            <span key={s.key} className="flex items-center gap-1.5 px-1 text-xs text-stone-600">
-              {inner}
-            </span>
+            <div key={r.key}>{inner}</div>
           );
         })}
       </div>
-    </div>
+      {onSelect && (
+        <p className="mt-3.5 text-xs text-stone-400">Tap a row to filter the cases below.</p>
+      )}
+    </section>
   );
 }
 
@@ -740,7 +759,7 @@ function TimeChart({
   bars: { heightPct: number; title: string; label: string }[];
 }) {
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-5">
+    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
       <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex h-32 items-end gap-1 border-b border-stone-200">
@@ -783,7 +802,7 @@ function BarPanel({
 }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-5">
+    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
       <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex flex-col gap-2.5">
