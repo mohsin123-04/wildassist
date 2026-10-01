@@ -59,17 +59,18 @@ export default function SiteHeader({
           <span>WildAssist</span>
         </Link>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <Link
             href="/emergency"
-            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+            aria-label="Emergency"
+            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors sm:px-3.5 ${
               overDark
                 ? "border border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/20"
                 : "border border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
             }`}
           >
             <Siren className="h-4 w-4" aria-hidden />
-            Emergency
+            <span className="hidden sm:inline">Emergency</span>
           </Link>
           <NotificationBell
             initialUser={initialUser}
