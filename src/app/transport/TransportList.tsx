@@ -78,9 +78,19 @@ export default function TransportList({
   }, []);
 
   // Keep the map/list live: refresh periodically and when the tab regains focus.
+  // These are BACKGROUND refreshes — they update the data in place and must not
+  // flip the full-screen loading state, or the map would blank out and rebuild
+  // on every tick. Focus refreshes are throttled so rapid tab switching doesn't
+  // spam the endpoint.
   useEffect(() => {
-    const id = setInterval(() => load(coords), 45000);
-    const onFocus = () => load(coords);
+    const id = setInterval(() => load(coords, true), 45000);
+    let lastFocusRefresh = 0;
+    const onFocus = () => {
+      const now = Date.now();
+      if (now - lastFocusRefresh < 30000) return;
+      lastFocusRefresh = now;
+      load(coords, true);
+    };
     window.addEventListener("focus", onFocus);
     return () => {
       clearInterval(id);
@@ -88,8 +98,13 @@ export default function TransportList({
     };
   }, [coords]);
 
-  async function load(c: { lat: number; lng: number } | null) {
-    setLoading(true);
+  async function load(
+    c: { lat: number; lng: number } | null,
+    background = false
+  ) {
+    // Only the first/explicit load shows the full-screen placeholder; background
+    // refreshes update the lists in place so the map stays put.
+    if (!background) setLoading(true);
     const q = c ? `?lat=${c.lat}&lng=${c.lng}` : "";
     try {
       const r = await fetch(`/api/transport/jobs${q}`);
@@ -100,7 +115,7 @@ export default function TransportList({
     } catch {
       // leave empty
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   }
 
@@ -118,7 +133,7 @@ export default function TransportList({
         }),
       });
       if (res.ok) {
-        await load(coords);
+        await load(coords, true);
       } else {
         const d = await res.json().catch(() => ({}));
         flash(d.error ?? "That didn't work. Please try again.");
