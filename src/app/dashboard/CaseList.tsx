@@ -172,6 +172,8 @@ export default function CaseList({
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "board" | "map">("list");
   const [showFilters, setShowFilters] = useState(false);
+  // Which page of the Options menu is showing: the filters, or the export scopes.
+  const [optionsView, setOptionsView] = useState<"main" | "export">("main");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -250,7 +252,33 @@ export default function CaseList({
       return sortBy === "oldest" ? ta - tb : tb - ta;
     });
 
-  function exportCsv() {
+  function exportCsv(
+    exportScope: "all" | "view" | "week" | "month" | "year"
+  ) {
+    // Pick the rows for the chosen scope. "view" honours the active
+    // search/status/date filters; the period scopes are calendar-to-date
+    // (this week starts Monday) over the full visible case set.
+    const data = (() => {
+      if (exportScope === "view") return filtered;
+      if (exportScope === "all") return cases;
+      const now = new Date();
+      let cutoff: Date;
+      if (exportScope === "week") {
+        cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        cutoff.setDate(cutoff.getDate() - ((cutoff.getDay() + 6) % 7));
+      } else if (exportScope === "month") {
+        cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+      } else {
+        cutoff = new Date(now.getFullYear(), 0, 1);
+      }
+      return cases.filter((c) => new Date(c.created_at) >= cutoff);
+    })();
+
+    if (data.length === 0) {
+      flash("No cases to export for that selection.");
+      return;
+    }
+
     const header = [
       "id",
       "reported_at",
@@ -289,13 +317,13 @@ export default function CaseList({
     ];
     const rows = [
       header.join(","),
-      ...filtered.map((c) => row(c).map(esc).join(",")),
+      ...data.map((c) => row(c).map(esc).join(",")),
     ];
     const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `wildassist-cases-${scope}.csv`;
+    a.download = `wildassist-cases-${exportScope}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -470,7 +498,10 @@ export default function CaseList({
 
           <div className="relative">
             <button
-              onClick={() => setShowFilters((v) => !v)}
+              onClick={() => {
+                setShowFilters((v) => !v);
+                setOptionsView("main");
+              }}
               aria-expanded={showFilters}
               className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
                 showFilters || dateFrom || dateTo || mineOnly
@@ -498,63 +529,127 @@ export default function CaseList({
                 <div
                   className="fixed inset-0 z-10"
                   aria-hidden
-                  onClick={() => setShowFilters(false)}
+                  onClick={() => {
+                    setShowFilters(false);
+                    setOptionsView("main");
+                  }}
                 />
                 <div className="absolute right-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                    Reported between
-                  </p>
-                  <div className="mt-2 flex items-center gap-2 text-sm">
-                    <input
-                      type="date"
-                      value={dateFrom}
-                      onChange={(e) => setDateFrom(e.target.value)}
-                      aria-label="Reported from date"
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-                    />
-                    <span className="shrink-0 text-stone-400">to</span>
-                    <input
-                      type="date"
-                      value={dateTo}
-                      onChange={(e) => setDateTo(e.target.value)}
-                      aria-label="Reported to date"
-                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-                    />
-                  </div>
-                  {(dateFrom || dateTo) && (
-                    <button
-                      onClick={() => {
-                        setDateFrom("");
-                        setDateTo("");
-                      }}
-                      className="mt-1.5 text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
-                    >
-                      Clear dates
-                    </button>
+                  {optionsView === "main" ? (
+                    <>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                        Reported between
+                      </p>
+                      <div className="mt-2 flex items-center gap-2 text-sm">
+                        <input
+                          type="date"
+                          value={dateFrom}
+                          onChange={(e) => setDateFrom(e.target.value)}
+                          aria-label="Reported from date"
+                          className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                        />
+                        <span className="shrink-0 text-stone-400">to</span>
+                        <input
+                          type="date"
+                          value={dateTo}
+                          onChange={(e) => setDateTo(e.target.value)}
+                          aria-label="Reported to date"
+                          className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                        />
+                      </div>
+                      {(dateFrom || dateTo) && (
+                        <button
+                          onClick={() => {
+                            setDateFrom("");
+                            setDateTo("");
+                          }}
+                          className="mt-1.5 text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
+                        >
+                          Clear dates
+                        </button>
+                      )}
+
+                      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                        Assignment
+                      </p>
+                      <div className="mt-2">
+                        <Chip
+                          active={mineOnly}
+                          onClick={() => setMineOnly((v) => !v)}
+                        >
+                          Assigned to me
+                        </Chip>
+                      </div>
+
+                      <button
+                        onClick={() => setOptionsView("export")}
+                        className="mt-4 flex h-10 w-full items-center justify-between rounded-xl border border-stone-200 px-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+                      >
+                        Export CSV
+                        <span aria-hidden className="text-stone-400">
+                          ›
+                        </span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setOptionsView("main")}
+                        className="-ml-1 mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800"
+                      >
+                        <span aria-hidden>‹</span> Back
+                      </button>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                        Export CSV
+                      </p>
+                      <div className="mt-2 flex flex-col gap-1.5">
+                        <button
+                          onClick={() => {
+                            exportCsv("all");
+                            setShowFilters(false);
+                            setOptionsView("main");
+                          }}
+                          className="flex h-9 w-full items-center rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-700 transition-colors hover:bg-stone-50"
+                        >
+                          Everything
+                        </button>
+                        <button
+                          onClick={() => {
+                            exportCsv("view");
+                            setShowFilters(false);
+                            setOptionsView("main");
+                          }}
+                          className="flex h-9 w-full items-center justify-between rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-700 transition-colors hover:bg-stone-50"
+                        >
+                          <span>Current view</span>
+                          <span className="text-xs text-stone-400">
+                            {filtered.length}
+                          </span>
+                        </button>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {(
+                            [
+                              ["week", "This week"],
+                              ["month", "This month"],
+                              ["year", "This year"],
+                            ] as const
+                          ).map(([val, label]) => (
+                            <button
+                              key={val}
+                              onClick={() => {
+                                exportCsv(val);
+                                setShowFilters(false);
+                                setOptionsView("main");
+                              }}
+                              className="flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-stone-200 bg-white px-1 text-[13px] text-stone-700 transition-colors hover:bg-stone-50"
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
                   )}
-
-                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
-                    Assignment
-                  </p>
-                  <div className="mt-2">
-                    <Chip
-                      active={mineOnly}
-                      onClick={() => setMineOnly((v) => !v)}
-                    >
-                      Assigned to me
-                    </Chip>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      exportCsv();
-                      setShowFilters(false);
-                    }}
-                    disabled={filtered.length === 0}
-                    className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-xl border border-stone-200 bg-white text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-50"
-                  >
-                    Export CSV
-                  </button>
                 </div>
               </>
             )}
