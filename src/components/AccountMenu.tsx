@@ -6,6 +6,7 @@ import { Download } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import Avatar from "@/components/Avatar";
+import ExportDialog from "@/components/ExportDialog";
 import { useExportApi } from "@/lib/exportStore";
 
 export type HeaderProfile = {
@@ -51,16 +52,9 @@ export default function AccountMenu({
   const [profileLoaded, setProfileLoaded] = useState(!!initialProfile);
   const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
-  // "export" = the nested CSV-export page of the menu (only reachable on the
-  // dashboard, which publishes the export via the shared store).
-  const [menuView, setMenuView] = useState<"main" | "export">("main");
+  const [exportOpen, setExportOpen] = useState(false);
   const exportApi = useExportApi();
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Always reopen the menu on its main page.
-  useEffect(() => {
-    if (!open) setMenuView("main");
-  }, [open]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -238,60 +232,6 @@ export default function AccountMenu({
 
       {open && (
         <div className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
-          {menuView === "export" && exportApi ? (
-            <>
-              <button
-                onClick={() => setMenuView("main")}
-                className="flex w-full items-center gap-1 border-b border-stone-100 px-4 py-2.5 text-left text-sm font-medium text-stone-500 transition-colors hover:text-stone-800"
-              >
-                <span aria-hidden>‹</span> Back
-              </button>
-              <div className="p-2">
-                <p className="px-2 pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-stone-400">
-                  All or filtered
-                </p>
-                {(
-                  [
-                    ["all", "Everything", "Every case you can see"],
-                    ["view", "Current view", "Matches your filters"],
-                  ] as const
-                ).map(([scope, label, desc]) => (
-                  <ExportRow
-                    key={scope}
-                    label={label}
-                    desc={desc}
-                    count={exportApi.counts[scope]}
-                    onClick={() => {
-                      exportApi.run(scope);
-                      setOpen(false);
-                    }}
-                  />
-                ))}
-                <p className="mt-2 border-t border-stone-100 px-2 pb-1 pt-2 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-stone-400">
-                  By time period
-                </p>
-                {(
-                  [
-                    ["week", "This week", "Reported since Monday"],
-                    ["month", "This month", "Reported this month"],
-                    ["year", "This year", "Reported this year"],
-                  ] as const
-                ).map(([scope, label, desc]) => (
-                  <ExportRow
-                    key={scope}
-                    label={label}
-                    desc={desc}
-                    count={exportApi.counts[scope]}
-                    onClick={() => {
-                      exportApi.run(scope);
-                      setOpen(false);
-                    }}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
           <div className="border-b border-stone-100 px-4 py-3">
             <div className="flex items-center gap-2.5">
               <Avatar
@@ -365,7 +305,10 @@ export default function AccountMenu({
           </Link>
           {exportApi && (
             <button
-              onClick={() => setMenuView("export")}
+              onClick={() => {
+                setOpen(false);
+                setExportOpen(true);
+              }}
               className="flex w-full items-center justify-between px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
             >
               <span className="inline-flex items-center gap-2">
@@ -383,41 +326,12 @@ export default function AccountMenu({
           >
             Sign out
           </button>
-            </>
-          )}
         </div>
       )}
-    </div>
-  );
-}
 
-function ExportRow({
-  label,
-  desc,
-  count,
-  onClick,
-}: {
-  label: string;
-  desc: string;
-  count: number;
-  onClick: () => void;
-}) {
-  const disabled = count === 0;
-  return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      className={`flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
-        disabled ? "cursor-not-allowed opacity-40" : "hover:bg-stone-50"
-      }`}
-    >
-      <span className="min-w-0">
-        <span className="block text-sm text-stone-800">{label}</span>
-        <span className="block text-xs text-stone-500">{desc}</span>
-      </span>
-      <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
-        {count}
-      </span>
-    </button>
+      {exportOpen && exportApi && (
+        <ExportDialog api={exportApi} onClose={() => setExportOpen(false)} />
+      )}
+    </div>
   );
 }
