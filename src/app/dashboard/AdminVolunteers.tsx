@@ -61,7 +61,7 @@ export default function AdminVolunteers() {
   const pending = vols.filter((v) => !v.volunteer_approved).length;
 
   return (
-    <div className="mb-5 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+    <div className="py-4">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between text-left"

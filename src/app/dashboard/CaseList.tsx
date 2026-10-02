@@ -424,39 +424,37 @@ export default function CaseList({
       {/* Quick-view stats: pinned left rail on desktop, top of the stack on
           mobile (they drive the list below, so they belong first). */}
       <div className="area-stats">
-        <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-stone-400">
-            Quick views · tap to filter
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <Stat
-              label={isAdmin ? "All cases" : "In your area"}
-              value={areaCases.length}
-              active={scope === "area"}
-              onClick={() => selectScope("area")}
-            />
-            <Stat
-              label="Unassigned"
-              value={stats.unassigned}
-              accent="text-amber-600"
-              active={scope === "unassigned"}
-              onClick={() => selectScope("unassigned")}
-            />
-            <Stat
-              label="Open"
-              value={stats.open}
-              accent="text-emerald-700"
-              active={scope === "open"}
-              onClick={() => selectScope("open")}
-            />
-            <Stat
-              label="Needs help"
-              value={stats.needsHelp}
-              accent="text-rose-700"
-              active={scope === "needs-help"}
-              onClick={() => selectScope("needs-help")}
-            />
-          </div>
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-stone-400">
+          Quick views · tap to filter
+        </p>
+        <div className="divide-y divide-stone-200/70">
+          <Stat
+            label={isAdmin ? "All cases" : "In your area"}
+            value={areaCases.length}
+            active={scope === "area"}
+            onClick={() => selectScope("area")}
+          />
+          <Stat
+            label="Unassigned"
+            value={stats.unassigned}
+            accent="text-amber-600"
+            active={scope === "unassigned"}
+            onClick={() => selectScope("unassigned")}
+          />
+          <Stat
+            label="Open"
+            value={stats.open}
+            accent="text-emerald-700"
+            active={scope === "open"}
+            onClick={() => selectScope("open")}
+          />
+          <Stat
+            label="Needs help"
+            value={stats.needsHelp}
+            accent="text-rose-700"
+            active={scope === "needs-help"}
+            onClick={() => selectScope("needs-help")}
+          />
         </div>
       </div>
 
@@ -1116,7 +1114,11 @@ export default function CaseList({
 
       {/* Centre-management panels: under the stats in the left rail on desktop,
           below the case list on mobile so cases aren't buried beneath them. */}
-      {sidebar && <div className="area-panels flex flex-col gap-5">{sidebar}</div>}
+      {sidebar && (
+        <div className="area-panels flex flex-col divide-y divide-stone-200/70 border-t border-stone-200/70">
+          {sidebar}
+        </div>
+      )}
     </div>
   );
 }
@@ -1136,15 +1138,21 @@ function Stat({
 }) {
   const content = (
     <>
-      <p className={`font-display text-xl font-semibold leading-none ${accent}`}>
+      <span
+        className={`w-9 shrink-0 font-display text-2xl font-semibold leading-none tabular-nums ${accent}`}
+      >
         {value}
-      </p>
-      <p className="mt-1 text-xs text-stone-500">{label}</p>
+      </span>
+      <span
+        className={`text-sm ${active ? "font-medium text-stone-900" : "text-stone-600"}`}
+      >
+        {label}
+      </span>
     </>
   );
-  const base = "rounded-xl border p-3 text-left transition-colors";
+  const base = "flex w-full items-baseline gap-3 border-l-2 py-2.5 pl-3 text-left transition-colors";
   if (!onClick) {
-    return <div className={`${base} border-stone-200 bg-white`}>{content}</div>;
+    return <div className={`${base} border-transparent`}>{content}</div>;
   }
   return (
     <button
@@ -1152,8 +1160,8 @@ function Stat({
       aria-pressed={active}
       className={`${base} ${
         active
-          ? "border-forest-900 bg-white ring-1 ring-forest-900"
-          : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50"
+          ? "border-forest-900"
+          : "border-transparent hover:bg-stone-900/[0.03]"
       }`}
     >
       {content}
