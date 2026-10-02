@@ -424,37 +424,40 @@ export default function CaseList({
       {/* Quick-view stats: pinned left rail on desktop, top of the stack on
           mobile (they drive the list below, so they belong first). */}
       <div className="area-stats">
-        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-stone-400">
-          Quick views · tap to filter
-        </p>
-        <div className="divide-y divide-stone-200/70">
-          <Stat
-            label={isAdmin ? "All cases" : "In your area"}
-            value={areaCases.length}
-            active={scope === "area"}
-            onClick={() => selectScope("area")}
-          />
-          <Stat
-            label="Unassigned"
-            value={stats.unassigned}
-            accent="text-amber-600"
-            active={scope === "unassigned"}
-            onClick={() => selectScope("unassigned")}
-          />
-          <Stat
-            label="Open"
-            value={stats.open}
-            accent="text-emerald-700"
-            active={scope === "open"}
-            onClick={() => selectScope("open")}
-          />
-          <Stat
-            label="Needs help"
-            value={stats.needsHelp}
-            accent="text-rose-700"
-            active={scope === "needs-help"}
-            onClick={() => selectScope("needs-help")}
-          />
+        <div className="rounded-2xl bg-forest-900 p-4">
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-moss-300">
+            Quick views · tap to filter
+          </p>
+          <div className="divide-y divide-white/10">
+            <Stat
+              label={isAdmin ? "All cases" : "In your area"}
+              value={areaCases.length}
+              accent="text-cream"
+              active={scope === "area"}
+              onClick={() => selectScope("area")}
+            />
+            <Stat
+              label="Unassigned"
+              value={stats.unassigned}
+              accent="text-amber-300"
+              active={scope === "unassigned"}
+              onClick={() => selectScope("unassigned")}
+            />
+            <Stat
+              label="Open"
+              value={stats.open}
+              accent="text-moss-300"
+              active={scope === "open"}
+              onClick={() => selectScope("open")}
+            />
+            <Stat
+              label="Needs help"
+              value={stats.needsHelp}
+              accent="text-rose-300"
+              active={scope === "needs-help"}
+              onClick={() => selectScope("needs-help")}
+            />
+          </div>
         </div>
       </div>
 
@@ -1124,12 +1127,12 @@ export default function CaseList({
 function Stat({
   label,
   value,
-  accent = "text-stone-900",
+  accent = "text-cream",
   active = false,
   onClick,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   accent?: string;
   active?: boolean;
   onClick?: () => void;
@@ -1142,7 +1145,7 @@ function Stat({
         {value}
       </span>
       <span
-        className={`text-sm ${active ? "font-medium text-stone-900" : "text-stone-600"}`}
+        className={`text-sm ${active ? "font-medium text-cream" : "text-cream/70"}`}
       >
         {label}
       </span>
@@ -1158,8 +1161,8 @@ function Stat({
       aria-pressed={active}
       className={`${base} ${
         active
-          ? "border-forest-900"
-          : "border-transparent hover:bg-stone-900/[0.03]"
+          ? "border-cream"
+          : "border-transparent hover:bg-white/5"
       }`}
     >
       {content}
