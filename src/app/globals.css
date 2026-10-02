@@ -89,8 +89,6 @@ body {
   }
   .dashboard-grid > .area-stats {
     grid-area: stats;
-    position: sticky;
-    top: 5rem;
   }
   .dashboard-grid > .area-list {
     grid-area: list;
