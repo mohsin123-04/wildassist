@@ -702,9 +702,9 @@ export default function CaseList({
             return (
               <div
                 key={s.value}
-                className="flex flex-col rounded-2xl border border-stone-200 bg-stone-50/50"
+                className="flex flex-col"
               >
-                <div className="flex items-center justify-between border-b border-stone-200 px-3 py-2.5">
+                <div className="flex items-center justify-between border-b border-stone-200 px-1 py-2.5">
                   <span className="flex items-center gap-1.5 text-sm font-semibold text-stone-700">
                     <span className={`h-2 w-2 rounded-full ${STATUS_DOT[s.value]}`} />
                     {s.label}
@@ -713,7 +713,7 @@ export default function CaseList({
                     {col.length}
                   </span>
                 </div>
-                <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-2">
+                <div className="flex max-h-[70vh] flex-col divide-y divide-stone-200/70 overflow-y-auto">
                   {col.length === 0 ? (
                     <p className="px-1 py-4 text-center text-xs text-stone-400">
                       None
@@ -726,10 +726,8 @@ export default function CaseList({
                         <button
                           key={c.id}
                           onClick={() => goToCase(c.id)}
-                          className={`w-full rounded-xl border bg-white p-2.5 text-left shadow-sm transition-colors hover:bg-stone-50 ${
-                            urgent
-                              ? "border-stone-200 border-l-2 border-l-rose-400"
-                              : "border-stone-200"
+                          className={`w-full px-1 py-2.5 text-left transition-colors hover:bg-stone-900/[0.03] ${
+                            urgent ? "border-l-2 border-l-rose-400 pl-1.5" : ""
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
@@ -767,7 +765,7 @@ export default function CaseList({
       ) : view === "map" ? (
         <CasesMap cases={filtered} center={centre} />
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-stone-200 bg-white/50 p-10 text-center">
+        <div className="py-10 text-center">
           <Bird className="mx-auto h-8 w-8 text-stone-300" aria-hidden />
           <p className="mt-2 font-medium text-stone-900">Nothing here</p>
           <p className="mt-1 text-sm text-stone-500">
@@ -858,7 +856,7 @@ export default function CaseList({
                     {c.duplicate_of && (
                       <div
                         role="alert"
-                        className="mb-3 rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm"
+                        className="mb-3 border-l-2 border-l-orange-400 bg-orange-50/60 p-3 text-sm"
                       >
                         <p className="font-medium text-orange-900">
                           Possible duplicate
@@ -1004,7 +1002,7 @@ export default function CaseList({
                     </div>
 
                     {c.driver_name && (
-                      <div className="mt-3 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm text-emerald-900">
+                      <div className="mt-3 border-l-2 border-l-emerald-500 bg-emerald-50/60 px-3 py-2.5 text-sm text-emerald-900">
                         <div className="flex items-center gap-2">
                           <Car className="h-4 w-4 shrink-0" aria-hidden />
                           <span>

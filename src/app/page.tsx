@@ -24,11 +24,6 @@ export default function Home() {
     <main className="flex flex-1 flex-col">
       {/* ---------- Hero: deep forest, asymmetric, phone overlaps down ------- */}
       <section className="relative -mt-16 overflow-x-clip bg-forest-900 text-cream">
-        {/* soft radial lift so the flat green has depth */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_85%_0%,rgba(139,189,156,0.18),transparent_60%)]"
-        />
         <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-24 pt-28 sm:pb-28 sm:pt-36 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:pb-16">
           <div className="animate-in flex flex-col items-center text-center lg:items-start lg:text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-moss-300">
@@ -124,11 +119,6 @@ export default function Home() {
       {/* ---------- Volunteer: forest card showing the rescue route -------- */}
       <section className="bg-cream px-5 pb-24">
         <div className="relative mx-auto grid w-full max-w-6xl overflow-hidden rounded-[2rem] bg-forest-900 text-cream shadow-xl shadow-forest-900/20 lg:grid-cols-[1.05fr_0.95fr]">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_120%_at_0%_0%,rgba(139,189,156,0.16),transparent_55%)]"
-          />
-
           {/* copy */}
           <div className="relative px-8 py-14 sm:px-12">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-moss-300">
