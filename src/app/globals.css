@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4eee2; /* warm cream ground — the app sits in the same world
-                            as the landing's cream bands, so white cards pop */
+  --background: #faf8f4; /* soft near-white with a hair of warmth — reads clean
+                            next to the flat hairline UI and the forest/clay/
+                            serif accents, without the heavy "beige" cast */
   --foreground: #1c1917; /* warm ink (stone-900) */
-  --muted: #ebe4d5; /* slightly deeper cream for alternating sections */
+  --muted: #f1eee8; /* faintly warmer tone for alternating sections */
 }
 
 @theme inline {
