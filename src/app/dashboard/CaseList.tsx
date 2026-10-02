@@ -659,11 +659,11 @@ export default function CaseList({
         </div>
       </div>
 
-      {/* Status filters on the left (scrollable), sort dropdown pinned right -
-          what to show vs what order, paired on one row so neither clutters.
-          Hide "Closed" when the scope already excludes it, so a contradictory
-          (always-empty) combination can't be selected. */}
-      <div className="flex items-center gap-2">
+      {/* Status filters (scrollable) + the sort dropdown. Inline on desktop;
+          on mobile the sort drops to its own right-aligned row so it can't
+          crowd the scrolling chips. Hide "Closed" when the scope already
+          excludes it, so a contradictory (always-empty) combo can't be set. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 pb-1">
           <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
             All
@@ -690,7 +690,7 @@ export default function CaseList({
           ariaLabel="Sort cases"
           align="right"
           size="sm"
-          className="w-36 shrink-0"
+          className="w-36 shrink-0 self-end sm:self-auto"
           options={[
             { value: "newest", label: "Newest first" },
             { value: "oldest", label: "Oldest first" },
