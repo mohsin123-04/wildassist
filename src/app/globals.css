@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f4; /* soft near-white with a hair of warmth — reads clean
-                            next to the flat hairline UI and the forest/clay/
-                            serif accents, without the heavy "beige" cast */
+  --background: #f4eee2; /* warm cream ground (user's preferred coloring) — ties
+                            the app to the landing's cream bands and the warm
+                            forest/clay/serif palette */
   --foreground: #1c1917; /* warm ink (stone-900) */
-  --muted: #f1eee8; /* faintly warmer tone for alternating sections */
+  --muted: #ebe4d5; /* slightly deeper cream for alternating sections */
 }
 
 @theme inline {
