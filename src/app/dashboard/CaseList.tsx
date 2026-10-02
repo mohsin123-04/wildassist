@@ -11,7 +11,7 @@ import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
 import LocalTime from "@/components/LocalTime";
 import Select from "@/components/Select";
-import { setExportApi } from "@/lib/exportStore";
+import { setExportApi, type ExportScope } from "@/lib/exportStore";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -274,11 +274,20 @@ export default function CaseList({
     return cases.filter((c) => new Date(c.created_at) >= cutoff);
   }
 
-  function exportCsv(
-    exportScope: "all" | "view" | "week" | "month" | "year"
-  ) {
-    const data = casesForScope(exportScope);
+  // Cases reported within a custom date range (yyyy-mm-dd; either end may be "").
+  function casesForRange(from: string, to: string): CaseRow[] {
+    const start = from ? new Date(`${from}T00:00:00`) : null;
+    const end = to ? new Date(`${to}T23:59:59.999`) : null;
+    return cases.filter((c) => {
+      const d = new Date(c.created_at);
+      if (start && d < start) return false;
+      if (end && d > end) return false;
+      return true;
+    });
+  }
 
+  // Build + download a CSV for a set of rows. `suffix` goes in the filename.
+  function exportData(data: CaseRow[], suffix: string) {
     if (data.length === 0) {
       flash("No cases to export for that selection.");
       return;
@@ -328,7 +337,7 @@ export default function CaseList({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const filename = `wildassist-cases-${exportScope}.csv`;
+    const filename = `wildassist-cases-${suffix}.csv`;
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
@@ -337,12 +346,37 @@ export default function CaseList({
     );
   }
 
+  function exportCsv(exportScope: "all" | "view" | "week" | "month" | "year") {
+    exportData(casesForScope(exportScope), exportScope);
+  }
+
+  // Routes a scope (a preset, or a custom date range) to its rows + filename.
+  function doExport(scope: ExportScope, range?: { from: string; to: string }) {
+    if (scope === "custom") {
+      const from = range?.from ?? "";
+      const to = range?.to ?? "";
+      const suffix =
+        from && to
+          ? `${from}_to_${to}`
+          : from
+            ? `from_${from}`
+            : to
+              ? `to_${to}`
+              : "custom";
+      exportData(casesForRange(from, to), suffix);
+    } else {
+      exportCsv(scope);
+    }
+  }
+
   // Publish the export + live per-scope counts to the shared store so the global
   // account menu can offer "Export cases". A ref keeps `run` pointed at the
   // latest exportCsv (fresh filters/data); republished when the counts change
   // and cleared on unmount so the menu hides Export off the dashboard.
-  const runExportRef = useRef(exportCsv);
-  runExportRef.current = exportCsv;
+  const doExportRef = useRef(doExport);
+  doExportRef.current = doExport;
+  const casesForRangeRef = useRef(casesForRange);
+  casesForRangeRef.current = casesForRange;
   const exportCountAll = cases.length;
   const exportCountView = filtered.length;
   const exportCountWeek = casesForScope("week").length;
@@ -357,7 +391,8 @@ export default function CaseList({
         month: exportCountMonth,
         year: exportCountYear,
       },
-      run: (scope) => runExportRef.current(scope),
+      countForRange: (from, to) => casesForRangeRef.current(from, to).length,
+      run: (scope, rng) => doExportRef.current(scope, rng),
     });
     return () => setExportApi(null);
   }, [

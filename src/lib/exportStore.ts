@@ -1,12 +1,16 @@
 import { useSyncExternalStore } from "react";
 
-export type ExportScope = "all" | "view" | "week" | "month" | "year";
+export type PresetScope = "all" | "view" | "week" | "month" | "year";
+export type ExportScope = PresetScope | "custom";
 
 export type ExportApi = {
-  /** How many cases each scope would export, for the menu's live counts. */
-  counts: Record<ExportScope, number>;
-  /** Run the export for a scope (downloads the CSV + shows a toast). */
-  run: (scope: ExportScope) => void;
+  /** How many cases each preset scope would export, for the live counts. */
+  counts: Record<PresetScope, number>;
+  /** How many cases fall in a custom date range (yyyy-mm-dd; either may be ""). */
+  countForRange: (from: string, to: string) => number;
+  /** Run the export (downloads the CSV + shows a toast). A custom range passes
+   *  its from/to dates. */
+  run: (scope: ExportScope, range?: { from: string; to: string }) => void;
 };
 
 /**
