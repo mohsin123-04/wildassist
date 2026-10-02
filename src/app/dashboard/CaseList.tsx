@@ -424,11 +424,11 @@ export default function CaseList({
       {/* Quick-view stats: pinned left rail on desktop, top of the stack on
           mobile (they drive the list below, so they belong first). */}
       <div className="area-stats">
-        <div className="rounded-2xl bg-forest-900 p-4">
-          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-moss-300">
+        <div className="rounded-2xl bg-forest-900 p-3">
+          <p className="mb-1.5 px-3 text-xs font-medium uppercase tracking-widest text-moss-300">
             Quick views · tap to filter
           </p>
-          <div className="divide-y divide-white/10">
+          <div className="space-y-0.5">
             <Stat
               label={isAdmin ? "All cases" : "In your area"}
               value={areaCases.length}
@@ -446,7 +446,7 @@ export default function CaseList({
             <Stat
               label="Open"
               value={stats.open}
-              accent="text-moss-300"
+              accent="text-cream"
               active={scope === "open"}
               onClick={() => selectScope("open")}
             />
@@ -1151,19 +1151,15 @@ function Stat({
       </span>
     </>
   );
-  const base = "flex w-full items-baseline gap-3 border-l-2 py-2.5 pl-3 text-left transition-colors";
+  const base = "flex w-full items-baseline gap-3 rounded-lg px-3 py-2 text-left transition-colors";
   if (!onClick) {
-    return <div className={`${base} border-transparent`}>{content}</div>;
+    return <div className={base}>{content}</div>;
   }
   return (
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`${base} ${
-        active
-          ? "border-cream"
-          : "border-transparent hover:bg-white/5"
-      }`}
+      className={`${base} ${active ? "bg-white/10" : "hover:bg-white/5"}`}
     >
       {content}
     </button>
