@@ -150,7 +150,7 @@ export default async function ProfilePage() {
           ))}
         </nav>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-5">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div id="profile" className="scroll-mt-24">
             <ProfileForm
               initialName={profile?.full_name ?? ""}

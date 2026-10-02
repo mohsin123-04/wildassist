@@ -82,7 +82,7 @@ export default function EnablePushCard() {
   if (!show) return null;
 
   return (
-    <div className="mb-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+    <div className="mb-5 flex items-center gap-3 border-l-2 border-l-emerald-500 bg-emerald-50/50 px-4 py-3">
       <BellRing className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden />
       <p className="min-w-0 flex-1 text-sm text-emerald-900">
         Get a notification the moment a new case is routed to your centre,

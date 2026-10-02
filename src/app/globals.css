@@ -62,9 +62,10 @@ body {
   }
 }
 
-/* A slower, eased entrance reads as considered rather than snappy/generic. */
+/* Entrance fade-in removed (reads as a "vibecoded" tell); content renders
+   immediately. The .animate-in class is kept as a no-op so existing usages and
+   the reduced-motion rule below stay valid. */
 .animate-in {
-  animation: fadeInUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Dashboard layout: on phones it's a simple stack — quick-view stats, then the

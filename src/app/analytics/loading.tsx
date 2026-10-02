@@ -18,16 +18,16 @@ export default function AnalyticsLoading() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-20 animate-pulse rounded-2xl border border-stone-200 bg-white"
+              className="h-20 animate-pulse rounded bg-stone-100"
             />
           ))}
         </div>
-        <div className="h-28 animate-pulse rounded-2xl border border-stone-200 bg-white" />
+        <div className="h-28 animate-pulse rounded bg-stone-100" />
         <div className="grid gap-5 sm:grid-cols-2">
-          <div className="h-32 animate-pulse rounded-2xl border border-stone-200 bg-white" />
-          <div className="h-32 animate-pulse rounded-2xl border border-stone-200 bg-white" />
+          <div className="h-32 animate-pulse rounded bg-stone-100" />
+          <div className="h-32 animate-pulse rounded bg-stone-100" />
         </div>
-        <div className="h-48 animate-pulse rounded-2xl border border-stone-200 bg-white" />
+        <div className="h-48 animate-pulse rounded bg-stone-100" />
       </div>
     </main>
   );

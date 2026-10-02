@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import TransportList from "./TransportList";
 
@@ -44,10 +45,10 @@ export default async function TransportPage() {
       {profile?.volunteer_approved ? (
         <TransportList centreNames={centreNames} />
       ) : (
-        <div className="rounded-2xl border border-stone-200 bg-white p-8">
+        <div className="border-t border-stone-200/70 pt-8">
           <div className="mx-auto max-w-md text-center">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-2xl">
-              🕓
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+              <Clock className="h-5 w-5" aria-hidden />
             </span>
             <p className="mt-4 font-display text-lg font-semibold tracking-tight text-stone-900">
               You&apos;re almost ready to help

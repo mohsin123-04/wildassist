@@ -147,7 +147,7 @@ export default function TransportList({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-sm text-stone-500">
+      <div className="py-10 text-center text-sm text-stone-500">
         Finding transport requests near you…
       </div>
     );
@@ -238,11 +238,11 @@ export default function TransportList({
             <span className="text-stone-400">{showHistory ? "▲" : "▼"}</span>
           </button>
           {showHistory && (
-            <ul className="mt-3 flex flex-col gap-2">
+            <ul className="mt-3 divide-y divide-stone-200/70">
               {completed.map((j) => (
                 <li
                   key={j.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm"
+                  className="flex items-center justify-between gap-3 px-1 py-2.5 text-sm"
                 >
                   <span className="min-w-0 truncate">
                     <span className="font-medium capitalize text-stone-800">
@@ -286,14 +286,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
         {title}
       </h2>
-      <div className="flex flex-col gap-3">{children}</div>
+      <div className="divide-y divide-stone-200/70">{children}</div>
     </div>
   );
 }
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 p-10 text-center">
+    <div className="py-10 text-center">
       <Inbox className="mx-auto h-8 w-8 text-stone-300" aria-hidden />
       <p className="mt-2 text-sm text-stone-500">{text}</p>
     </div>
@@ -312,7 +312,7 @@ function JobCard({
   actions: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-4">
+    <div className="py-4">
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium capitalize text-stone-900">
           {job.animal}

@@ -66,7 +66,7 @@ export default function AppearanceSection({
   }
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section className="mt-8 border-t border-stone-200/70 pt-8">
       <h2 className="font-display text-lg font-semibold text-stone-900">
         Appearance
       </h2>

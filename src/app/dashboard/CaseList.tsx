@@ -781,7 +781,7 @@ export default function CaseList({
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+        <ul className="divide-y divide-stone-200 border-y border-stone-200">
           {filtered.map((c) => {
             const expanded = expandedId === c.id;
             const isMine = c.centre_id === myCentreId;

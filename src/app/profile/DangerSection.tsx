@@ -37,7 +37,7 @@ export default function DangerSection() {
   }
 
   return (
-    <section className="rounded-2xl border border-rose-200 bg-rose-50/50 p-6">
+    <section className="mt-8 border-t border-stone-200/70 pt-8">
       <h2 className="font-display text-lg font-semibold text-rose-900">
         Danger zone
       </h2>

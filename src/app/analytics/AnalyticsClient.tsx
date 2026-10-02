@@ -388,10 +388,10 @@ export default function AnalyticsClient({
         <div className="mt-2 h-7 w-32 animate-pulse rounded bg-stone-200" />
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl border border-black/5 bg-white shadow-sm" />
+            <div key={i} className="h-20 animate-pulse rounded bg-stone-100" />
           ))}
         </div>
-        <div className="mt-5 h-48 animate-pulse rounded-2xl border border-black/5 bg-white shadow-sm" />
+        <div className="mt-5 h-48 animate-pulse rounded bg-stone-100" />
       </main>
     );
   }
@@ -486,7 +486,7 @@ export default function AnalyticsClient({
       )}
 
       {m.cases.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 p-10 text-center text-sm text-stone-500">
+        <div className="py-10 text-center text-sm text-stone-500">
           No cases in {win.windowLabel}. Try a wider range or clearing filters.
         </div>
       ) : (
@@ -519,7 +519,7 @@ export default function AnalyticsClient({
             </p>
           )}
 
-          <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+          <section>
             <h2 className="font-display text-base font-semibold text-stone-900">Open queue</h2>
             <p className="mt-0.5 text-xs text-stone-500">
               How long cases have been waiting right now
@@ -562,7 +562,7 @@ export default function AnalyticsClient({
             />
           </div>
 
-          <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+          <section>
             <h2 className="font-display text-base font-semibold text-stone-900">Response time</h2>
             {m.medianResponse === null ? (
               <p className="mt-2 text-sm text-stone-500">
@@ -650,7 +650,7 @@ function Stat({
   accent?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white shadow-sm p-4">
+    <div>
       <p className={`font-display text-2xl font-semibold ${accent}`}>{value}</p>
       <p className="mt-0.5 text-xs text-stone-500">{label}</p>
       {sub && (
@@ -695,7 +695,7 @@ function Breakdown({
   onSelect?: (key: string) => void;
 }) {
   return (
-    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+    <section>
       <h2 className="font-display text-base font-medium text-stone-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-sm text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex flex-col gap-3.5">
@@ -759,7 +759,7 @@ function TimeChart({
   bars: { heightPct: number; title: string; label: string }[];
 }) {
   return (
-    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+    <section>
       <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex h-32 items-end gap-1 border-b border-stone-200">
@@ -802,7 +802,7 @@ function BarPanel({
 }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
   return (
-    <section className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+    <section>
       <h2 className="font-display text-base font-semibold text-stone-900">{title}</h2>
       {subtitle && <p className="mt-0.5 text-xs text-stone-500">{subtitle}</p>}
       <div className="mt-4 flex flex-col gap-2.5">

@@ -67,7 +67,7 @@ export default function ProfileForm({
   }
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section>
       <h2 className="font-display text-lg font-semibold text-stone-900">
         Profile
       </h2>
