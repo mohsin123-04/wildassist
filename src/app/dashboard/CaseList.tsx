@@ -253,27 +253,32 @@ export default function CaseList({
       return sortBy === "oldest" ? ta - tb : tb - ta;
     });
 
+  // Rows for a given export scope. "view" honours the active search/status/date
+  // filters; the period scopes are calendar-to-date (this week starts Monday)
+  // over the full visible case set. Used for both the export and the per-scope
+  // counts shown in the menu.
+  function casesForScope(
+    exportScope: "all" | "view" | "week" | "month" | "year"
+  ): CaseRow[] {
+    if (exportScope === "view") return filtered;
+    if (exportScope === "all") return cases;
+    const now = new Date();
+    let cutoff: Date;
+    if (exportScope === "week") {
+      cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      cutoff.setDate(cutoff.getDate() - ((cutoff.getDay() + 6) % 7));
+    } else if (exportScope === "month") {
+      cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else {
+      cutoff = new Date(now.getFullYear(), 0, 1);
+    }
+    return cases.filter((c) => new Date(c.created_at) >= cutoff);
+  }
+
   function exportCsv(
     exportScope: "all" | "view" | "week" | "month" | "year"
   ) {
-    // Pick the rows for the chosen scope. "view" honours the active
-    // search/status/date filters; the period scopes are calendar-to-date
-    // (this week starts Monday) over the full visible case set.
-    const data = (() => {
-      if (exportScope === "view") return filtered;
-      if (exportScope === "all") return cases;
-      const now = new Date();
-      let cutoff: Date;
-      if (exportScope === "week") {
-        cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        cutoff.setDate(cutoff.getDate() - ((cutoff.getDay() + 6) % 7));
-      } else if (exportScope === "month") {
-        cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
-      } else {
-        cutoff = new Date(now.getFullYear(), 0, 1);
-      }
-      return cases.filter((c) => new Date(c.created_at) >= cutoff);
-    })();
+    const data = casesForScope(exportScope);
 
     if (data.length === 0) {
       flash("No cases to export for that selection.");
@@ -324,9 +329,13 @@ export default function CaseList({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `wildassist-cases-${exportScope}.csv`;
+    const filename = `wildassist-cases-${exportScope}.csv`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+    flash(
+      `Downloaded ${data.length} case${data.length === 1 ? "" : "s"} · ${filename}`
+    );
   }
 
   async function updateStatus(id: string, status: CaseRow["status"]) {
@@ -635,51 +644,55 @@ export default function CaseList({
                       <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
                         Export CSV
                       </p>
-                      <div className="mt-2 flex flex-col gap-1.5">
-                        <button
-                          onClick={() => {
-                            exportCsv("all");
-                            setShowFilters(false);
-                            setOptionsView("main");
-                          }}
-                          className="flex h-9 w-full items-center rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-700 transition-colors hover:bg-stone-50"
-                        >
-                          Everything
-                        </button>
-                        <button
-                          onClick={() => {
-                            exportCsv("view");
-                            setShowFilters(false);
-                            setOptionsView("main");
-                          }}
-                          className="flex h-9 w-full items-center justify-between rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-700 transition-colors hover:bg-stone-50"
-                        >
-                          <span>Current view</span>
-                          <span className="text-xs text-stone-400">
-                            {filtered.length}
-                          </span>
-                        </button>
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {(
-                            [
-                              ["week", "This week"],
-                              ["month", "This month"],
-                              ["year", "This year"],
-                            ] as const
-                          ).map(([val, label]) => (
+                      <p className="mt-1 text-xs leading-5 text-stone-500">
+                        Download a spreadsheet of cases. The number is how many
+                        you&apos;ll get:
+                      </p>
+                      <div className="mt-2 flex flex-col gap-0.5">
+                        {(
+                          [
+                            ["all", "Everything", "Every case you can see"],
+                            ["view", "Current view", "Matches your filters"],
+                            ["week", "This week", "Reported since Monday"],
+                            ["month", "This month", "Reported this month"],
+                            ["year", "This year", "Reported this year"],
+                          ] as const
+                        ).map(([val, label, desc], i) => {
+                          const count = casesForScope(val).length;
+                          const disabled = count === 0;
+                          return (
                             <button
                               key={val}
+                              disabled={disabled}
                               onClick={() => {
                                 exportCsv(val);
                                 setShowFilters(false);
                                 setOptionsView("main");
                               }}
-                              className="flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-stone-200 bg-white px-1 text-[13px] text-stone-700 transition-colors hover:bg-stone-50"
+                              className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                                i === 2
+                                  ? "mt-1 border-t border-stone-100 pt-2.5"
+                                  : ""
+                              } ${
+                                disabled
+                                  ? "cursor-not-allowed opacity-40"
+                                  : "hover:bg-stone-900/[0.04]"
+                              }`}
                             >
-                              {label}
+                              <span className="min-w-0">
+                                <span className="block text-sm text-stone-800">
+                                  {label}
+                                </span>
+                                <span className="block text-xs text-stone-500">
+                                  {desc}
+                                </span>
+                              </span>
+                              <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
+                                {count}
+                              </span>
                             </button>
-                          ))}
-                        </div>
+                          );
+                        })}
                       </div>
                     </>
                   )}
