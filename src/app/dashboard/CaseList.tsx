@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check } from "lucide-react";
+import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check, Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
@@ -173,8 +173,7 @@ export default function CaseList({
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "board" | "map">("list");
   const [showFilters, setShowFilters] = useState(false);
-  // Which page of the Options menu is showing: the filters, or the export scopes.
-  const [optionsView, setOptionsView] = useState<"main" | "export">("main");
+  const [exportOpen, setExportOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -490,7 +489,7 @@ export default function CaseList({
             className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-10 pr-4 text-sm outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200">
             {(["list", "board", "map"] as const).map((v) => (
               <button
@@ -509,10 +508,7 @@ export default function CaseList({
 
           <div className="relative">
             <button
-              onClick={() => {
-                setShowFilters((v) => !v);
-                setOptionsView("main");
-              }}
+              onClick={() => setShowFilters((v) => !v)}
               aria-expanded={showFilters}
               className={`inline-flex h-10 items-center gap-1.5 rounded-xl border px-4 text-sm font-medium transition-colors ${
                 showFilters || dateFrom || dateTo || mineOnly || sortBy !== "newest"
@@ -540,162 +536,163 @@ export default function CaseList({
                 <div
                   className="fixed inset-0 z-10"
                   aria-hidden
-                  onClick={() => {
-                    setShowFilters(false);
-                    setOptionsView("main");
-                  }}
+                  onClick={() => setShowFilters(false)}
                 />
                 <div className="absolute right-0 top-full z-20 mt-2 max-h-[70vh] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
-                  {optionsView === "main" ? (
-                    <>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                        Sort by
-                      </p>
-                      <div className="mt-2 flex flex-col gap-0.5">
-                        {(
-                          [
-                            ["newest", "Newest first"],
-                            ["oldest", "Oldest first"],
-                            ["urgent", "Most urgent"],
-                          ] as const
-                        ).map(([val, label]) => (
-                          <button
-                            key={val}
-                            onClick={() => setSortBy(val)}
-                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                              sortBy === val
-                                ? "bg-forest-900/[0.06] font-medium text-forest-900"
-                                : "text-stone-700 hover:bg-stone-900/[0.04]"
-                            }`}
-                          >
-                            <span>{label}</span>
-                            {sortBy === val && (
-                              <Check
-                                className="h-4 w-4 shrink-0 text-forest-900"
-                                aria-hidden
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-
-                      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
-                        Reported between
-                      </p>
-                      <div className="mt-2 flex items-center gap-2 text-sm">
-                        <input
-                          type="date"
-                          value={dateFrom}
-                          onChange={(e) => setDateFrom(e.target.value)}
-                          aria-label="Reported from date"
-                          className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-                        />
-                        <span className="shrink-0 text-stone-400">to</span>
-                        <input
-                          type="date"
-                          value={dateTo}
-                          onChange={(e) => setDateTo(e.target.value)}
-                          aria-label="Reported to date"
-                          className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
-                        />
-                      </div>
-                      {(dateFrom || dateTo) && (
-                        <button
-                          onClick={() => {
-                            setDateFrom("");
-                            setDateTo("");
-                          }}
-                          className="mt-1.5 text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
-                        >
-                          Clear dates
-                        </button>
-                      )}
-
-                      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
-                        Assignment
-                      </p>
-                      <div className="mt-2">
-                        <Chip
-                          active={mineOnly}
-                          onClick={() => setMineOnly((v) => !v)}
-                        >
-                          Assigned to me
-                        </Chip>
-                      </div>
-
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Sort by
+                  </p>
+                  <div className="mt-2 flex flex-col gap-0.5">
+                    {(
+                      [
+                        ["newest", "Newest first"],
+                        ["oldest", "Oldest first"],
+                        ["urgent", "Most urgent"],
+                      ] as const
+                    ).map(([val, label]) => (
                       <button
-                        onClick={() => setOptionsView("export")}
-                        className="mt-4 flex h-10 w-full items-center justify-between rounded-xl border border-stone-200 px-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+                        key={val}
+                        onClick={() => setSortBy(val)}
+                        className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                          sortBy === val
+                            ? "bg-forest-900/[0.06] font-medium text-forest-900"
+                            : "text-stone-700 hover:bg-stone-900/[0.04]"
+                        }`}
                       >
-                        Export CSV
-                        <span aria-hidden className="text-stone-400">
-                          ›
-                        </span>
+                        <span>{label}</span>
+                        {sortBy === val && (
+                          <Check
+                            className="h-4 w-4 shrink-0 text-forest-900"
+                            aria-hidden
+                          />
+                        )}
                       </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => setOptionsView("main")}
-                        className="-ml-1 mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800"
-                      >
-                        <span aria-hidden>‹</span> Back
-                      </button>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                        Export CSV
-                      </p>
-                      <p className="mt-1 text-xs leading-5 text-stone-500">
-                        Download a spreadsheet of cases. The number is how many
-                        you&apos;ll get:
-                      </p>
-                      <div className="mt-2 flex flex-col gap-0.5">
-                        {(
-                          [
-                            ["all", "Everything", "Every case you can see"],
-                            ["view", "Current view", "Matches your filters"],
-                            ["week", "This week", "Reported since Monday"],
-                            ["month", "This month", "Reported this month"],
-                            ["year", "This year", "Reported this year"],
-                          ] as const
-                        ).map(([val, label, desc], i) => {
-                          const count = casesForScope(val).length;
-                          const disabled = count === 0;
-                          return (
-                            <button
-                              key={val}
-                              disabled={disabled}
-                              onClick={() => {
-                                exportCsv(val);
-                                setShowFilters(false);
-                                setOptionsView("main");
-                              }}
-                              className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
-                                i === 2
-                                  ? "mt-1 border-t border-stone-100 pt-2.5"
-                                  : ""
-                              } ${
-                                disabled
-                                  ? "cursor-not-allowed opacity-40"
-                                  : "hover:bg-stone-900/[0.04]"
-                              }`}
-                            >
-                              <span className="min-w-0">
-                                <span className="block text-sm text-stone-800">
-                                  {label}
-                                </span>
-                                <span className="block text-xs text-stone-500">
-                                  {desc}
-                                </span>
-                              </span>
-                              <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
-                                {count}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
+                    ))}
+                  </div>
+
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Reported between
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-sm">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      aria-label="Reported from date"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                    />
+                    <span className="shrink-0 text-stone-400">to</span>
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      aria-label="Reported to date"
+                      className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-stone-700 outline-none focus:border-emerald-400"
+                    />
+                  </div>
+                  {(dateFrom || dateTo) && (
+                    <button
+                      onClick={() => {
+                        setDateFrom("");
+                        setDateTo("");
+                      }}
+                      className="mt-1.5 text-xs font-medium text-stone-500 underline underline-offset-2 hover:text-stone-800"
+                    >
+                      Clear dates
+                    </button>
                   )}
+
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Assignment
+                  </p>
+                  <div className="mt-2">
+                    <Chip active={mineOnly} onClick={() => setMineOnly((v) => !v)}>
+                      Assigned to me
+                    </Chip>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen((v) => !v)}
+              aria-expanded={exportOpen}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+            >
+              <Download className="h-4 w-4 text-stone-500" aria-hidden />
+              Export
+              <span
+                aria-hidden
+                className={`text-xs text-stone-400 transition-transform ${exportOpen ? "rotate-180" : ""}`}
+              >
+                ▾
+              </span>
+            </button>
+
+            {exportOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  aria-hidden
+                  onClick={() => setExportOpen(false)}
+                />
+                <div className="absolute right-0 top-full z-20 mt-2 max-h-[70vh] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                    Export CSV
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-stone-500">
+                    Download a spreadsheet of cases. The number is how many
+                    you&apos;ll get.
+                  </p>
+
+                  <p className="mt-3 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400">
+                    All or filtered
+                  </p>
+                  <div className="mt-1.5 flex flex-col gap-0.5">
+                    {(
+                      [
+                        ["all", "Everything", "Every case you can see"],
+                        ["view", "Current view", "Matches your filters"],
+                      ] as const
+                    ).map(([val, label, desc]) => (
+                      <ExportRow
+                        key={val}
+                        label={label}
+                        desc={desc}
+                        count={casesForScope(val).length}
+                        onClick={() => {
+                          exportCsv(val);
+                          setExportOpen(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  <p className="mt-3 border-t border-stone-100 pt-3 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400">
+                    By time period
+                  </p>
+                  <div className="mt-1.5 flex flex-col gap-0.5">
+                    {(
+                      [
+                        ["week", "This week", "Reported since Monday"],
+                        ["month", "This month", "Reported this month"],
+                        ["year", "This year", "Reported this year"],
+                      ] as const
+                    ).map(([val, label, desc]) => (
+                      <ExportRow
+                        key={val}
+                        label={label}
+                        desc={desc}
+                        count={casesForScope(val).length}
+                        onClick={() => {
+                          exportCsv(val);
+                          setExportOpen(false);
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </>
             )}
@@ -1190,6 +1187,37 @@ function Stat({
       className={`${base} ${active ? "bg-white/10" : "hover:bg-white/5"}`}
     >
       {content}
+    </button>
+  );
+}
+
+function ExportRow({
+  label,
+  desc,
+  count,
+  onClick,
+}: {
+  label: string;
+  desc: string;
+  count: number;
+  onClick: () => void;
+}) {
+  const disabled = count === 0;
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+        disabled ? "cursor-not-allowed opacity-40" : "hover:bg-stone-900/[0.04]"
+      }`}
+    >
+      <span className="min-w-0">
+        <span className="block text-sm text-stone-800">{label}</span>
+        <span className="block text-xs text-stone-500">{desc}</span>
+      </span>
+      <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
+        {count}
+      </span>
     </button>
   );
 }
