@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check, Download } from "lucide-react";
+import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
@@ -11,6 +11,7 @@ import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
 import LocalTime from "@/components/LocalTime";
 import Select from "@/components/Select";
+import { setExportApi } from "@/lib/exportStore";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -173,7 +174,6 @@ export default function CaseList({
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "board" | "map">("list");
   const [showFilters, setShowFilters] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -336,6 +336,37 @@ export default function CaseList({
       `Downloaded ${data.length} case${data.length === 1 ? "" : "s"} · ${filename}`
     );
   }
+
+  // Publish the export + live per-scope counts to the shared store so the global
+  // account menu can offer "Export cases". A ref keeps `run` pointed at the
+  // latest exportCsv (fresh filters/data); republished when the counts change
+  // and cleared on unmount so the menu hides Export off the dashboard.
+  const runExportRef = useRef(exportCsv);
+  runExportRef.current = exportCsv;
+  const exportCountAll = cases.length;
+  const exportCountView = filtered.length;
+  const exportCountWeek = casesForScope("week").length;
+  const exportCountMonth = casesForScope("month").length;
+  const exportCountYear = casesForScope("year").length;
+  useEffect(() => {
+    setExportApi({
+      counts: {
+        all: exportCountAll,
+        view: exportCountView,
+        week: exportCountWeek,
+        month: exportCountMonth,
+        year: exportCountYear,
+      },
+      run: (scope) => runExportRef.current(scope),
+    });
+    return () => setExportApi(null);
+  }, [
+    exportCountAll,
+    exportCountView,
+    exportCountWeek,
+    exportCountMonth,
+    exportCountYear,
+  ]);
 
   async function updateStatus(id: string, status: CaseRow["status"]) {
     const previous = cases;
@@ -609,89 +640,6 @@ export default function CaseList({
                     <Chip active={mineOnly} onClick={() => setMineOnly((v) => !v)}>
                       Assigned to me
                     </Chip>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={() => setExportOpen((v) => !v)}
-              aria-expanded={exportOpen}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
-            >
-              <Download className="h-4 w-4 text-stone-500" aria-hidden />
-              Export
-              <span
-                aria-hidden
-                className={`text-xs text-stone-400 transition-transform ${exportOpen ? "rotate-180" : ""}`}
-              >
-                ▾
-              </span>
-            </button>
-
-            {exportOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  aria-hidden
-                  onClick={() => setExportOpen(false)}
-                />
-                <div className="absolute right-0 top-full z-20 mt-2 max-h-[70vh] w-72 max-w-[calc(100vw-2.5rem)] overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 text-left shadow-lg shadow-stone-900/10">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                    Export CSV
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-stone-500">
-                    Download a spreadsheet of cases. The number is how many
-                    you&apos;ll get.
-                  </p>
-
-                  <p className="mt-3 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400">
-                    All or filtered
-                  </p>
-                  <div className="mt-1.5 flex flex-col gap-0.5">
-                    {(
-                      [
-                        ["all", "Everything", "Every case you can see"],
-                        ["view", "Current view", "Matches your filters"],
-                      ] as const
-                    ).map(([val, label, desc]) => (
-                      <ExportRow
-                        key={val}
-                        label={label}
-                        desc={desc}
-                        count={casesForScope(val).length}
-                        onClick={() => {
-                          exportCsv(val);
-                          setExportOpen(false);
-                        }}
-                      />
-                    ))}
-                  </div>
-
-                  <p className="mt-3 border-t border-stone-100 pt-3 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400">
-                    By time period
-                  </p>
-                  <div className="mt-1.5 flex flex-col gap-0.5">
-                    {(
-                      [
-                        ["week", "This week", "Reported since Monday"],
-                        ["month", "This month", "Reported this month"],
-                        ["year", "This year", "Reported this year"],
-                      ] as const
-                    ).map(([val, label, desc]) => (
-                      <ExportRow
-                        key={val}
-                        label={label}
-                        desc={desc}
-                        count={casesForScope(val).length}
-                        onClick={() => {
-                          exportCsv(val);
-                          setExportOpen(false);
-                        }}
-                      />
-                    ))}
                   </div>
                 </div>
               </>
@@ -1187,37 +1135,6 @@ function Stat({
       className={`${base} ${active ? "bg-white/10" : "hover:bg-white/5"}`}
     >
       {content}
-    </button>
-  );
-}
-
-function ExportRow({
-  label,
-  desc,
-  count,
-  onClick,
-}: {
-  label: string;
-  desc: string;
-  count: number;
-  onClick: () => void;
-}) {
-  const disabled = count === 0;
-  return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
-        disabled ? "cursor-not-allowed opacity-40" : "hover:bg-stone-900/[0.04]"
-      }`}
-    >
-      <span className="min-w-0">
-        <span className="block text-sm text-stone-800">{label}</span>
-        <span className="block text-xs text-stone-500">{desc}</span>
-      </span>
-      <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
-        {count}
-      </span>
     </button>
   );
 }
