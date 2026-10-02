@@ -805,7 +805,7 @@ export default function CaseList({
                   className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
                 >
                   <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
+                    className={`w-[72px] shrink-0 rounded-full py-0.5 text-center text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
                   >
                     {c.verdict}
                   </span>
