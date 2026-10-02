@@ -1,11 +1,13 @@
 import { useSyncExternalStore } from "react";
 
 export type PresetScope = "all" | "view" | "week" | "month" | "year";
-export type ExportScope = PresetScope | "custom";
+export type ExportScope = PresetScope | "custom" | "selected";
 
 export type ExportApi = {
   /** How many cases each preset scope would export, for the live counts. */
   counts: Record<PresetScope, number>;
+  /** How many cases are ticked on the dashboard right now (manual selection). */
+  selectedCount: number;
   /** How many cases fall in a custom date range (yyyy-mm-dd; either may be ""). */
   countForRange: (from: string, to: string) => number;
   /** Run the export (downloads the CSV + shows a toast). A custom range passes
@@ -15,33 +17,64 @@ export type ExportApi = {
 
 /**
  * Tiny shared store so the global account menu (in the header) can offer "Export
- * cases" that's driven by the dashboard's CaseList — which is the only place
- * that has the case data + active filters. The dashboard publishes an ExportApi
- * while it's mounted; the menu reads it and only shows Export when it exists.
+ * cases" that's driven by the dashboard's CaseList — the only place with the
+ * case data, filters, and manual selection. CaseList publishes an ExportApi
+ * while mounted; the menu / selection bar read it. The dialog's open state also
+ * lives here so it can be opened from either the account menu or the dashboard
+ * selection bar.
  */
 let current: ExportApi | null = null;
-const listeners = new Set<() => void>();
+const apiListeners = new Set<() => void>();
 
 export function setExportApi(api: ExportApi | null) {
   current = api;
-  listeners.forEach((l) => l());
+  apiListeners.forEach((l) => l());
 }
 
-function subscribe(cb: () => void) {
-  listeners.add(cb);
+function subscribeApi(cb: () => void) {
+  apiListeners.add(cb);
   return () => {
-    listeners.delete(cb);
+    apiListeners.delete(cb);
   };
 }
 
-function getSnapshot() {
-  return current;
-}
-
-function getServerSnapshot() {
-  return null;
-}
-
 export function useExportApi() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(
+    subscribeApi,
+    () => current,
+    () => null
+  );
+}
+
+// --- Dialog open state (shared so either entry point can open it) -----------
+let dialogOpen = false;
+let dialogInitialScope: ExportScope | null = null;
+const dialogListeners = new Set<() => void>();
+
+export function openExportDialog(initialScope: ExportScope | null = null) {
+  if (!current) return; // nothing to export (not on the dashboard)
+  dialogOpen = true;
+  dialogInitialScope = initialScope;
+  dialogListeners.forEach((l) => l());
+}
+
+export function closeExportDialog() {
+  dialogOpen = false;
+  dialogListeners.forEach((l) => l());
+}
+
+function subscribeDialog(cb: () => void) {
+  dialogListeners.add(cb);
+  return () => {
+    dialogListeners.delete(cb);
+  };
+}
+
+export function useExportDialogOpen() {
+  const open = useSyncExternalStore(
+    subscribeDialog,
+    () => dialogOpen,
+    () => false
+  );
+  return { open, initialScope: dialogInitialScope };
 }

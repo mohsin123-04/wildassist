@@ -32,14 +32,17 @@ const GROUPS: {
  */
 export default function ExportDialog({
   api,
+  initialScope,
   onClose,
 }: {
   api: ExportApi;
+  initialScope?: ExportScope | null;
   onClose: () => void;
 }) {
-  // Default to "Current view" when it has cases, otherwise "Everything".
+  // Honour an initial scope (e.g. "selected" from the dashboard selection bar),
+  // else default to "Current view" when it has cases, otherwise "Everything".
   const [scope, setScope] = useState<ExportScope>(
-    api.counts.view > 0 ? "view" : "all"
+    initialScope ?? (api.counts.view > 0 ? "view" : "all")
   );
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
@@ -56,7 +59,12 @@ export default function ExportDialog({
   const customCount = customRangeSet
     ? api.countForRange(customFrom, customTo)
     : 0;
-  const selectedCount = scope === "custom" ? customCount : api.counts[scope];
+  const selectedCount =
+    scope === "custom"
+      ? customCount
+      : scope === "selected"
+        ? api.selectedCount
+        : api.counts[scope];
   const filename =
     scope === "custom"
       ? `wildassist-cases-${
@@ -68,7 +76,9 @@ export default function ExportDialog({
                 ? `to_${customTo}`
                 : "custom"
         }.csv`
-      : `wildassist-cases-${scope}.csv`;
+      : scope === "selected"
+        ? "wildassist-cases-selected.csv"
+        : `wildassist-cases-${scope}.csv`;
 
   function download() {
     if (selectedCount === 0) return;
@@ -108,6 +118,48 @@ export default function ExportDialog({
             cases you&apos;ll get.
           </p>
           <div className="mt-4 space-y-4">
+            {api.selectedCount > 0 && (
+              <div>
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-stone-400">
+                  Your selection
+                </p>
+                <div className="mt-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setScope("selected")}
+                    className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                      scope === "selected"
+                        ? "border-forest-900 bg-forest-900/[0.04]"
+                        : "border-stone-200 hover:bg-stone-50"
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                        scope === "selected"
+                          ? "border-forest-900"
+                          : "border-stone-300"
+                      }`}
+                    >
+                      {scope === "selected" && (
+                        <span className="h-2 w-2 rounded-full bg-forest-900" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium text-stone-800">
+                        Selected cases
+                      </span>
+                      <span className="block text-xs text-stone-500">
+                        The cases you ticked on the dashboard
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
+                      {api.selectedCount}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
             {GROUPS.map((grp) => (
               <div key={grp.group}>
                 <p className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-stone-400">

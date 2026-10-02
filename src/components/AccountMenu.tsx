@@ -7,7 +7,12 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import Avatar from "@/components/Avatar";
 import ExportDialog from "@/components/ExportDialog";
-import { useExportApi } from "@/lib/exportStore";
+import {
+  useExportApi,
+  useExportDialogOpen,
+  openExportDialog,
+  closeExportDialog,
+} from "@/lib/exportStore";
 
 export type HeaderProfile = {
   full_name: string | null;
@@ -52,8 +57,9 @@ export default function AccountMenu({
   const [profileLoaded, setProfileLoaded] = useState(!!initialProfile);
   const [reload, setReload] = useState(0);
   const [open, setOpen] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
   const exportApi = useExportApi();
+  const { open: exportDialogOpen, initialScope: exportInitialScope } =
+    useExportDialogOpen();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -307,7 +313,7 @@ export default function AccountMenu({
             <button
               onClick={() => {
                 setOpen(false);
-                setExportOpen(true);
+                openExportDialog();
               }}
               className="flex w-full items-center justify-between px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
             >
@@ -329,8 +335,12 @@ export default function AccountMenu({
         </div>
       )}
 
-      {exportOpen && exportApi && (
-        <ExportDialog api={exportApi} onClose={() => setExportOpen(false)} />
+      {exportDialogOpen && exportApi && (
+        <ExportDialog
+          api={exportApi}
+          initialScope={exportInitialScope}
+          onClose={closeExportDialog}
+        />
       )}
     </div>
   );

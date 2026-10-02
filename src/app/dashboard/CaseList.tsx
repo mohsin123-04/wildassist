@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check } from "lucide-react";
+import { Bird, MapPin, Car, Phone, MessageSquare, SquareArrowOutUpRight, Search, Check, CheckSquare, Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import { haversineKm } from "@/lib/centres";
@@ -11,7 +11,11 @@ import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
 import LocalTime from "@/components/LocalTime";
 import Select from "@/components/Select";
-import { setExportApi, type ExportScope } from "@/lib/exportStore";
+import {
+  setExportApi,
+  openExportDialog,
+  type ExportScope,
+} from "@/lib/exportStore";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -174,6 +178,9 @@ export default function CaseList({
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "urgent">("newest");
   const [view, setView] = useState<"list" | "board" | "map">("list");
   const [showFilters, setShowFilters] = useState(false);
+  // Manual selection: tick specific cases to export just those.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
@@ -350,7 +357,7 @@ export default function CaseList({
     exportData(casesForScope(exportScope), exportScope);
   }
 
-  // Routes a scope (a preset, or a custom date range) to its rows + filename.
+  // Routes a scope (preset, custom range, or the manual selection) to its rows.
   function doExport(scope: ExportScope, range?: { from: string; to: string }) {
     if (scope === "custom") {
       const from = range?.from ?? "";
@@ -364,6 +371,11 @@ export default function CaseList({
               ? `to_${to}`
               : "custom";
       exportData(casesForRange(from, to), suffix);
+    } else if (scope === "selected") {
+      exportData(
+        cases.filter((c) => selectedIds.has(c.id)),
+        "selected"
+      );
     } else {
       exportCsv(scope);
     }
@@ -382,6 +394,7 @@ export default function CaseList({
   const exportCountWeek = casesForScope("week").length;
   const exportCountMonth = casesForScope("month").length;
   const exportCountYear = casesForScope("year").length;
+  const exportCountSelected = cases.filter((c) => selectedIds.has(c.id)).length;
   useEffect(() => {
     setExportApi({
       counts: {
@@ -391,6 +404,7 @@ export default function CaseList({
         month: exportCountMonth,
         year: exportCountYear,
       },
+      selectedCount: exportCountSelected,
       countForRange: (from, to) => casesForRangeRef.current(from, to).length,
       run: (scope, rng) => doExportRef.current(scope, rng),
     });
@@ -401,7 +415,21 @@ export default function CaseList({
     exportCountWeek,
     exportCountMonth,
     exportCountYear,
+    exportCountSelected,
   ]);
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function exitSelectMode() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  }
 
   async function updateStatus(id: string, status: CaseRow["status"]) {
     const previous = cases;
@@ -572,6 +600,16 @@ export default function CaseList({
             ))}
           </div>
 
+          {view === "list" && !selectMode && (
+            <button
+              onClick={() => setSelectMode(true)}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+            >
+              <CheckSquare className="h-4 w-4 text-stone-500" aria-hidden />
+              Select
+            </button>
+          )}
+
           <div className="relative">
             <button
               onClick={() => setShowFilters((v) => !v)}
@@ -707,6 +745,42 @@ export default function CaseList({
         ))}
       </div>
 
+      {/* Manual-selection bar (list view only). */}
+      {selectMode && view === "list" && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-forest-900 px-3 py-2.5 text-sm text-cream">
+          <span className="font-medium">{exportCountSelected} selected</span>
+          <button
+            onClick={() => setSelectedIds(new Set(filtered.map((c) => c.id)))}
+            className="text-cream/80 underline-offset-2 hover:text-cream hover:underline"
+          >
+            Select all ({filtered.length})
+          </button>
+          {exportCountSelected > 0 && (
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="text-cream/80 underline-offset-2 hover:text-cream hover:underline"
+            >
+              Clear
+            </button>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => openExportDialog("selected")}
+              disabled={exportCountSelected === 0}
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-cream px-3 text-xs font-semibold text-forest-900 transition-colors hover:bg-white disabled:opacity-50"
+            >
+              <Download className="h-3.5 w-3.5" aria-hidden /> Export selected
+            </button>
+            <button
+              onClick={exitSelectMode}
+              className="inline-flex h-8 items-center rounded-lg border border-cream/30 px-3 text-xs font-medium text-cream transition-colors hover:bg-white/10"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* List, board, or map */}
       {view === "board" ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -803,16 +877,42 @@ export default function CaseList({
               !!otherCentre ||
               !!c.duplicate_of ||
               !!c.assigned_to;
+            const isSelected = selectedIds.has(c.id);
             return (
               <li
                 key={c.id}
                 id={`case-${c.id}`}
-                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""}`}
+                className={`scroll-mt-24 ${
+                  selectMode && isSelected
+                    ? "bg-forest-900/[0.04]"
+                    : expanded
+                      ? "bg-stone-50/60"
+                      : ""
+                }`}
               >
                 <button
-                  onClick={() => setExpandedId(expanded ? null : c.id)}
+                  onClick={() =>
+                    selectMode
+                      ? toggleSelect(c.id)
+                      : setExpandedId(expanded ? null : c.id)
+                  }
+                  aria-pressed={selectMode ? isSelected : undefined}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
                 >
+                  {selectMode && (
+                    <span
+                      aria-hidden
+                      className={`mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                        isSelected
+                          ? "border-forest-900 bg-forest-900 text-white"
+                          : "border-stone-300 bg-white"
+                      }`}
+                    >
+                      {isSelected && (
+                        <Check className="h-3.5 w-3.5" aria-hidden />
+                      )}
+                    </span>
+                  )}
                   <span
                     className={`w-[72px] shrink-0 rounded-full py-0.5 text-center text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
                   >
@@ -856,12 +956,14 @@ export default function CaseList({
                   <span className="hidden shrink-0 text-xs leading-5 text-stone-400 sm:block">
                     <LocalTime iso={c.created_at} />
                   </span>
-                  <span
-                    aria-hidden
-                    className={`shrink-0 text-sm leading-5 text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
-                  >
-                    ▾
-                  </span>
+                  {!selectMode && (
+                    <span
+                      aria-hidden
+                      className={`shrink-0 text-sm leading-5 text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    >
+                      ▾
+                    </span>
+                  )}
                 </button>
 
                 {expanded && (
