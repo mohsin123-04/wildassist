@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Building2, ChevronDown } from "lucide-react";
 import Spinner from "@/components/Spinner";
+import Select from "@/components/Select";
 import { FACILITY_TYPES, type FacilityType } from "@/lib/centres";
 
 type CentreRow = {
@@ -117,17 +118,15 @@ export default function AdminCentres() {
                 onChange={(e) => setAddress(e.target.value)}
               />
               <div className="grid gap-3 sm:grid-cols-2">
-                <select
-                  className={inputClass + " px-3"}
+                <Select
                   value={type}
-                  onChange={(e) => setType(e.target.value as FacilityType)}
-                >
-                  {Object.entries(FACILITY_TYPES).map(([v, label]) => (
-                    <option key={v} value={v}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setType(v as FacilityType)}
+                  ariaLabel="Facility type"
+                  options={Object.entries(FACILITY_TYPES).map(([v, label]) => ({
+                    value: v,
+                    label,
+                  }))}
+                />
                 <label className="flex h-11 items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 text-sm text-stone-700">
                   <input
                     type="checkbox"

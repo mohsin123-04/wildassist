@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
+import Select from "@/components/Select";
 
 type CentreOption = { id: string; name: string; town: string };
 
@@ -48,21 +49,19 @@ export default function CentreOnboarding({
       </p>
 
       <div className="mt-5 flex flex-col gap-3">
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-stone-700">Centre</span>
-          <select
+          <Select
             value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            className="h-11 w-full rounded-xl border border-stone-200 bg-white px-3 outline-none focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5"
-          >
-            <option value="">Select a centre…</option>
-            {centres.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} ({c.town})
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={setSelected}
+            placeholder="Select a centre…"
+            ariaLabel="Centre"
+            options={centres.map((c) => ({
+              value: c.id,
+              label: `${c.name} (${c.town})`,
+            }))}
+          />
+        </div>
 
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-stone-700">Join code</span>

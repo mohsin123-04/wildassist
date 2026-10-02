@@ -10,6 +10,7 @@ import ShareCase from "@/components/ShareCase";
 import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
 import LocalTime from "@/components/LocalTime";
+import Select from "@/components/Select";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -683,18 +684,19 @@ export default function CaseList({
             </Chip>
           ))}
         </div>
-        <label className="shrink-0">
-          <span className="sr-only">Sort cases</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="h-9 rounded-lg border border-stone-200 bg-white px-2.5 text-sm text-stone-700 outline-none focus:border-emerald-400"
-          >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="urgent">Most urgent</option>
-          </select>
-        </label>
+        <Select
+          value={sortBy}
+          onChange={(v) => setSortBy(v as typeof sortBy)}
+          ariaLabel="Sort cases"
+          align="right"
+          size="sm"
+          className="w-36 shrink-0"
+          options={[
+            { value: "newest", label: "Newest first" },
+            { value: "oldest", label: "Oldest first" },
+            { value: "urgent", label: "Most urgent" },
+          ]}
+        />
       </div>
 
       {/* List, board, or map */}
@@ -986,20 +988,21 @@ export default function CaseList({
                       ) : (
                         <label className="ml-auto flex items-center gap-2 text-sm text-stone-500">
                           Status
-                          <select
+                          <Select
                             value={c.status}
-                            disabled={savingId === c.id}
-                            onChange={(e) =>
-                              updateStatus(c.id, e.target.value as CaseRow["status"])
+                            onChange={(v) =>
+                              updateStatus(c.id, v as CaseRow["status"])
                             }
-                            className="rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-800 outline-none focus:border-emerald-400 disabled:opacity-50"
-                          >
-                            {STATUSES.map((s) => (
-                              <option key={s.value} value={s.value}>
-                                {s.label}
-                              </option>
-                            ))}
-                          </select>
+                            disabled={savingId === c.id}
+                            ariaLabel="Case status"
+                            align="right"
+                            size="sm"
+                            className="w-32"
+                            options={STATUSES.map((s) => ({
+                              value: s.value,
+                              label: s.label,
+                            }))}
+                          />
                         </label>
                       )}
                     </div>
@@ -1064,28 +1067,25 @@ export default function CaseList({
                     {/* Assignment */}
                     {teammates.length > 0 && (
                       <div className="mt-4 border-t border-stone-100 pt-3">
-                        <label
-                          htmlFor={`assign-${c.id}`}
-                          className="text-xs font-semibold uppercase tracking-wide text-stone-500"
-                        >
+                        <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
                           Assigned to
-                        </label>
-                        <select
-                          id={`assign-${c.id}`}
-                          value={c.assigned_to ?? ""}
-                          onChange={(e) =>
-                            assignCase(c.id, e.target.value || null)
-                          }
-                          className="mt-1 block h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-stone-700 outline-none focus:border-emerald-400"
-                        >
-                          <option value="">Unassigned</option>
-                          {teammates.map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.full_name || "A teammate"}
-                              {t.id === myId ? " (me)" : ""}
-                            </option>
-                          ))}
-                        </select>
+                        </p>
+                        <div className="mt-1">
+                          <Select
+                            value={c.assigned_to ?? ""}
+                            onChange={(v) => assignCase(c.id, v || null)}
+                            ariaLabel="Assign case to a teammate"
+                            options={[
+                              { value: "", label: "Unassigned" },
+                              ...teammates.map((t) => ({
+                                value: t.id,
+                                label:
+                                  (t.full_name || "A teammate") +
+                                  (t.id === myId ? " (me)" : ""),
+                              })),
+                            ]}
+                          />
+                        </div>
                       </div>
                     )}
 

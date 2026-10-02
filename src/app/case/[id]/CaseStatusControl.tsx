@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
+import Select from "@/components/Select";
 
 const STATUSES = [
   { value: "reported", label: "Reported" },
@@ -46,18 +47,16 @@ export default function CaseStatusControl({
   return (
     <label className="flex items-center gap-2 text-sm text-stone-600">
       Status
-      <select
+      <Select
         value={status}
+        onChange={(v) => update(v as Status)}
         disabled={saving}
-        onChange={(e) => update(e.target.value as Status)}
-        className="rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-800 outline-none focus:border-emerald-400 disabled:opacity-50"
-      >
-        {STATUSES.map((s) => (
-          <option key={s.value} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+        ariaLabel="Case status"
+        align="right"
+        size="sm"
+        className="w-32"
+        options={STATUSES.map((s) => ({ value: s.value, label: s.label }))}
+      />
     </label>
   );
 }
