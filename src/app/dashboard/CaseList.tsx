@@ -11,11 +11,7 @@ import CaseTimeline from "@/components/CaseTimeline";
 import CaseNotes from "@/components/CaseNotes";
 import LocalTime from "@/components/LocalTime";
 import Select from "@/components/Select";
-import {
-  setExportApi,
-  type ExportScope,
-  type ExportCase,
-} from "@/lib/exportStore";
+import { setExportApi, type ExportScope } from "@/lib/exportStore";
 
 /** "3h ago", "2d ago", etc. */
 function timeAgo(iso: string): string {
@@ -354,14 +350,11 @@ export default function CaseList({
     exportData(casesForScope(exportScope), exportScope);
   }
 
-  // Routes a scope (preset, custom range, or hand-picked ids) to its rows.
-  function doExport(
-    scope: ExportScope,
-    opts?: { range?: { from: string; to: string }; ids?: string[] }
-  ) {
+  // Routes a scope (a preset, or a custom date range) to its rows + filename.
+  function doExport(scope: ExportScope, range?: { from: string; to: string }) {
     if (scope === "custom") {
-      const from = opts?.range?.from ?? "";
-      const to = opts?.range?.to ?? "";
+      const from = range?.from ?? "";
+      const to = range?.to ?? "";
       const suffix =
         from && to
           ? `${from}_to_${to}`
@@ -371,12 +364,6 @@ export default function CaseList({
               ? `to_${to}`
               : "custom";
       exportData(casesForRange(from, to), suffix);
-    } else if (scope === "selected") {
-      const ids = new Set(opts?.ids ?? []);
-      exportData(
-        cases.filter((c) => ids.has(c.id)),
-        "selected"
-      );
     } else {
       exportCsv(scope);
     }
@@ -395,17 +382,6 @@ export default function CaseList({
   const exportCountWeek = casesForScope("week").length;
   const exportCountMonth = casesForScope("month").length;
   const exportCountYear = casesForScope("year").length;
-  // Lightweight list for the dialog's "pick specific cases" checklist. Memoised
-  // so the published api only changes when the underlying cases do.
-  const exportCases = useMemo<ExportCase[]>(
-    () =>
-      cases.map((c) => ({
-        id: c.id,
-        label: `${c.animal} · ${c.title ?? c.situation.replace(/-/g, " ")}`,
-        when: c.created_at,
-      })),
-    [cases]
-  );
   useEffect(() => {
     setExportApi({
       counts: {
@@ -415,9 +391,8 @@ export default function CaseList({
         month: exportCountMonth,
         year: exportCountYear,
       },
-      cases: exportCases,
       countForRange: (from, to) => casesForRangeRef.current(from, to).length,
-      run: (scope, opts) => doExportRef.current(scope, opts),
+      run: (scope, range) => doExportRef.current(scope, range),
     });
     return () => setExportApi(null);
   }, [
@@ -426,7 +401,6 @@ export default function CaseList({
     exportCountWeek,
     exportCountMonth,
     exportCountYear,
-    exportCases,
   ]);
 
   async function updateStatus(id: string, status: CaseRow["status"]) {

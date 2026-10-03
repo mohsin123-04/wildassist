@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, Download, Search, X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import type { ExportApi, ExportScope, PresetScope } from "@/lib/exportStore";
 
 const GROUPS: {
@@ -13,7 +13,11 @@ const GROUPS: {
     group: "All or filtered",
     items: [
       { scope: "all", label: "Everything", desc: "Every case you can see" },
-      { scope: "view", label: "Current view", desc: "Matches your filters" },
+      {
+        scope: "view",
+        label: "Current view",
+        desc: "What your filters & search show — narrow it on the dashboard",
+      },
     ],
   },
   {
@@ -46,9 +50,6 @@ export default function ExportDialog({
   );
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
-  // Hand-picked case ids + the picker's search box.
-  const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [caseSearch, setCaseSearch] = useState("");
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,29 +59,11 @@ export default function ExportDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const query = caseSearch.trim().toLowerCase();
-  const shownCases = query
-    ? api.cases.filter((c) => c.label.toLowerCase().includes(query))
-    : api.cases;
-  function togglePick(id: string) {
-    setPicked((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
   const customRangeSet = Boolean(customFrom || customTo);
   const customCount = customRangeSet
     ? api.countForRange(customFrom, customTo)
     : 0;
-  const selectedCount =
-    scope === "custom"
-      ? customCount
-      : scope === "selected"
-        ? picked.size
-        : api.counts[scope];
+  const selectedCount = scope === "custom" ? customCount : api.counts[scope];
   const filename =
     scope === "custom"
       ? `wildassist-cases-${
@@ -92,15 +75,11 @@ export default function ExportDialog({
                 ? `to_${customTo}`
                 : "custom"
         }.csv`
-      : scope === "selected"
-        ? "wildassist-cases-selected.csv"
-        : `wildassist-cases-${scope}.csv`;
+      : `wildassist-cases-${scope}.csv`;
 
   function download() {
     if (selectedCount === 0) return;
-    if (scope === "custom")
-      api.run("custom", { range: { from: customFrom, to: customTo } });
-    else if (scope === "selected") api.run("selected", { ids: [...picked] });
+    if (scope === "custom") api.run("custom", { from: customFrom, to: customTo });
     else api.run(scope);
     onClose();
   }
@@ -247,136 +226,6 @@ export default function ExportDialog({
                       aria-label="To date"
                       className="h-9 min-w-0 flex-1 rounded-lg border border-stone-200 bg-white px-2 text-sm text-stone-700 outline-none focus:border-emerald-400"
                     />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-stone-400">
-                Specific cases
-              </p>
-              <div className="mt-1.5">
-                <button
-                  type="button"
-                  onClick={() => setScope("selected")}
-                  className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                    scope === "selected"
-                      ? "border-forest-900 bg-forest-900/[0.04]"
-                      : "border-stone-200 hover:bg-stone-50"
-                  }`}
-                >
-                  <span
-                    aria-hidden
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                      scope === "selected"
-                        ? "border-forest-900"
-                        : "border-stone-300"
-                    }`}
-                  >
-                    {scope === "selected" && (
-                      <span className="h-2 w-2 rounded-full bg-forest-900" />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium text-stone-800">
-                      Pick specific cases
-                    </span>
-                    <span className="block text-xs text-stone-500">
-                      Tick the exact cases you want
-                    </span>
-                  </span>
-                  {scope === "selected" && picked.size > 0 && (
-                    <span className="shrink-0 text-xs font-medium tabular-nums text-stone-400">
-                      {picked.size}
-                    </span>
-                  )}
-                </button>
-                {scope === "selected" && (
-                  <div className="mt-2">
-                    <div className="relative">
-                      <Search
-                        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
-                        aria-hidden
-                      />
-                      <input
-                        value={caseSearch}
-                        onChange={(e) => setCaseSearch(e.target.value)}
-                        placeholder="Search cases…"
-                        aria-label="Search cases to export"
-                        className="h-9 w-full rounded-lg border border-stone-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-emerald-400"
-                      />
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between px-0.5 text-xs">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPicked(
-                            (prev) =>
-                              new Set([
-                                ...prev,
-                                ...shownCases.map((c) => c.id),
-                              ])
-                          )
-                        }
-                        className="font-medium text-forest-900 hover:underline"
-                      >
-                        Select all
-                        {query
-                          ? ` shown (${shownCases.length})`
-                          : ` (${api.cases.length})`}
-                      </button>
-                      {picked.size > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setPicked(new Set())}
-                          className="font-medium text-stone-500 hover:underline"
-                        >
-                          Clear
-                        </button>
-                      )}
-                    </div>
-                    <div className="mt-1.5 max-h-44 overflow-y-auto rounded-xl border border-stone-200">
-                      {shownCases.length === 0 ? (
-                        <p className="px-3 py-6 text-center text-xs text-stone-400">
-                          No cases match.
-                        </p>
-                      ) : (
-                        shownCases.map((c, i) => {
-                          const on = picked.has(c.id);
-                          return (
-                            <button
-                              key={c.id}
-                              type="button"
-                              onClick={() => togglePick(c.id)}
-                              className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-stone-50 ${
-                                i > 0 ? "border-t border-stone-100" : ""
-                              }`}
-                            >
-                              <span
-                                aria-hidden
-                                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
-                                  on
-                                    ? "border-forest-900 bg-forest-900 text-white"
-                                    : "border-stone-300 bg-white"
-                                }`}
-                              >
-                                {on && <Check className="h-3 w-3" aria-hidden />}
-                              </span>
-                              <span className="min-w-0 flex-1 truncate text-sm text-stone-800">
-                                {c.label}
-                              </span>
-                              <span className="shrink-0 text-[11px] text-stone-400">
-                                {new Date(c.when).toLocaleDateString(undefined, {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </span>
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
                   </div>
                 )}
               </div>

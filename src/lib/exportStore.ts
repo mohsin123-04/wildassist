@@ -1,24 +1,16 @@
 import { useSyncExternalStore } from "react";
 
 export type PresetScope = "all" | "view" | "week" | "month" | "year";
-export type ExportScope = PresetScope | "custom" | "selected";
-
-/** A case, lightweight, for the in-dialog "pick specific cases" checklist. */
-export type ExportCase = { id: string; label: string; when: string };
+export type ExportScope = PresetScope | "custom";
 
 export type ExportApi = {
   /** How many cases each preset scope would export, for the live counts. */
   counts: Record<PresetScope, number>;
-  /** The visible cases, for the "pick specific cases" checklist in the dialog. */
-  cases: ExportCase[];
   /** How many cases fall in a custom date range (yyyy-mm-dd; either may be ""). */
   countForRange: (from: string, to: string) => number;
-  /** Run the export (downloads the CSV + shows a toast). Pass a custom range's
-   *  from/to dates, or the ids picked for a manual selection. */
-  run: (
-    scope: ExportScope,
-    opts?: { range?: { from: string; to: string }; ids?: string[] }
-  ) => void;
+  /** Run the export (downloads the CSV + shows a toast). A custom range passes
+   *  its from/to dates. */
+  run: (scope: ExportScope, range?: { from: string; to: string }) => void;
 };
 
 /**
