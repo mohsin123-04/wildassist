@@ -793,7 +793,7 @@ export default function CaseList({
         </div>
       ) : (
         <ul className="divide-y divide-stone-200 border-y border-stone-200">
-          {filtered.map((c) => {
+          {filtered.map((c, i) => {
             const expanded = expandedId === c.id;
             const isMine = c.centre_id === myCentreId;
             const otherCentre =
@@ -807,11 +807,17 @@ export default function CaseList({
               <li
                 key={c.id}
                 id={`case-${c.id}`}
-                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""}`}
+                className={`scroll-mt-24 ${
+                  expanded
+                    ? "bg-stone-50/60"
+                    : i % 2 === 1
+                      ? "bg-moss-300/25"
+                      : ""
+                }`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : c.id)}
-                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-50"
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-900/[0.03]"
                 >
                   <span
                     className={`w-[72px] shrink-0 rounded-full py-0.5 text-center text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
