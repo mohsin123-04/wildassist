@@ -852,10 +852,23 @@ export default function CaseList({
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-200 border-y border-stone-200">
+        <>
+        <div className="flex items-center gap-3 border-b border-stone-200 px-4 py-2">
+          <span className="w-[72px] shrink-0 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+            Status
+          </span>
+          <span className="min-w-0 flex-1 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+            Animal / case
+          </span>
+          <span className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-wider text-stone-400 sm:block">
+            Reported
+          </span>
+          <span className="w-4 shrink-0" aria-hidden />
+        </div>
+        <ul className="divide-y divide-stone-200">
           {filtered.map((c, i) => {
             const expanded = expandedId === c.id;
-            const dark = i % 2 === 1 && !expanded;
+            const alt = i % 2 === 1 && !expanded;
             const isMine = c.centre_id === myCentreId;
             const otherCentre =
               c.centre_id && !isMine ? centreNames[c.centre_id] : null;
@@ -870,15 +883,11 @@ export default function CaseList({
               <li
                 key={c.id}
                 id={`case-${c.id}`}
-                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : ""}`}
+                className={`scroll-mt-24 ${expanded ? "bg-stone-50/60" : alt ? "bg-muted/60" : ""}`}
               >
                 <button
                   onClick={() => setExpandedId(expanded ? null : c.id)}
-                  className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors ${
-                    dark
-                      ? "bg-forest-900 hover:bg-forest-800"
-                      : "hover:bg-stone-900/[0.03]"
-                  }`}
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-stone-900/[0.03]"
                 >
                   <span
                     className={`w-[72px] shrink-0 rounded-full py-0.5 text-center text-[11px] font-semibold leading-5 ${VERDICT_BADGE[c.verdict]}`}
@@ -886,14 +895,10 @@ export default function CaseList({
                     {c.verdict}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p
-                      className={`truncate text-sm ${dark ? "text-cream" : "text-stone-900"}`}
-                    >
+                    <p className="truncate text-sm text-stone-900">
                       <span className="font-medium capitalize">{c.animal}</span>
-                      <span className={dark ? "text-cream/40" : "text-stone-300"}>
-                        {" · "}
-                      </span>
-                      <span className={dark ? "text-cream/80" : "text-stone-600"}>
+                      <span className="text-stone-300">{" · "}</span>
+                      <span className="text-stone-600">
                         {c.title ?? c.situation.replace(/-/g, " ")}
                       </span>
                     </p>
@@ -932,14 +937,12 @@ export default function CaseList({
                       </div>
                     )}
                   </div>
-                  <span
-                    className={`hidden shrink-0 text-xs leading-5 sm:block ${dark ? "text-cream/60" : "text-stone-400"}`}
-                  >
+                  <span className="hidden shrink-0 text-xs leading-5 text-stone-400 sm:block">
                     <LocalTime iso={c.created_at} />
                   </span>
                   <span
                     aria-hidden
-                    className={`shrink-0 text-sm leading-5 transition-transform ${dark ? "text-cream/50" : "text-stone-400"} ${expanded ? "rotate-180" : ""}`}
+                    className={`shrink-0 text-sm leading-5 text-stone-400 transition-transform ${expanded ? "rotate-180" : ""}`}
                   >
                     ▾
                   </span>
@@ -1199,6 +1202,7 @@ export default function CaseList({
             );
           })}
         </ul>
+        </>
       )}
       </div>
 
