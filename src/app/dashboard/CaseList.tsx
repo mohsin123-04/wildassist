@@ -573,7 +573,7 @@ export default function CaseList({
       {/* Search, filters, and the cases */}
       <div className="area-list flex min-w-0 flex-col gap-5">
       {/* Rescue vs deceased (surveillance) queue. */}
-      <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200 self-start">
+      <div className="grid grid-cols-2 gap-2">
         {(
           [
             ["rescue", "Rescues", kindCounts.rescue],
@@ -583,19 +583,17 @@ export default function CaseList({
           <button
             key={k}
             onClick={() => selectKind(k)}
-            className={`flex items-center justify-center gap-1.5 px-4 text-sm font-medium transition-colors ${
+            className={`rounded-xl border p-3 text-left transition-colors ${
               kindTab === k
-                ? "bg-forest-900 text-white"
-                : "bg-white text-stone-600 hover:bg-stone-50"
+                ? "border-stone-300 bg-muted"
+                : "border-stone-200 bg-white hover:bg-stone-50"
             }`}
           >
-            {label}
-            <span
-              className={`text-xs tabular-nums ${
-                kindTab === k ? "text-white/70" : "text-stone-400"
-              }`}
-            >
+            <span className="block font-display text-2xl font-semibold tabular-nums text-stone-900">
               {n}
+            </span>
+            <span className="mt-0.5 block text-xs font-medium text-stone-500">
+              {label}
             </span>
           </button>
         ))}
