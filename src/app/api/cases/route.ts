@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
     lat?: number;
     lng?: number;
     photoUrl?: string;
+    kind?: string;
+    surveillance?: string[];
   };
   try {
     body = await req.json();
@@ -123,10 +125,26 @@ export async function POST(req: NextRequest) {
     photoUrl,
   } = body;
 
+  // A deceased-animal report is a surveillance case, not a rehab intake: it has
+  // a fixed situation/verdict, isn't routed to a centre, and carries any health
+  // flags from lib/surveillance.ts. Everything else is the normal rescue flow.
+  const kind = body.kind === "deceased" ? "deceased" : "rescue";
+  const isDeceased = kind === "deceased";
+
+  const VALID_SURVEILLANCE = ["avian-flu", "rabies", "cwd", "die-off"];
+  const safeSurveillance =
+    isDeceased && Array.isArray(body.surveillance)
+      ? body.surveillance.filter((s) => VALID_SURVEILLANCE.includes(s)).slice(0, 8)
+      : null;
+
   const animalOk =
     typeof animal === "string" && animal.trim().length > 0 && animal.length <= 60;
-  const situationOk = SITUATIONS.some((s) => s.value === situation);
-  const verdictOk = ["leave", "help", "uncertain"].includes(verdict ?? "");
+  const situationOk = isDeceased
+    ? situation === "found-dead"
+    : SITUATIONS.some((s) => s.value === situation);
+  const verdictOk = isDeceased
+    ? verdict === "deceased"
+    : ["leave", "help", "uncertain"].includes(verdict ?? "");
   if (!animalOk || !situationOk || !verdictOk) {
     return Response.json({ error: "Invalid case data" }, { status: 400 });
   }
@@ -163,7 +181,7 @@ export async function POST(req: NextRequest) {
   > | null = null;
   // A short, honest explanation of the routing choice, shown to the finder.
   let routingNote: string | null = null;
-  if (typeof lat === "number" && typeof lng === "number") {
+  if (!isDeceased && typeof lat === "number" && typeof lng === "number") {
     let claimedIds: string[] | null = null;
     if (ROUTE_ONLY_ONBOARDED) {
       const { data: staffRows } = await supabase
@@ -259,7 +277,7 @@ export async function POST(req: NextRequest) {
   // "raccoon") and the radius/window live in lib/dedup. Flag it so staff can
   // merge or dismiss rather than dispatching twice for one animal.
   let duplicateOf: string | null = null;
-  if (typeof lat === "number" && typeof lng === "number") {
+  if (!isDeceased && typeof lat === "number" && typeof lng === "number") {
     const since = new Date(
       Date.now() - DUP_WINDOW_HOURS * 60 * 60 * 1000
     ).toISOString();
@@ -292,6 +310,8 @@ export async function POST(req: NextRequest) {
       photo_url: safePhotoUrl,
       duplicate_of: duplicateOf,
       track_token: trackToken,
+      kind,
+      surveillance: safeSurveillance,
     })
     .select("id")
     .single();

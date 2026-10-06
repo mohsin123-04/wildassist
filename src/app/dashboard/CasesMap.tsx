@@ -8,6 +8,7 @@ const VERDICT_COLOR: Record<CaseRow["verdict"], string> = {
   help: "#e11d48",
   leave: "#059669",
   uncertain: "#d97706",
+  deceased: "#78716c",
 };
 
 export default function CasesMap({

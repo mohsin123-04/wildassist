@@ -58,7 +58,7 @@ export default async function DashboardPage() {
     supabase
       .from("cases")
       .select(
-        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of, assigned_to"
+        "id, created_at, animal, situation, verdict, title, status, description, lat, lng, reporter_name, reporter_phone, staff_notes, centre_id, photo_url, driver_id, driver_name, duplicate_of, assigned_to, kind, surveillance"
       )
       .order("created_at", { ascending: false }),
   ]);

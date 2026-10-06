@@ -11,9 +11,10 @@ import NearbyHelp from "@/components/NearbyHelp";
 import SafetyBanner from "@/components/SafetyBanner";
 import Spinner from "@/components/Spinner";
 import AnimalIcon from "@/components/AnimalIcon";
-import { Camera, Images, MapPin, ChevronRight } from "lucide-react";
+import { Camera, Images, MapPin, ChevronRight, HeartPulse, Leaf } from "lucide-react";
 import { flash } from "@/lib/flash";
 import { detectDanger, type DangerInfo } from "@/lib/safety";
+import { assessDeceased, type DeceasedAssessment } from "@/lib/surveillance";
 import {
   ANIMAL_OPTIONS,
   SITUATIONS,
@@ -24,7 +25,8 @@ import {
   type Recommendation,
 } from "@/lib/triage";
 
-type Step = "animal" | "situation" | "details" | "result";
+type Step = "intro" | "animal" | "situation" | "details" | "result";
+type Mode = "rescue" | "deceased";
 type Result = Recommendation & { source?: "ai" | "rules" };
 type AssignedCentre = {
   id: string;
@@ -35,10 +37,15 @@ type AssignedCentre = {
 };
 type LocStatus = "idle" | "locating" | "done" | "denied";
 
-const STEP_ORDER: Step[] = ["animal", "situation", "details", "result"];
+// The progress bar covers the input steps + result. A deceased report skips the
+// "what's wrong" situation step (it's already dead), so its track is shorter.
+const STEP_ORDER_RESCUE: Step[] = ["animal", "situation", "details", "result"];
+const STEP_ORDER_DECEASED: Step[] = ["animal", "details", "result"];
 
 export default function TriagePage() {
-  const [step, setStep] = useState<Step>("animal");
+  const [step, setStep] = useState<Step>("intro");
+  const [mode, setMode] = useState<Mode>("rescue");
+  const [assessment, setAssessment] = useState<DeceasedAssessment | null>(null);
   const [domestic, setDomestic] = useState(false);
   const [animalOption, setAnimalOption] = useState<AnimalOption | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
@@ -63,7 +70,10 @@ export default function TriagePage() {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const stepIndex = STEP_ORDER.indexOf(step);
+  const stepOrder = mode === "deceased" ? STEP_ORDER_DECEASED : STEP_ORDER_RESCUE;
+  const stepIndex = stepOrder.indexOf(step);
+  // Input steps are everything before "result"; used for the "Step N of M" label.
+  const inputStepCount = stepOrder.length - 1;
 
 
   // ---- Draft persistence: an interrupted report survives a refresh. --------
@@ -74,17 +84,22 @@ export default function TriagePage() {
       const raw = sessionStorage.getItem("wa_triage_draft");
       if (!raw) return;
       const d = JSON.parse(raw) as {
-        at: number; step?: Step; animal?: string | null;
+        at: number; step?: Step; mode?: Mode; animal?: string | null;
         situation?: Situation | null; description?: string;
       };
       if (!d.at || Date.now() - d.at > 60 * 60 * 1000) return;
       const opt = d.animal
         ? ANIMAL_OPTIONS.find((o) => o.value === d.animal) ?? null
         : null;
+      if (d.mode === "deceased") setMode("deceased");
       if (opt) setAnimalOption(opt);
       if (d.situation) setSituation(d.situation);
       if (d.description) setDescription(d.description);
-      if (d.step && d.step !== "result" && (d.step === "animal" || opt)) {
+      if (
+        d.step &&
+        d.step !== "result" &&
+        (d.step === "intro" || d.step === "animal" || opt)
+      ) {
         setStep(d.step);
       }
     } catch {
@@ -106,6 +121,7 @@ export default function TriagePage() {
         JSON.stringify({
           at: Date.now(),
           step,
+          mode,
           animal: animalOption?.value ?? null,
           situation,
           description,
@@ -114,7 +130,7 @@ export default function TriagePage() {
     } catch {
       // storage unavailable, fine
     }
-  }, [step, animalOption, situation, description]);
+  }, [step, mode, animalOption, situation, description]);
 
   function reset() {
     setAnimalOption(null);
@@ -135,7 +151,9 @@ export default function TriagePage() {
     setRoutingNote(null);
     setAssignedCentre(null);
     setDomestic(false);
-    setStep("animal");
+    setMode("rescue");
+    setAssessment(null);
+    setStep("intro");
   }
 
   function onPhotoPick(e: React.ChangeEvent<HTMLInputElement>) {
@@ -189,7 +207,8 @@ export default function TriagePage() {
   }
 
   async function submit() {
-    if (!animalOption || !situation) return;
+    if (!animalOption) return;
+    if (mode === "rescue" && !situation) return;
     setLoading(true);
     setSaveError(false);
     const category = animalOption.category;
@@ -198,11 +217,7 @@ export default function TriagePage() {
     if (description.trim()) parts.push(description.trim());
     const fullDescription = parts.join(" ");
 
-    // Deterministic safety check across everything we know about the animal.
-    const d = danger ?? detectDanger(description, photoHint, animalOption.label);
-    if (d) setDanger(d);
-
-    // Upload the animal photo first (best-effort).
+    // Upload the animal photo first (best-effort), shared by both flows.
     let photoUrl: string | undefined;
     if (photoFile) {
       try {
@@ -215,6 +230,58 @@ export default function TriagePage() {
         // keep going without the photo
       }
     }
+
+    // Deceased report: a surveillance case, no care advice or centre routing.
+    // The assessment is deterministic (lib/surveillance.ts); we just log it with
+    // its health flags and location.
+    if (mode === "deceased") {
+      const assess = assessDeceased(category, fullDescription);
+      setAssessment(assess);
+      const title =
+        animalOption.value === "unsure"
+          ? "Deceased animal"
+          : `Deceased ${animalOption.label.toLowerCase()}`;
+      try {
+        const r = await fetch("/api/cases", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            animal: animalOption.label,
+            category,
+            situation: "found-dead",
+            description: fullDescription,
+            verdict: "deceased",
+            title,
+            lat: coords?.lat,
+            lng: coords?.lng,
+            photoUrl,
+            kind: "deceased",
+            surveillance: assess.risks.map((r) => r.code),
+          }),
+        });
+        const d = r.ok ? await r.json() : null;
+        if (d?.id) {
+          setCaseId(d.id);
+          if (d.trackToken) setTrackToken(d.trackToken);
+        } else {
+          setSaveError(true);
+        }
+      } catch {
+        setSaveError(true);
+      }
+      setLoading(false);
+      setStep("result");
+      return;
+    }
+
+    // ---- Rescue flow (live animal) -----------------------------------------
+    if (!situation) {
+      setLoading(false);
+      return;
+    }
+    // Deterministic safety check across everything we know about the animal.
+    const d = danger ?? detectDanger(description, photoHint, animalOption.label);
+    if (d) setDanger(d);
 
     // Get the care advice.
     let advice: Result;
@@ -281,16 +348,84 @@ export default function TriagePage() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-5 py-8">
       {/* Progress */}
-      <div className="mb-8 flex items-center gap-1.5">
-        {STEP_ORDER.map((s, i) => (
-          <div
-            key={s}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i <= stepIndex ? "bg-forest-900" : "bg-stone-200"
-            }`}
-          />
-        ))}
-      </div>
+      {step !== "intro" && (
+        <div className="mb-8 flex items-center gap-1.5">
+          {stepOrder.map((s, i) => (
+            <div
+              key={s}
+              className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+                i <= stepIndex ? "bg-forest-900" : "bg-stone-200"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      {step === "intro" && (
+        <Section
+          key="intro"
+          eyebrow="Report an animal"
+          title="Is the animal alive?"
+          subtitle="This tells us whether to guide a rescue or log it for wildlife-health tracking."
+        >
+          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
+            <button
+              onClick={() => {
+                setMode("rescue");
+                setStep("animal");
+              }}
+              className="group flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-stone-50"
+            >
+              <HeartPulse className="h-6 w-6 shrink-0 text-emerald-700" aria-hidden />
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-stone-900">
+                  It&apos;s alive but injured, sick, or in trouble
+                </span>
+                <span className="block text-sm leading-snug text-stone-500">
+                  Get step-by-step care advice and route it to the nearest
+                  wildlife centre.
+                </span>
+              </span>
+              <ChevronRight
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
+              />
+            </button>
+            <button
+              onClick={() => {
+                setMode("deceased");
+                setStep("animal");
+              }}
+              className="group flex w-full items-center gap-4 border-t border-stone-100 px-4 py-4 text-left transition-colors hover:bg-stone-50"
+            >
+              <Leaf className="h-6 w-6 shrink-0 text-stone-500" aria-hidden />
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-stone-900">
+                  It has died
+                </span>
+                <span className="block text-sm leading-snug text-stone-500">
+                  Report a dead animal so it can be tracked for disease and
+                  handled safely.
+                </span>
+              </span>
+              <ChevronRight
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-stone-300 transition-all group-hover:translate-x-0.5 group-hover:text-stone-500"
+              />
+            </button>
+          </div>
+
+          <p className="mt-4 border-t border-stone-100 pt-4 text-sm text-stone-500">
+            Not a wild animal?{" "}
+            <button
+              onClick={() => setDomestic(true)}
+              className="font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-700"
+            >
+              It&apos;s a pet, or a dog or cat
+            </button>
+          </p>
+        </Section>
+      )}
 
       {animalOption &&
         (step === "situation" || step === "details") && (
@@ -319,9 +454,10 @@ export default function TriagePage() {
       {step === "animal" && (
         <Section
           key="animal"
-          eyebrow="Step 1 of 3"
-          title="What did you find?"
+          eyebrow={`Step 1 of ${inputStepCount}`}
+          title={mode === "deceased" ? "What is the animal?" : "What did you find?"}
           subtitle="Pick the closest match. It's okay to guess."
+          onBack={() => setStep("intro")}
         >
           <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
             {ANIMAL_OPTIONS.map((a, i) => (
@@ -329,7 +465,7 @@ export default function TriagePage() {
                 key={a.value}
                 onClick={() => {
                   setAnimalOption(a);
-                  setStep("situation");
+                  setStep(mode === "deceased" ? "details" : "situation");
                 }}
                 className={`group flex w-full items-center gap-4 px-4 py-4 text-left transition-colors ${
                   i > 0 ? "border-t border-stone-100" : ""
@@ -379,7 +515,7 @@ export default function TriagePage() {
                   );
                   if (match) {
                     setAnimalOption(match);
-                    setStep("situation");
+                    setStep(mode === "deceased" ? "details" : "situation");
                   }
                 }}
               />
@@ -401,7 +537,7 @@ export default function TriagePage() {
       {step === "situation" && (
         <Section
           key="situation"
-          eyebrow="Step 2 of 3"
+          eyebrow={`Step ${stepIndex + 1} of ${inputStepCount}`}
           title="What's going on with it?"
           subtitle="Choose the option that best fits what you're seeing."
           onBack={() => setStep("animal")}
@@ -432,10 +568,14 @@ export default function TriagePage() {
       {step === "details" && (
         <Section
           key="details"
-          eyebrow="Step 3 of 3"
+          eyebrow={`Step ${stepIndex + 1} of ${inputStepCount}`}
           title="Tell us a bit more"
-          subtitle="These help whoever responds. Everything here is optional."
-          onBack={() => setStep("situation")}
+          subtitle={
+            mode === "deceased"
+              ? "These help officials track and handle it. Everything here is optional."
+              : "These help whoever responds. Everything here is optional."
+          }
+          onBack={() => setStep(mode === "deceased" ? "animal" : "situation")}
         >
           {/* Description */}
           <label className="flex flex-col gap-1.5">
@@ -524,8 +664,9 @@ export default function TriagePage() {
               Where is the animal?
             </p>
             <p className="mb-2 text-xs text-stone-500">
-              Sharing your location routes this report and shows the closest
-              help.
+              {mode === "deceased"
+                ? "Sharing the location helps track where animals are dying and flags clusters."
+                : "Sharing your location routes this report and shows the closest help."}
             </p>
             {locStatus === "done" ? (
               <div
@@ -574,12 +715,29 @@ export default function TriagePage() {
             disabled={loading}
             className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-forest-900 px-7 text-sm font-semibold text-white shadow-sm transition-all hover:bg-forest-800 active:scale-[0.98] disabled:opacity-60"
           >
-            {loading ? <Spinner label="Submitting…" /> : "Get help & send report"}
+            {loading ? (
+              <Spinner label="Submitting…" />
+            ) : mode === "deceased" ? (
+              "Submit report"
+            ) : (
+              "Get help & send report"
+            )}
           </button>
         </Section>
       )}
 
-      {step === "result" && animalOption && result && (
+      {step === "result" && mode === "deceased" && animalOption && assessment && (
+        <DeceasedResultView
+          animalLabel={animalOption.label}
+          assessment={assessment}
+          trackToken={trackToken}
+          saveError={saveError}
+          coords={coords}
+          onRestart={reset}
+        />
+      )}
+
+      {step === "result" && mode === "rescue" && animalOption && result && (
         <ResultView
           animal={animalOption.category}
           result={result}
@@ -841,6 +999,171 @@ function ResultView({
         General guidance from an early prototype, not veterinary advice. When in
         doubt, always contact a licensed wildlife rehabilitator.
         {result.source === "rules" && " (Offline guidance mode.)"}
+      </p>
+    </div>
+  );
+}
+
+function DeceasedResultView({
+  animalLabel,
+  assessment,
+  trackToken,
+  saveError,
+  coords,
+  onRestart,
+}: {
+  animalLabel: string;
+  assessment: DeceasedAssessment;
+  trackToken: string | null;
+  saveError: boolean;
+  coords: { lat: number; lng: number } | null;
+  onRestart: () => void;
+}) {
+  const { risks, handling, reporting } = assessment;
+
+  function copyTrackLink() {
+    if (!trackToken) return;
+    const url = `${window.location.origin}/track/${trackToken}`;
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => flash("Tracking link copied"))
+      .catch(() => flash(url));
+  }
+
+  return (
+    <div className="animate-in flex flex-col gap-5">
+      {saveError && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+        >
+          <span className="font-semibold">Your report didn&apos;t save.</span>{" "}
+          The safety guidance below still applies. Please follow it when handling
+          or reporting the animal.
+        </div>
+      )}
+
+      <div className="rounded-2xl border border-stone-200 bg-white p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
+          Report received
+        </p>
+        <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-stone-900">
+          Thank you for reporting this
+        </h1>
+        <p className="mt-2 leading-7 text-stone-700">
+          You logged a deceased {animalLabel.toLowerCase()}
+          {coords ? " with its location" : ""}. Reports like this help
+          wildlife-health teams catch disease and pollution early. Here&apos;s
+          how to stay safe around it and what happens next.
+        </p>
+      </div>
+
+      {risks.length > 0 && (
+        <div>
+          <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
+            Health &amp; safety flags
+          </h2>
+          <div className="flex flex-col gap-3">
+            {risks.map((r) => (
+              <div
+                key={r.code}
+                className="rounded-xl border-l-2 border-amber-400 bg-amber-50/60 p-4"
+              >
+                <p className="font-semibold text-amber-900">{r.label}</p>
+                <p className="mt-1 text-sm leading-6 text-stone-700">{r.why}</p>
+                <p className="mt-1.5 text-sm leading-6 text-stone-800">
+                  <span className="font-medium">What to do:</span> {r.action}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
+          Handling it safely
+        </h2>
+        <ul className="flex flex-col gap-2">
+          {handling.map((h, i) => (
+            <li
+              key={i}
+              className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
+            >
+              <span
+                aria-hidden
+                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-forest-900"
+              />
+              <span className="leading-6 text-stone-700">{h}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
+          What happens next
+        </h2>
+        <ul className="flex flex-col gap-2">
+          {reporting.map((r, i) => (
+            <li
+              key={i}
+              className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
+            >
+              <span
+                aria-hidden
+                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-stone-400"
+              />
+              <span className="leading-6 text-stone-700">{r}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {trackToken && (
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <h2 className="font-display text-lg font-semibold text-stone-900">
+            Follow your report
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            Check its status any time. No account needed, just keep this link.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href={`/track/${trackToken}`}
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+            >
+              View status
+            </Link>
+            <button
+              onClick={copyTrackLink}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50"
+            >
+              Copy link
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-3 pt-1">
+        <button
+          onClick={onRestart}
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-forest-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-forest-800"
+        >
+          Report another
+        </button>
+        <Link
+          href="/"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-stone-200 bg-white px-6 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-50"
+        >
+          Home
+        </Link>
+      </div>
+
+      <p className="text-xs leading-5 text-stone-500">
+        General guidance from an early prototype. If a person or pet was bitten
+        or scratched, or you think there may be a public-health risk, contact
+        your local public-health or wildlife authority directly.
       </p>
     </div>
   );

@@ -38,6 +38,10 @@ export default function Home() {
               you exactly what to do, then connects the animal to the nearest
               help, from rehabilitation centres to vets and hotlines.
             </p>
+            <p className="mt-3 max-w-lg text-base leading-7 text-cream/60">
+              Found one that has already died? You can report that here too, so
+              it&apos;s logged for disease tracking and handled safely.
+            </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
               <Link
                 href="/triage"
@@ -91,8 +95,9 @@ export default function Home() {
                 Three steps, a few minutes
               </h2>
               <p className="mt-4 font-display text-lg italic leading-8 text-stone-500">
-                Not every animal that looks alone or hurt needs rescuing.
-                WildAssist helps you tell the difference.
+                Not every animal that looks alone or hurt needs rescuing, and
+                some are already gone. WildAssist helps with all of it, from a
+                clear rescue plan to reporting a death for disease tracking.
               </p>
             </div>
 

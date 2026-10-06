@@ -42,9 +42,11 @@ export type CaseRow = {
   created_at: string;
   animal: string;
   situation: string;
-  verdict: "leave" | "help" | "uncertain";
+  verdict: "leave" | "help" | "uncertain" | "deceased";
   title: string | null;
   status: "reported" | "in_transit" | "at_centre" | "closed";
+  kind: "rescue" | "deceased";
+  surveillance: string[] | null;
   description: string | null;
   lat: number | null;
   lng: number | null;
@@ -80,6 +82,16 @@ const VERDICT_BADGE: Record<CaseRow["verdict"], string> = {
   help: "bg-rose-100 text-rose-700",
   leave: "bg-emerald-100 text-emerald-700",
   uncertain: "bg-amber-100 text-amber-700",
+  deceased: "bg-stone-200 text-stone-600",
+};
+
+// Short labels for the wildlife-health flags on a deceased report
+// (codes come from lib/surveillance.ts).
+const SURVEILLANCE_LABEL: Record<string, string> = {
+  "avian-flu": "avian flu",
+  rabies: "rabies risk",
+  cwd: "CWD",
+  "die-off": "die-off",
 };
 
 type Scope = "area" | "unassigned" | "open" | "needs-help";
@@ -177,6 +189,9 @@ export default function CaseList({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [mineOnly, setMineOnly] = useState(false);
+  // Rescue vs deceased (surveillance) queue. Deceased reports aren't routed to a
+  // centre, so they live in "Open" rather than the area/needs-help scopes.
+  const [kindTab, setKindTab] = useState<CaseRow["kind"]>("rescue");
 
   const teammateName = useMemo(
     () => Object.fromEntries(teammates.map((t) => [t.id, t.full_name || "A teammate"])),
@@ -193,8 +208,18 @@ export default function CaseList({
     if (error) setCases(previous);
   }
 
-  const areaCases = cases.filter((c) => c.centre_id !== null);
-  const unassignedCases = cases.filter((c) => c.centre_id === null);
+  // Everything downstream (scopes, stats, filters, export) operates on the
+  // currently selected queue: rescues or deceased reports.
+  const kindCases = cases.filter((c) => (c.kind ?? "rescue") === kindTab);
+  const kindCounts = useMemo(() => {
+    let rescue = 0;
+    let deceased = 0;
+    for (const c of cases) (c.kind ?? "rescue") === "deceased" ? deceased++ : rescue++;
+    return { rescue, deceased };
+  }, [cases]);
+
+  const areaCases = kindCases.filter((c) => c.centre_id !== null);
+  const unassignedCases = kindCases.filter((c) => c.centre_id === null);
   // The clickable summary cards drive the scope; "open" and "needs-help" span
   // both area and unassigned cases.
   const baseCases =
@@ -203,24 +228,33 @@ export default function CaseList({
       : scope === "unassigned"
         ? unassignedCases
         : scope === "open"
-          ? cases.filter((c) => c.status !== "closed")
-          : cases.filter((c) => c.verdict === "help" && c.status !== "closed");
+          ? kindCases.filter((c) => c.status !== "closed")
+          : kindCases.filter((c) => c.verdict === "help" && c.status !== "closed");
 
   function selectScope(s: Scope) {
     setScope(s);
     setStatusFilter("all");
   }
 
+  // Deceased reports have no centre, so land them on "Open" (which spans both
+  // routed and unrouted) rather than the empty "In your area" scope.
+  function selectKind(k: CaseRow["kind"]) {
+    setKindTab(k);
+    setStatusFilter("all");
+    setScope(k === "deceased" ? "open" : "area");
+  }
+
   const stats = useMemo(() => {
     return {
-      total: cases.length,
-      open: cases.filter((c) => c.status !== "closed").length,
-      needsHelp: cases.filter(
+      total: kindCases.length,
+      open: kindCases.filter((c) => c.status !== "closed").length,
+      needsHelp: kindCases.filter(
         (c) => c.verdict === "help" && c.status !== "closed"
       ).length,
       unassigned: unassignedCases.length,
     };
-  }, [cases, unassignedCases.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cases, kindTab, unassignedCases.length]);
 
   const q = query.trim().toLowerCase();
   const fromMs = dateFrom ? new Date(dateFrom).getTime() : null;
@@ -260,7 +294,7 @@ export default function CaseList({
     exportScope: "all" | "view" | "week" | "month" | "year"
   ): CaseRow[] {
     if (exportScope === "view") return filtered;
-    if (exportScope === "all") return cases;
+    if (exportScope === "all") return kindCases;
     const now = new Date();
     let cutoff: Date;
     if (exportScope === "week") {
@@ -271,14 +305,14 @@ export default function CaseList({
     } else {
       cutoff = new Date(now.getFullYear(), 0, 1);
     }
-    return cases.filter((c) => new Date(c.created_at) >= cutoff);
+    return kindCases.filter((c) => new Date(c.created_at) >= cutoff);
   }
 
   // Cases reported within a custom date range (yyyy-mm-dd; either end may be "").
   function casesForRange(from: string, to: string): CaseRow[] {
     const start = from ? new Date(`${from}T00:00:00`) : null;
     const end = to ? new Date(`${to}T23:59:59.999`) : null;
-    return cases.filter((c) => {
+    return kindCases.filter((c) => {
       const d = new Date(c.created_at);
       if (start && d < start) return false;
       if (end && d > end) return false;
@@ -377,7 +411,7 @@ export default function CaseList({
   doExportRef.current = doExport;
   const casesForRangeRef = useRef(casesForRange);
   casesForRangeRef.current = casesForRange;
-  const exportCountAll = cases.length;
+  const exportCountAll = kindCases.length;
   const exportCountView = filtered.length;
   const exportCountWeek = casesForScope("week").length;
   const exportCountMonth = casesForScope("month").length;
@@ -538,6 +572,34 @@ export default function CaseList({
 
       {/* Search, filters, and the cases */}
       <div className="area-list flex min-w-0 flex-col gap-5">
+      {/* Rescue vs deceased (surveillance) queue. */}
+      <div className="flex h-10 overflow-hidden rounded-xl border border-stone-200 self-start">
+        {(
+          [
+            ["rescue", "Rescues", kindCounts.rescue],
+            ["deceased", "Deceased", kindCounts.deceased],
+          ] as const
+        ).map(([k, label, n]) => (
+          <button
+            key={k}
+            onClick={() => selectKind(k)}
+            className={`flex items-center justify-center gap-1.5 px-4 text-sm font-medium transition-colors ${
+              kindTab === k
+                ? "bg-forest-900 text-white"
+                : "bg-white text-stone-600 hover:bg-stone-50"
+            }`}
+          >
+            {label}
+            <span
+              className={`text-xs tabular-nums ${
+                kindTab === k ? "text-white/70" : "text-stone-400"
+              }`}
+            >
+              {n}
+            </span>
+          </button>
+        ))}
+      </div>
       {/* Toolbar: search + view toggle + one "Options" menu holding the
           secondary controls (sort, date range, assignment, export) so the row
           stays calm, especially on mobile. */}
@@ -799,11 +861,13 @@ export default function CaseList({
             const isMine = c.centre_id === myCentreId;
             const otherCentre =
               c.centre_id && !isMine ? centreNames[c.centre_id] : null;
+            const flags = c.kind === "deceased" ? c.surveillance ?? [] : [];
             const hasMeta =
               c.centre_id === null ||
               !!otherCentre ||
               !!c.duplicate_of ||
-              !!c.assigned_to;
+              !!c.assigned_to ||
+              flags.length > 0;
             return (
               <li
                 key={c.id}
@@ -837,7 +901,15 @@ export default function CaseList({
                     </p>
                     {hasMeta && (
                       <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                        {c.centre_id === null && (
+                        {flags.map((f) => (
+                          <span
+                            key={f}
+                            className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800"
+                          >
+                            {SURVEILLANCE_LABEL[f] ?? f}
+                          </span>
+                        ))}
+                        {c.kind !== "deceased" && c.centre_id === null && (
                           <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-700">
                             unassigned
                           </span>
