@@ -33,7 +33,10 @@ export async function POST(req: Request) {
   }
 
   const { userId, role } = body;
-  if (!userId || (role !== "staff" && role !== "volunteer")) {
+  if (
+    !userId ||
+    (role !== "staff" && role !== "volunteer" && role !== "surveillance")
+  ) {
     return Response.json({ error: "Invalid role" }, { status: 400 });
   }
 

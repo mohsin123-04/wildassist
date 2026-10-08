@@ -12,7 +12,7 @@ import NotificationBell from "@/components/NotificationBell";
 const DARK_HERO_ROUTES = new Set(["/"]);
 const CENTRE_ROLES = ["staff", "manager", "admin"];
 // Data-dense app pages get a wider shell so they don't float in dead margins.
-const WIDE_ROUTES = ["/dashboard", "/analytics"];
+const WIDE_ROUTES = ["/dashboard", "/analytics", "/surveillance"];
 
 export default function SiteHeader({
   initialUser = null,

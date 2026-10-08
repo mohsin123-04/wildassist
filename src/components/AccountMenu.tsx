@@ -273,11 +273,11 @@ export default function AccountMenu({
             </div>
           </div>
           <Link
-            href="/dashboard"
+            href={role === "volunteer" ? "/transport" : role === "surveillance" ? "/surveillance" : "/dashboard"}
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-sm text-stone-700 transition-colors hover:bg-stone-50"
           >
-            Dashboard
+            {role === "surveillance" ? "Surveillance" : "Dashboard"}
           </Link>
           {centreName && (
             <Link

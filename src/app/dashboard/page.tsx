@@ -29,8 +29,9 @@ export default async function DashboardPage() {
   const isAdmin = profile?.role === "admin";
   const isManager = profile?.role === "manager";
 
-  // Volunteers have their own transport view.
+  // Volunteers and surveillance officers have their own views.
   if (profile?.role === "volunteer") redirect("/transport");
+  if (profile?.role === "surveillance") redirect("/surveillance");
 
   // Non-admin staff who haven't linked a centre yet: show onboarding.
   if (!profile?.centre_id && !isAdmin) {

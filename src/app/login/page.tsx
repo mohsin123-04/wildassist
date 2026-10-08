@@ -6,10 +6,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { flash } from "@/lib/flash";
 import Spinner from "@/components/Spinner";
-import { Bird, Building2, Car, type LucideIcon } from "lucide-react";
+import { Bird, Building2, Car, Microscope, type LucideIcon } from "lucide-react";
 
 type Mode = "signin" | "signup";
-type Role = "staff" | "volunteer";
+type Role = "staff" | "volunteer" | "surveillance";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-stone-200 bg-white px-4 outline-none transition-colors focus:border-stone-400 focus:ring-4 focus:ring-stone-900/5";
@@ -26,6 +26,12 @@ const ROLES: { value: Role; Icon: LucideIcon; title: string; desc: string }[] = 
     Icon: Car,
     title: "Rescue volunteer",
     desc: "Help transport injured animals from where they're found to a centre.",
+  },
+  {
+    value: "surveillance",
+    Icon: Microscope,
+    title: "Wildlife health officer",
+    desc: "Monitor deceased animal reports for disease flags, die-off events, and public health tracking.",
   },
 ];
 
@@ -44,12 +50,14 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  // Landing "become a volunteer" link opens signup with the volunteer role.
   useEffect(() => {
     const p = new URLSearchParams(window.location.search).get("signup");
     if (p === "volunteer") {
       setMode("signup");
       setRole("volunteer");
+    } else if (p === "surveillance") {
+      setMode("signup");
+      setRole("surveillance");
     }
   }, []);
 
@@ -132,7 +140,7 @@ export default function LoginPage() {
         <p className="mt-2 text-sm leading-6 text-stone-600">
           WildAssist accounts are for{" "}
           <span className="font-medium text-stone-800">
-            wildlife centre staff and rescue volunteers
+            wildlife centre staff, rescue volunteers, and wildlife health officers
           </span>
           . Found an animal?{" "}
           <Link
