@@ -30,8 +30,8 @@ export default function Home() {
               Wildlife help · US &amp; Canada
             </p>
             <h1 className="mt-5 max-w-2xl font-display text-[2.7rem] font-medium leading-[1.02] text-cream sm:text-6xl">
-              Found an injured or orphaned{" "}
-              <em className="font-normal italic text-amber-300">wild animal?</em>
+              Found an injured, orphaned, or{" "}
+              <em className="font-normal italic text-amber-300">dead wild animal?</em>
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-8 text-cream/75">
               Take a breath. Answer a few quick questions and WildAssist tells

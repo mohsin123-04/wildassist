@@ -50,6 +50,9 @@ body {
   font-family: var(--font-display);
   letter-spacing: -0.011em;
   font-optical-sizing: auto;
+  /* Fraunces enables swash alternates and discretionary ligatures by default,
+     which makes f and j look decorative/odd at display sizes. Turn them off. */
+  font-feature-settings: "dlig" 0, "swsh" 0;
 }
 
 @keyframes fadeInUp {
