@@ -78,6 +78,27 @@ export const GUIDANCE: GuidanceEntry[] = [
 
   // ---- Situation-scoped ----
   {
+    id: "looks-fine-worried",
+    animals: [],
+    situations: ["looks-fine-worried"],
+    text: "Many wild animals that look healthy and are found in yards or parks do not need rescuing at all. A fledgling bird hopping on the ground with its parents nearby is completely normal; this is a natural stage and the parents are usually close. A fawn lying still and quiet is almost certainly not abandoned; the mother leaves it hidden while she feeds and returns to nurse. A rabbit nest in the grass is rarely abandoned even if the mother is never seen. A groundhog, chipmunk, or fox kit exploring near its burrow is normal. The most helpful thing is often to watch from a distance for an hour or two before doing anything. Intervene only if the animal is clearly injured, cold, covered in insects, or the parents are confirmed dead.",
+    source: "Toronto Wildlife Centre / Ontario SPCA / general wildlife guidance (compiled 2026-10).",
+  },
+  {
+    id: "baby-alone-birds",
+    animals: ["bird"],
+    situations: ["baby-alone"],
+    text: "When you find a baby bird alone, the most important step is deciding which stage it is at. A NESTLING has few or no feathers and cannot perch or grip; it must be returned to its nest. Look for the nest within a few metres (in a tree, shrub, or eave) and gently place it back. The parents will not reject it because you touched it. A FLEDGLING is fully or mostly feathered, can hop and grip, and may flutter short distances; hopping on the ground with adults nearby is a normal developmental stage and the parents are usually watching from nearby branches. Leave fledglings alone unless they are in direct danger (a cat, dog, or road). A bird that is cold, lethargic, has closed eyes, or has visible injuries is different and needs a rehabilitator right away.",
+    source: "Toronto Wildlife Centre / Cornell Lab of Ornithology (compiled 2026-10).",
+  },
+  {
+    id: "baby-alone-mammals",
+    animals: ["mammal"],
+    situations: ["baby-alone"],
+    text: "Most baby mammals found alone are not true orphans. Squirrel mothers retrieve fallen young during daylight, usually within a few hours. Fawns are left hidden by the doe, who returns to nurse. Rabbit mothers visit the nest only at dawn and dusk. Baby raccoons can be retrieved overnight. Before assuming abandonment, wait the appropriate time for the species (a few hours for squirrels, up to 24 hours for fawns and rabbits). Keep pets and children away so the mother is not deterred. Only intervene if the baby is clearly injured, cold, has flies on it, or the mother is confirmed dead.",
+    source: "Toronto Wildlife Centre / Ontario SPCA (compiled 2026-10).",
+  },
+  {
     id: "clear-trauma",
     animals: [],
     situations: ["bleeding", "hit-by-vehicle", "cant-move"],
@@ -142,6 +163,41 @@ export const GUIDANCE: GuidanceEntry[] = [
     text: "Do not handle hawks, owls, falcons, or eagles; their talons and beaks can cause serious injury, and they need experienced handling. If a bird of prey is grounded or injured, keep people and pets away, and if it is safe you can drape a towel or box over it to keep it calm while you call a rehabilitator. Note the exact location and contact a licensed rehabilitator right away.",
     source: "Wildlife-rehabilitation guidance (verified 2026-09).",
   },
+  {
+    id: "heron",
+    animals: ["bird"],
+    situations: [],
+    text: "Great blue herons and other herons are extremely dangerous to approach. Their long, sharp bill strikes at eye level and can cause serious injury. Do not approach, grab, or reach toward the head at any time. If a heron is grounded and injured, keep people and pets well back, do not corner it, and call a wildlife rehabilitator or raptor / large-bird specialist immediately. If you must contain it while waiting, use a large cardboard box or blanket to drape over it from behind, and wear eye protection. Treat it as you would a raptor.",
+    source: "Toronto Wildlife Centre / wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
+  {
+    id: "oil-covered-bird",
+    animals: ["bird"],
+    situations: [],
+    text: "If a bird is covered or coated in oil, motor fluid, or another oily substance, do not attempt to clean it yourself. Cleaning it incorrectly removes the waterproofing and natural oils it needs to survive, and the solvents or soap can be toxic. Contain the bird gently without rubbing its feathers, keep it warm, do not let it preen or drink contaminated water, and get it to a wildlife rehabilitator or bird-oiling response team as fast as possible. Oil ingestion from preening is life-threatening, so time is critical.",
+    source: "International Bird Rescue / wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
+  {
+    id: "swift",
+    animals: ["bird"],
+    situations: [],
+    text: "Chimney swifts and other swifts have very short legs and cannot take off from a flat surface. A swift found on the ground is not necessarily badly injured; it may have fallen and simply cannot launch. If the bird appears alert and uninjured, hold it gently in both hands and raise your arms to release it with a gentle upward toss so it can get airborne. Release it in an open area away from trees and buildings. If it fails to fly, is injured, or is visibly unwell, contain it and contact a rehabilitator.",
+    source: "Wildlife-rehabilitation guidance / Toronto Wildlife Centre (compiled 2026-10).",
+  },
+  {
+    id: "loon-grebe",
+    animals: ["bird"],
+    situations: [],
+    text: "Loons and grebes are diving birds built for water and cannot walk on land. If one is found on a road, parking lot, or lawn, it likely landed there by mistake (mistaking wet pavement for water) and cannot take off from flat ground. Do not try to put it back in the air from land. The bird needs to be placed in a body of water large enough to take off from; loons and larger grebes need a long stretch of water to run on the surface before lifting off. Carry the bird gently in a towel, supporting the body and keeping the bill pointing away from your face, and place it at the edge of open water. If it cannot swim or is injured, contact a rehabilitator.",
+    source: "Wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
+  {
+    id: "hummingbird",
+    animals: ["bird"],
+    situations: [],
+    text: "Hummingbirds have an extremely high metabolism and can die of hypoglycemia within hours if they cannot feed. This is one of the rare cases where offering a simple sugar solution may be appropriate if a rehabilitator cannot be reached quickly. You can offer plain white sugar dissolved in water (1 part sugar to 4 parts water, no dye, no honey, no artificial sweetener) in a small shallow lid. Place the bird near it and let it feed on its own if able. Do not force it to drink. Get it to a rehabilitator as soon as possible regardless. A stunned hummingbird that hit a window should be kept warm and dark in a small container; if alert within 30 minutes, release it outside; if it stays limp or does not improve, it needs expert care.",
+    source: "Hummingbird Society / wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
 
   // ---- Mammals ----
   {
@@ -199,6 +255,27 @@ export const GUIDANCE: GuidanceEntry[] = [
     situations: [],
     text: "Never handle a fox or coyote; keep people and pets well back and call a wildlife rehabilitator or animal control. An animal with severe hair loss and crusty skin likely has mange, which rehabilitators can treat. A pup alone is not necessarily orphaned, as parents leave young while hunting. Report injured or clearly sick animals rather than approaching them.",
     source: "Wildlife-rehabilitation guidance (verified 2026-09).",
+  },
+  {
+    id: "adult-deer",
+    animals: ["mammal"],
+    situations: [],
+    text: "An adult deer that is injured (especially one hit by a car) is dangerous to approach. A deer in pain can kick with enough force to break bones. Do not try to restrain, move, or help an injured adult deer yourself. Call your local animal control, municipal police non-emergency line, or a licensed wildlife rehabilitator. In most jurisdictions, a severely injured deer on a road may be humanely euthanized by animal control or the authorities. Keep people and pets far away from it.",
+    source: "Ontario SPCA / wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
+  {
+    id: "porcupine",
+    animals: ["mammal"],
+    situations: [],
+    text: "Do not touch a porcupine. The quills have barbed tips that work deeper into tissue and are very difficult to remove. The porcupine does not throw quills, but the lightest contact drives them in. If you or a pet is quilled, do not pull quills out yourself; see a doctor or vet as soon as possible. An injured porcupine should be contained by nudging it gently into a large box using a broom handle or thick gloves, keeping your hands and face away from its back end. Contact a wildlife rehabilitator.",
+    source: "Wildlife-rehabilitation guidance (compiled 2026-10).",
+  },
+  {
+    id: "beaver",
+    animals: ["mammal"],
+    situations: [],
+    text: "Beavers have extremely powerful jaws and large incisor teeth capable of cutting through wood; a bite can cause serious injury. Do not attempt to handle a beaver. Keep children and pets well away. A beaver found far from water may be disoriented or ill. Report an injured or stranded beaver to a wildlife rehabilitator or animal control and wait for expert help.",
+    source: "Wildlife-rehabilitation guidance (compiled 2026-10).",
   },
 
   // ---- Reptiles & amphibians ----
