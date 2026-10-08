@@ -14,7 +14,9 @@ import AnimalIcon from "@/components/AnimalIcon";
 import { Camera, Images, MapPin, ChevronRight, HeartPulse, Leaf } from "lucide-react";
 import { flash } from "@/lib/flash";
 import { detectDanger, type DangerInfo } from "@/lib/safety";
-import { assessDeceased, type DeceasedAssessment } from "@/lib/surveillance";
+import { assessDeceased } from "@/lib/surveillance";
+import type { SurveillanceResult } from "@/app/api/surveillance/route";
+type DeceasedAssessment = SurveillanceResult;
 import {
   ANIMAL_OPTIONS,
   SITUATIONS,
@@ -206,6 +208,19 @@ export default function TriagePage() {
     );
   }
 
+  function deceasedFallback(animal: AnimalType, desc: string): DeceasedAssessment {
+    const det = assessDeceased(animal, desc);
+    return {
+      title: "",
+      summary: "",
+      whoHandlesRemoval:
+        "For a dead animal on a public road or sidewalk, call your local municipality (usually 311). On private property, contact a licensed wildlife removal company. If this involves a disease concern, contact your regional wildlife-health authority.",
+      risks: det.risks.map((r) => ({ label: r.label, why: r.why, action: r.action })),
+      handling: det.handling,
+      source: "rules" as const,
+    };
+  }
+
   async function submit() {
     if (!animalOption) return;
     if (mode === "rescue" && !situation) return;
@@ -235,12 +250,26 @@ export default function TriagePage() {
     // The assessment is deterministic (lib/surveillance.ts); we just log it with
     // its health flags and location.
     if (mode === "deceased") {
-      const assess = assessDeceased(category, fullDescription);
+      // Try the LLM-grounded surveillance API first; fall back to deterministic.
+      let assess: DeceasedAssessment;
+      try {
+        const res = await fetch("/api/surveillance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ animal: category, description: fullDescription }),
+        });
+        const data = res.ok ? await res.json() : null;
+        assess = data?.title ? data : deceasedFallback(category, fullDescription);
+      } catch {
+        assess = deceasedFallback(category, fullDescription);
+      }
       setAssessment(assess);
-      const title =
-        animalOption.value === "unsure"
+      // Deterministic codes for the DB (independent of LLM display result).
+      const detFlags = assessDeceased(category, fullDescription).risks.map((r) => r.code);
+      const caseTitle = assess.title ||
+        (animalOption.value === "unsure"
           ? "Deceased animal"
-          : `Deceased ${animalOption.label.toLowerCase()}`;
+          : `Deceased ${animalOption.label.toLowerCase()}`);
       try {
         const r = await fetch("/api/cases", {
           method: "POST",
@@ -251,12 +280,12 @@ export default function TriagePage() {
             situation: "found-dead",
             description: fullDescription,
             verdict: "deceased",
-            title,
+            title: caseTitle,
             lat: coords?.lat,
             lng: coords?.lng,
             photoUrl,
             kind: "deceased",
-            surveillance: assess.risks.map((r) => r.code),
+            surveillance: detFlags,
           }),
         });
         const d = r.ok ? await r.json() : null;
@@ -1019,7 +1048,7 @@ function DeceasedResultView({
   coords: { lat: number; lng: number } | null;
   onRestart: () => void;
 }) {
-  const { risks, handling, reporting } = assessment;
+  const { title, summary, whoHandlesRemoval, risks, handling } = assessment;
 
   function copyTrackLink() {
     if (!trackToken) return;
@@ -1038,25 +1067,39 @@ function DeceasedResultView({
           className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
         >
           <span className="font-semibold">Your report didn&apos;t save.</span>{" "}
-          The safety guidance below still applies. Please follow it when handling
-          or reporting the animal.
+          The guidance below still applies. Please follow it when handling or
+          reporting the animal.
         </div>
       )}
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay-600">
           Report received
+          {coords && (
+            <span className="ml-2 font-normal normal-case tracking-normal text-stone-400">
+              · location logged
+            </span>
+          )}
         </p>
         <h1 className="mt-3 font-display text-2xl font-semibold tracking-tight text-stone-900">
-          Thank you for reporting this
+          {title || `Dead ${animalLabel.toLowerCase()} reported`}
         </h1>
         <p className="mt-2 leading-7 text-stone-700">
-          You logged a deceased {animalLabel.toLowerCase()}
-          {coords ? " with its location" : ""}. Reports like this help
-          wildlife-health teams catch disease and pollution early. Here&apos;s
-          how to stay safe around it and what happens next.
+          {summary ||
+            "Your report has been logged. Here is what to do to stay safe and make sure it is handled correctly."}
         </p>
       </div>
+
+      {whoHandlesRemoval && (
+        <div>
+          <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
+            Who handles this
+          </h2>
+          <div className="rounded-xl border-l-2 border-forest-900/30 bg-stone-50 p-4 text-sm leading-7 text-stone-700">
+            {whoHandlesRemoval}
+          </div>
+        </div>
+      )}
 
       {risks.length > 0 && (
         <div>
@@ -1064,9 +1107,9 @@ function DeceasedResultView({
             Health &amp; safety flags
           </h2>
           <div className="flex flex-col gap-3">
-            {risks.map((r) => (
+            {risks.map((r, i) => (
               <div
-                key={r.code}
+                key={i}
                 className="rounded-xl border-l-2 border-amber-400 bg-amber-50/60 p-4"
               >
                 <p className="font-semibold text-amber-900">{r.label}</p>
@@ -1082,7 +1125,7 @@ function DeceasedResultView({
 
       <div>
         <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
-          Handling it safely
+          Stay safe around it
         </h2>
         <ul className="flex flex-col gap-2">
           {handling.map((h, i) => (
@@ -1090,31 +1133,10 @@ function DeceasedResultView({
               key={i}
               className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
             >
-              <span
-                aria-hidden
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-forest-900"
-              />
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-forest-900 text-xs font-semibold text-white">
+                {i + 1}
+              </span>
               <span className="leading-6 text-stone-700">{h}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="mb-2.5 font-display text-lg font-semibold tracking-tight text-stone-900">
-          What happens next
-        </h2>
-        <ul className="flex flex-col gap-2">
-          {reporting.map((r, i) => (
-            <li
-              key={i}
-              className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
-            >
-              <span
-                aria-hidden
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-stone-400"
-              />
-              <span className="leading-6 text-stone-700">{r}</span>
             </li>
           ))}
         </ul>
