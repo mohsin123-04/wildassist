@@ -1,160 +1,84 @@
 # WildAssist
 
-Guided help for people who find injured or orphaned wildlife in Canada, and the operations tooling for the centres and volunteers who rescue them.
+Found an injured or orphaned wild animal and not sure what to do? WildAssist walks you through it and gets your report to a nearby wildlife rehabilitation centre. It's also the tool those centres and their volunteers use to handle the rescue.
+
+**Live:** https://wildassist.vercel.app
 
 [![CI](https://github.com/mohsin123-04/wildassist/actions/workflows/ci.yml/badge.svg)](https://github.com/mohsin123-04/wildassist/actions/workflows/ci.yml)
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20Realtime-3FCF8E?logo=supabase&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white)
 
-**Live demo:** https://wildassist.vercel.app
+<img src="public/screenshots/triage-phone.png" alt="Triage flow on a phone" width="300">
 
----
+## Why
 
-## What it is
+When people find a hurt animal they usually guess, call around, or get it wrong. A lot of "orphaned" babies aren't orphaned, and a cat-caught bird has hours, not days. The centres that could help are mostly running on phone calls and spreadsheets. WildAssist sits in between: the public gets quick, sourced advice and their report lands at the right centre, where staff and volunteers pick it up.
 
-Most people who find a hurt animal do not know what to do. They call around, get bad advice, or accidentally do harm (a lot of "orphaned" babies are not orphaned, and cat-caught birds need treatment within hours). Wildlife rehabilitation centres, meanwhile, are underfunded and run on phone calls and spreadsheets.
+You don't need an account to get help. Everything else is behind roles. The whole thing runs on free tiers.
 
-WildAssist connects those two sides. A member of the public answers a few questions, gets clear and sourced guidance, and their report is routed to the nearest centre that can help. Staff at that centre see it arrive on a dashboard, volunteers can claim the transport, and everyone stays coordinated. The public side needs no account. The staff, manager, admin, and volunteer sides sit behind role-based access.
+## What it does
 
-It runs entirely on free tiers.
+**Public (no login)**
+- Guided triage: pick the animal, say what's going on, get a straight answer: leave it, keep an eye on it, or it needs help.
+- Optional photo ID that runs a vision model in your browser. Nothing gets uploaded.
+- Firm "do not touch" warnings for the dangerous ones (bats, raptors, snakes, raccoons, and so on). These come from a fixed rule list, not the AI.
+- Shares your location to route the report to the closest centre that can take it.
+- Found a dead animal instead? A separate flow gives you carcass-handling do's and don'ts and flags public-health risks (bird flu, rabies, chronic wasting disease, mass die-offs), then tells you who's responsible for removing it. Like the safety warnings, the flags come from a fixed rule set, with the LLM filling in the specifics.
 
-## Features
+**Centres and volunteers (login + role)**
+- A dashboard of incoming cases scoped to the centre's area, updating live, with search, filters, a map, and CSV export.
+- Case detail: the photo, the finder's description, a location link, their contact, staff notes, and a status workflow.
+- A volunteer transport feed sorted by distance. Claim a job, deliver it, release it. Volunteers are approved first and can't see the finder's contact until they claim.
+- Per-centre messaging: a main channel, direct messages, and group chats, all realtime.
+- Admins onboard a centre by typing its address (it geocodes itself) and approve volunteers.
 
-**For the public (no login)**
-- A guided triage flow: choose the animal, describe the situation, add detail.
-- Optional photo identification that runs a vision model in the browser (nothing is uploaded, no cost).
-- AI guidance from an LLM grounded in vetted rehabilitation advice, returning one of three clear outcomes: leave it be, check first, or needs help.
-- A deterministic safety layer that shows firm "do not handle" warnings for snakes, bats, raptors, raccoons, and other risky animals, independent of the AI, plus a browser alert.
-- Location capture that auto-routes the report to the nearest suitable centre, followed by a clear confirmation.
+## Stack
 
-**For centre staff and managers**
-- A dashboard of incoming cases, scoped to the centre's area with an unassigned safety net so nothing falls through.
-- Search, sort, status filters, a map view, and CSV export.
-- Case detail with the photo, reporter's description, a location link, reporter contact, staff notes, and a status workflow.
-- Live notifications when new cases arrive.
-- Team roster with role badges, plus a join-code and team-management panel for managers.
-
-**For rescue volunteers**
-- A transport feed of nearby animals that need a lift, sorted by distance.
-- Claim, deliver, and release actions. The destination centre sees who is transporting.
-- Vetting: volunteers are approved by an admin or manager before they see any jobs, the feed is area-scoped, and a finder's contact stays hidden until a job is claimed.
-
-**For admins**
-- Onboard a centre by typing its address (geocoded automatically) and naming its first manager.
-- Approve volunteers and view every case across the country.
-
-**Team messaging**
-- A per-centre main channel, one-to-one direct messages, and named group chats, all in real time with unread badges.
-
-## Screenshots
-
-> Add images to `docs/screenshots/` and they will render here.
-
-| Triage flow | Care guidance |
-| --- | --- |
-| ![Triage](docs/screenshots/triage.png) | ![Guidance](docs/screenshots/guidance.png) |
-
-| Centre dashboard | Messaging |
-| --- | --- |
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Messages](docs/screenshots/messages.png) |
-
-## How it works
-
-```
-Finder                     Server / Supabase                 Centre + Volunteers
-  |                              |                                   |
-  |-- photo + situation ------->|  in-browser vision (hint)          |
-  |                              |  LLM triage (grounded in guidance)|
-  |<-- advice + safety warnings-|                                   |
-  |-- location ---------------->|  nearest-centre routing (haversine)|
-  |                              |  case saved (Postgres, RLS)       |
-  |<-- "sent to Centre X" ------|-------- realtime ---------------->| staff see the case
-                                 |                                   | volunteer claims transport
-```
-
-The public never touches the database directly. Reads and writes go through server route handlers, and every table is protected by Row-Level Security so a user only ever sees what their role allows (a volunteer cannot read a finder's phone number, one centre cannot read another's cases, and so on).
-
-## Tech stack
-
-- **Frontend:** Next.js 16 (App Router), React, TypeScript, Tailwind CSS.
-- **Backend:** Next.js route handlers running as serverless functions on Vercel.
-- **Data and auth:** Supabase (Postgres, Auth, Storage, Realtime) with Row-Level Security throughout.
-- **AI:** Groq (`openai/gpt-oss-120b`) for triage, grounded in a curated guidance set. In-browser image classification via `@huggingface/transformers`.
-- **Maps and geocoding:** Leaflet with OpenStreetMap tiles, and Nominatim for turning centre addresses into coordinates.
-- **Hosting:** Vercel.
+- Next.js 16 (App Router), React, TypeScript, Tailwind
+- Supabase for Postgres, Auth, Storage, and Realtime, with Row-Level Security on every table
+- Groq (`gpt-oss-120b`) for triage, grounded in a vetted guidance set; in-browser image classification with `@huggingface/transformers`
+- Leaflet + OpenStreetMap, with Nominatim for geocoding
+- Vercel for hosting, Vitest for tests, GitHub Actions for CI
 
 ## Running it locally
 
-**Prerequisites:** Node 20+, a free Supabase project, and a free Groq API key.
+You'll need Node 20+, a Supabase project, and a Groq key. Both are free.
 
 ```bash
 git clone https://github.com/mohsin123-04/wildassist.git
 cd wildassist
 npm install
-cp .env.local.example .env.local   # then fill in the values below
+cp .env.local.example .env.local   # fill in the keys below
 npm run dev
 ```
 
-Set these in `.env.local`:
-
 ```
-GROQ_API_KEY=              # from console.groq.com
-NEXT_PUBLIC_SUPABASE_URL=  # Supabase project settings > API
+GROQ_API_KEY=                 # console.groq.com
+NEXT_PUBLIC_SUPABASE_URL=     # Supabase settings > API
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY= # keep server-side only
+SUPABASE_SERVICE_ROLE_KEY=    # server-side only
 ```
 
-**Database:** open the Supabase SQL editor and run the files in `supabase/`, starting with `schema.sql` and `seed.sql`, then the feature migrations (profile fields, area visibility, roles, messaging, rate limiting, and so on). Create two public Storage buckets, `avatars` and `case-photos`.
+For the database, run the SQL in `supabase/` from the Supabase SQL editor, starting with `schema.sql` and `seed.sql` and then the migrations. Create two public Storage buckets, `avatars` and `case-photos`.
 
-The app runs without the AI key (it falls back to a built-in rule engine) and without the database (the public flow still works), which makes local development forgiving.
-
-## Tests and CI
+It starts fine without the Groq key (it falls back to a rule engine) and without the database (the public flow still works), so you can poke at it before wiring everything up.
 
 ```bash
-npm test          # run the unit suite once
-npm run test:watch
+npm test     # Vitest
 ```
 
-Vitest covers the core logic: triage verdicts, danger detection, centre ranking and distance, vision label mapping, duplicate detection, email, and API-route validation (auth, rate limits, the signup privilege guard). GitHub Actions runs the tests and a production build on every push and pull request (see the CI badge above).
+The tests cover the logic that actually matters: triage verdicts, danger detection, centre ranking and distance, duplicate detection, email, and the API-route guards (auth, rate limits, the signup privilege check). CI runs them plus a production build on every push.
 
-## Project structure
-
-```
-src/
-  app/
-    page.tsx            landing
-    triage/             the public guided flow
-    emergency/          quick reference
-    dashboard/          staff, manager, and admin views + panels
-    transport/          volunteer job feed
-    messages/           channel, DMs, and group chats
-    login/  profile/
-    api/                route handlers (triage, cases, conversations, admin, ...)
-  components/           shared UI (Avatar, SafetyBanner, AnimalIcon, ...)
-  lib/
-    triage.ts           types + rule-engine fallback
-    guidance.ts         vetted guidance knowledge base
-    safety.ts           deterministic danger registry
-    centres.ts          centre data + distance ranking
-    vision.ts           label to category mapping
-    ratelimit.ts        Postgres-backed limiter
-    supabase/           browser, server, and admin clients
-supabase/               SQL schema, seed data, and migrations
-```
-
-## Roles and access
+## Roles
 
 | Role | How they join | What they get |
 | --- | --- | --- |
 | Public | No account | Triage and guidance |
-| Volunteer | Sign up, then approved | Area-scoped transport jobs |
+| Volunteer | Sign up, then get approved | Area-scoped transport jobs |
 | Staff | Sign up with a centre join code | Their centre's cases |
-| Manager | Designated when the centre is onboarded | Staff view plus join code, team, and volunteer approval |
-| Admin | Set by the operator | All cases, centre onboarding, oversight |
+| Manager | Set when the centre is onboarded | Staff view, plus join code, team, and volunteer approvals |
+| Health officer | Sign up as a wildlife health officer | A surveillance board of deceased-animal reports across the US and Canada, with the disease flags |
+| Admin | Set by the operator | Every case, centre onboarding, oversight |
 
-**Demo accounts** (shared demo, please be gentle): password `wildlife2026`.
+Demo accounts (shared, so please be gentle), password `wildlife2026`:
 
 | Email | Role |
 | --- | --- |
@@ -165,25 +89,12 @@ supabase/               SQL schema, seed data, and migrations
 
 ## Security
 
-- Row-Level Security on every table, including geospatial rules (a staffer sees cases within range of their centre) and membership rules (you read only the conversations you belong to).
-- Secrets stay on the server. The service-role key is never exposed to the browser.
-- Volunteers are vetted, area-scoped, and cannot see a finder's contact details until they claim a job.
-- Centre access is gated by join codes, and managing a centre is gated by the manager role.
-- Public endpoints are rate limited per IP, backed by an atomic Postgres function, so nobody can drain the AI quota or flood storage.
+- Row-Level Security on every table, including distance rules (staff only see cases near their centre) and membership rules (you only see conversations you're in).
+- The service-role key stays on the server and is never shipped to the browser.
+- Public endpoints are rate-limited per IP by an atomic Postgres function, so nobody can drain the AI quota or flood storage.
 
-## Roadmap
+## A note
 
-- Public report tracking so a finder can follow their case status without an account.
-- An installable, offline-capable PWA for finders in the field with poor signal.
-- Localization (English and French) for a Canada-wide audience.
-- Photo sharing within team messaging.
+I built this to learn and to see whether the idea holds up. The guidance and centre contact details were checked in 2026 against sources like Toronto Wildlife Centre, Ontario SPCA, Audubon, and Tufts Wildlife Clinic, but seasonal details change. If you've actually found an animal in distress, call a licensed wildlife rehabilitator directly.
 
-Recently shipped: a unit and API test suite with CI, a case audit trail with a response-time metric, fuzzy duplicate-report detection, per-centre analytics, email notifications, an accessibility pass, and fact-checked guidance and centre data.
-
-## Status
-
-This is a working, deployed project built to explore the space and to learn. The guidance and centre contact details were fact-checked in 2026 against authoritative sources (Toronto Wildlife Centre, Ontario SPCA, Audubon, Tufts Wildlife Clinic, the Ontario Turtle Conservation Centre, and others), but seasonal details change, so always confirm by phone. If you have found an animal in distress, contact a licensed wildlife rehabilitator directly.
-
-## License
-
-MIT.
+MIT licensed.
