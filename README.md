@@ -22,12 +22,14 @@ You don't need an account to get help. Everything else is behind roles. The whol
 - Firm "do not touch" warnings for the dangerous ones (bats, raptors, snakes, raccoons, and so on). These come from a fixed rule list, not the AI.
 - Shares your location to route the report to the closest centre that can take it.
 - Found a dead animal instead? A separate flow gives you carcass-handling do's and don'ts and flags public-health risks (bird flu, rabies, chronic wasting disease, mass die-offs), then tells you who's responsible for removing it. Like the safety warnings, the flags come from a fixed rule set, with the LLM filling in the specifics.
+- After you send a report you get a private tracking link (still no account) that shows its status live as it moves from reported, to on the way, to in care, to resolved.
 
 **Centres and volunteers (login + role)**
 - A dashboard of incoming cases scoped to the centre's area, updating live, with search, filters, a map, and CSV export.
 - Case detail: the photo, the finder's description, a location link, their contact, staff notes, and a status workflow.
 - A volunteer transport feed sorted by distance. Claim a job, deliver it, release it. Volunteers are approved first and can't see the finder's contact until they claim.
 - Per-centre messaging: a main channel, direct messages, and group chats, all realtime.
+- Analytics for managers and admins: open-queue and response-time metrics over a date range, built from each case's status history (admins can break it down by centre).
 - Admins onboard a centre by typing its address (it geocodes itself) and approve volunteers.
 
 ## Stack
